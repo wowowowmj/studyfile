@@ -1,0 +1,1324 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>스터디 자료 준비 현황 대시보드</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: #fdf6ed;
+      color: #1e293b;
+      min-height: 100vh;
+    }
+
+    /* ── 헤더 ── */
+    header {
+      background: linear-gradient(135deg, #7c2d12 0%, #b45309 100%);
+      color: #fff;
+      padding: 28px 40px 24px;
+      box-shadow: 0 4px 16px rgba(30,58,138,.25);
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.5px; margin-bottom: 4px; }
+    header p.subtitle { font-size: .85rem; opacity: .75; margin-bottom: 20px; }
+
+    .overall-bar-wrap { display: flex; align-items: center; gap: 14px; }
+    .overall-bar-wrap label { font-size: .8rem; opacity: .85; white-space: nowrap; }
+    .overall-bar-track {
+      flex: 1; height: 10px;
+      background: rgba(255,255,255,.25);
+      border-radius: 99px; overflow: hidden;
+    }
+    .overall-bar-fill {
+      height: 100%; background: #fbbf24;
+      border-radius: 99px; transition: width .5s ease;
+    }
+    .overall-pct { font-size: .85rem; font-weight: 700; min-width: 38px; text-align: right; }
+
+    /* ── 메인 ── */
+    main { max-width: 1140px; margin: 0 auto; padding: 36px 24px 60px; }
+
+    /* ── 학년 섹션 ── */
+    .grade-section { margin-bottom: 52px; }
+
+    .grade-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 18px;
+    }
+    .grade-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--grade-color, #c4a47c);
+      color: #fff; font-size: .85rem; font-weight: 700; flex-shrink: 0;
+    }
+    .grade-header h2 { font-size: 1.18rem; font-weight: 700; color: #1e293b; }
+    .grade-mini-bar {
+      flex: 1; height: 6px; background: #f0dcc0;
+      border-radius: 99px; overflow: hidden; max-width: 200px;
+    }
+    .grade-mini-fill {
+      height: 100%; background: var(--grade-color, #c4a47c);
+      border-radius: 99px; transition: width .4s ease;
+    }
+    .grade-mini-pct { font-size: .78rem; font-weight: 600; color: #64748b; min-width: 36px; }
+
+    /* ── 학기 그리드 (같은 학년 1학기·2학기 나란히) ── */
+    .semesters-grid {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 24px;
+      align-items: start;
+    }
+    .semester-block {
+      flex: 0 0 auto;
+    }
+    .semester-label {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .82rem; font-weight: 600; color: #64748b;
+      padding-bottom: 10px; margin-bottom: 14px;
+      border-bottom: 1.5px solid #f0dcc0;
+    }
+    .semester-label::before {
+      content: '';
+      display: inline-block; width: 3px; height: 14px;
+      background: var(--grade-color, #c4a47c); border-radius: 99px;
+    }
+    .semester-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .semester-cards .card {
+      width: 250px;
+      flex-shrink: 0;
+    }
+
+    /* ── 카드 ── */
+    .card {
+      background: #fff; border-radius: 16px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.07);
+      padding: 22px 22px 18px; transition: box-shadow .2s;
+    }
+    .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.12); }
+
+    .card-top { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
+
+    /* 원형 진행률 */
+    .circle-wrap { position: relative; flex-shrink: 0; width: 84px; height: 84px; }
+    .circle-wrap svg { transform: rotate(-90deg); width: 84px; height: 84px; }
+    .circle-bg  { fill: none; stroke: #fef0d8; stroke-width: 8; }
+    .circle-prog {
+      fill: none; stroke-width: 8; stroke-linecap: round;
+      transition: stroke-dashoffset .5s ease, stroke .4s ease;
+    }
+    .circle-pct-text {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      line-height: 1;
+    }
+    .circle-pct-text .num  { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
+    .circle-pct-text .unit { font-size: .6rem; color: #c4a47c; margin-top: 2px; }
+
+    .card-info { flex: 1; min-width: 0; }
+    .card-type-badge {
+      display: inline-block; font-size: .68rem; font-weight: 600;
+      padding: 2px 8px; border-radius: 99px; margin-bottom: 5px; color: #fff;
+    }
+    .card-title  { font-size: .95rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+    .card-count  { font-size: .78rem; color: #64748b; }
+    .card-count .done-num { font-weight: 700; color: #1e293b; }
+
+    /* ── 체크리스트 ── */
+    .checklist { display: flex; flex-direction: column; gap: 3px; }
+
+    .checklist-item {
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer; padding: 5px 8px; border-radius: 8px;
+      transition: background .15s; user-select: none;
+    }
+    .checklist-item:hover { background: #fff9f0; }
+    .checklist-item input[type="checkbox"] { display: none; }
+
+    .check-box {
+      width: 20px; height: 20px; border-radius: 6px;
+      border: 2px solid #e8c8a0; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .2s, border-color .2s;
+    }
+    .check-box svg {
+      width: 11px; height: 11px; fill: none;
+      stroke: #fff; stroke-width: 2.5;
+      stroke-linecap: round; stroke-linejoin: round;
+      opacity: 0; transition: opacity .15s;
+    }
+
+    /* 완료 상태 */
+    .checklist-item.checked .check-box {
+      background: var(--grade-color, #64748b);
+      border-color: var(--grade-color, #64748b);
+    }
+    .checklist-item.checked .check-box svg { opacity: 1; }
+    .check-label { font-size: .82rem; color: #475569; transition: color .2s; }
+    .checklist-item.checked .check-label {
+      text-decoration: line-through;
+      text-decoration-thickness: 1.5px;
+      color: #c4a47c;
+    }
+
+    /* 완료 배지 */
+    .complete-badge {
+      display: none; align-items: center; justify-content: center; gap: 5px;
+      margin-top: 12px; padding: 7px 0; border-radius: 8px;
+      background: #f0fdf4; color: #16a34a; font-size: .8rem; font-weight: 600;
+    }
+    .complete-badge svg { width: 14px; height: 14px; }
+    .card.all-done .complete-badge { display: flex; }
+
+    /* ─── 자료준비 로드맵 ─── */
+    #roadmap-section {
+      background: #fff;
+      border-bottom: 1px solid #f0dcc0;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04);
+    }
+    .roadmap-wrapper { max-width: 1200px; margin: 0 auto; padding: 24px 24px 28px; }
+    .roadmap-title {
+      font-size: .9rem; font-weight: 700; color: #1e293b;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+    }
+    .roadmap-body { display: flex; gap: 14px; align-items: stretch; }
+    .roadmap-left { flex: 1; min-width: 0; overflow-x: auto; }
+
+    /* 구간 띠 */
+    .roadmap-band {
+      display: flex; min-width: max-content;
+      border: 1.5px solid #f0dcc0; border-radius: 12px; overflow: visible;
+    }
+    .rm-seg {
+      flex: 1; min-width: 130px; padding: 20px 16px;
+      position: relative; border-right: 1px solid #f0dcc0;
+      cursor: default; transition: filter .15s;
+    }
+    .rm-seg:first-child { border-radius: 10px 0 0 10px; }
+    .rm-seg:last-child  { border-radius: 0 10px 10px 0; border-right: none; }
+    .rm-seg::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 4px; border-radius: 4px 4px 0 0;
+    }
+    .rm-seg.seg-green  { background: #f0fdf4; }
+    .rm-seg.seg-green::before  { background: #16a34a; }
+    .rm-seg.seg-yellow { background: #fefce8; }
+    .rm-seg.seg-yellow::before { background: #eab308; }
+    .rm-seg.seg-red    { background: #fff1f2; }
+    .rm-seg.seg-red::before    { background: #ef4444; }
+
+    .rm-seg-period { font-size: .68rem; font-weight: 700; margin-bottom: 5px; }
+    .rm-seg.seg-green  .rm-seg-period { color: #16a34a; }
+    .rm-seg.seg-yellow .rm-seg-period { color: #a16207; }
+    .rm-seg.seg-red    .rm-seg-period { color: #dc2626; }
+
+    .rm-seg-pct { font-size: 1.25rem; font-weight: 800; line-height: 1; margin-bottom: 7px; }
+    .rm-seg.seg-green  .rm-seg-pct { color: #16a34a; }
+    .rm-seg.seg-yellow .rm-seg-pct { color: #a16207; }
+    .rm-seg.seg-red    .rm-seg-pct { color: #dc2626; }
+
+    .rm-bar-track { height: 6px; border-radius: 99px; overflow: hidden; margin-bottom: 5px; }
+    .rm-seg.seg-green  .rm-bar-track { background: #dcfce7; }
+    .rm-seg.seg-yellow .rm-bar-track { background: #fef9c3; }
+    .rm-seg.seg-red    .rm-bar-track { background: #fee2e2; }
+    .rm-bar-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .rm-seg.seg-green  .rm-bar-fill { background: #16a34a; }
+    .rm-seg.seg-yellow .rm-bar-fill { background: #eab308; }
+    .rm-seg.seg-red    .rm-bar-fill { background: #ef4444; }
+
+    .rm-seg-count { font-size: .62rem; color: #c4a47c; }
+
+    /* 툴팁 */
+    .rm-tooltip {
+      display: none; position: absolute; top: calc(100% + 8px); left: 50%;
+      transform: translateX(-50%); min-width: 200px;
+      background: #1e293b; color: #f0dcc0; border-radius: 10px;
+      padding: 10px 13px; font-size: .72rem; z-index: 300;
+      box-shadow: 0 6px 20px rgba(0,0,0,.25); pointer-events: none;
+    }
+    .rm-tooltip::before {
+      content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+      border: 6px solid transparent; border-bottom-color: #1e293b;
+    }
+    .rm-seg:hover .rm-tooltip { display: block; }
+    .rm-seg:last-child .rm-tooltip { left: auto; right: 0; transform: none; }
+    .rm-seg:last-child .rm-tooltip::before { left: auto; right: 16px; transform: none; }
+    .rm-tt-title { font-weight: 700; color: #c4a47c; font-size: .63rem; margin-bottom: 7px; letter-spacing: .04em; }
+    .rm-tt-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
+    .rm-tt-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .rm-tt-dot.done { background: #34d399; }
+    .rm-tt-dot.todo { background: #f87171; }
+
+    /* 우선작업 체크리스트 패널 */
+    .priority-panel {
+      width: 246px; flex-shrink: 0;
+      border: 1.5px solid #f0dcc0; border-radius: 12px;
+      display: flex; flex-direction: column; overflow: hidden; background: #fff;
+    }
+    .pri-header {
+      padding: 10px 14px; border-bottom: 1px solid #fef0d8;
+      font-size: .78rem; font-weight: 700; color: #1e293b;
+      display: flex; align-items: center; gap: 5px; flex-shrink: 0;
+      background: #fff9f2;
+    }
+    .pri-badge {
+      margin-left: auto; font-size: .65rem; font-weight: 700;
+      background: #ef4444; color: #fff; padding: 1px 6px; border-radius: 99px;
+    }
+    .pri-list { overflow-y: auto; flex: 1; padding: 4px 0; min-height: 80px; max-height: 260px; }
+    .pri-empty {
+      padding: 20px 14px; text-align: center; font-size: .75rem; color: #c4a47c; line-height: 1.6;
+    }
+    .pri-item { padding: 5px 12px; }
+    .pri-item label {
+      display: flex; align-items: flex-start; gap: 8px; cursor: pointer; user-select: none;
+    }
+    .pri-item input[type="checkbox"] { display: none; }
+    .pri-chk {
+      width: 16px; height: 16px; border-radius: 4px; border: 2px solid #e8c8a0;
+      flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
+      justify-content: center; transition: background .15s, border-color .15s;
+    }
+    .pri-chk svg {
+      width: 9px; height: 9px; fill: none; stroke: #fff;
+      stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0;
+    }
+    .pri-item.pri-checked .pri-chk { background: #d97706; border-color: #d97706; }
+    .pri-item.pri-checked .pri-chk svg { opacity: 1; }
+    .pri-item.pri-checked .pri-item-name { text-decoration: line-through; color: #c4a47c; }
+    .pri-text { flex: 1; min-width: 0; }
+    .pri-period {
+      display: inline-block; font-size: .58rem; font-weight: 700;
+      padding: 1px 5px; border-radius: 4px; margin-bottom: 2px;
+    }
+    .pri-card-name { font-size: .7rem; font-weight: 600; color: #334155; margin-bottom: 1px; }
+    .pri-item-name { font-size: .67rem; color: #64748b; }
+
+    /* ── 담당자 입력 ── */
+    .check-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .assignee-colon { font-size: .75rem; color: #c4a47c; flex-shrink: 0; }
+    .assignee-input {
+      width: 40px; flex-shrink: 0; user-select: text;
+      border: none; outline: none; background: transparent; font-family: inherit;
+      font-size: .72rem; color: #92400e;
+      border-bottom: 1.5px dashed #e0c898; padding: 0 2px;
+      transition: width .2s ease, border-color .15s;
+      cursor: text;
+    }
+    .assignee-input::placeholder { color: #e0c898; font-size: .65rem; }
+    .assignee-input:focus { width: 70px; border-bottom-color: #fbbf24; }
+    .assignee-input:not(:placeholder-shown) { border-bottom-color: #fbbf24; font-weight: 600; }
+    .checklist-item.has-assignee .check-label {
+      border-bottom: 2px solid #fbbf24; padding-bottom: 1px;
+    }
+    .checklist-item.checked.has-assignee .check-label { border-bottom-color: #e0c898; }
+
+    /* 우선작업 담당자 태그 */
+    .pri-assignee-tip {
+      display: inline-flex; align-items: center; gap: 2px;
+      background: #fef3c7; color: #92400e; border: 1px solid #fde68a;
+      font-size: .6rem; font-weight: 600; padding: 1px 6px; border-radius: 4px;
+      margin-left: 4px; vertical-align: middle;
+    }
+
+    /* ── 담당자별 담당업무 ── */
+    #assignee-section {
+      background: #fff9f0;
+      border-bottom: 1px solid #f0dcc0;
+    }
+    .assignee-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px 24px 26px; }
+    .assignee-title {
+      font-size: .9rem; font-weight: 700; color: #1e293b;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
+    }
+    .assignee-grid { display: flex; gap: 14px; }
+    .assignee-card {
+      flex: 1; background: #fff; border-radius: 12px;
+      border: 1.5px solid #f0dcc0; overflow: hidden;
+    }
+    .assignee-card-header {
+      padding: 10px 14px; background: #fff9f0; border-bottom: 1px solid #f0dcc0;
+      font-size: .82rem; font-weight: 700; color: #1e293b;
+      display: flex; align-items: center; gap: 7px;
+    }
+    .assignee-avatar {
+      width: 26px; height: 26px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .72rem; font-weight: 700; color: #fff;
+    }
+    .assignee-count {
+      margin-left: auto; font-size: .65rem; font-weight: 600;
+      background: #f0dcc0; color: #64748b; padding: 1px 7px; border-radius: 99px;
+      white-space: nowrap;
+    }
+    .ac-toggle {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1.5px solid #f0dcc0; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #64748b; flex-shrink: 0; margin-left: 6px;
+      transition: background .15s, border-color .15s;
+    }
+    .ac-toggle:hover { background: #fef0d8; border-color: #e8c8a0; }
+    .ac-toggle svg { transition: transform .25s ease; }
+    .assignee-card.collapsed .ac-toggle svg { transform: rotate(180deg); }
+    .assignee-card.collapsed .assignee-items { display: none; }
+    .assignee-items { padding: 4px 0; }
+    .assignee-empty {
+      padding: 18px 14px; font-size: .73rem; color: #c4a47c; text-align: center; line-height: 1.6;
+    }
+    .assignee-task {
+      padding: 6px 14px; display: flex; align-items: flex-start; gap: 8px;
+      border-bottom: 1px solid #fef0d8;
+    }
+    .assignee-task:last-child { border-bottom: none; }
+    .assignee-task-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      flex-shrink: 0; margin-top: 5px;
+    }
+    .assignee-task-info { flex: 1; min-width: 0; }
+    .assignee-task-card { font-size: .62rem; color: #c4a47c; margin-bottom: 2px; }
+    .assignee-task-label { font-size: .73rem; color: #334155; font-weight: 500; }
+    .assignee-task.is-done .assignee-task-label {
+      text-decoration: line-through; color: #c4a47c;
+    }
+
+    /* ── 학년 토글 ── */
+    .grade-toggle {
+      width: 28px; height: 28px; border-radius: 50%;
+      border: 1.5px solid #f0dcc0; background: #fff;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; flex-shrink: 0; margin-left: 8px; color: #64748b;
+      transition: background .15s, border-color .15s;
+    }
+    .grade-toggle:hover { background: #fef0d8; border-color: #e8c8a0; }
+    .grade-toggle svg { transition: transform .25s ease; }
+    .grade-section.collapsed .grade-toggle svg { transform: rotate(180deg); }
+    .grade-section.collapsed .semesters-grid { display: none; }
+
+    /* ── 부드러운 스크롤 ── */
+    html { scroll-behavior: smooth; }
+
+    /* ── 상단 내비게이션 ── */
+    #top-nav {
+      background: #fff; border-bottom: 1px solid #f0dcc0;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 1px 4px rgba(0,0,0,.06);
+    }
+    .nav-wrapper {
+      max-width: 1200px; margin: 0 auto; padding: 0 24px;
+      display: flex; overflow-x: auto;
+    }
+    .nav-item {
+      padding: 13px 18px; font-size: .82rem; font-weight: 600; color: #64748b;
+      text-decoration: none; white-space: nowrap;
+      border-bottom: 2px solid transparent;
+      transition: color .15s, border-color .15s;
+    }
+    .nav-item:hover { color: #1e293b; border-bottom-color: #d97706; }
+
+    /* ── 담당자 선택 (드롭다운) ── */
+    .assignee-select {
+      flex-shrink: 0; cursor: pointer; max-width: 54px;
+      border: none; outline: none; background: transparent; font-family: inherit;
+      font-size: .72rem; color: #92400e;
+      border-bottom: 1.5px dashed #e0c898; padding: 0 2px;
+      transition: border-color .15s;
+    }
+    .assignee-select:focus { border-bottom-color: #fbbf24; }
+    .checklist-item.has-assignee .assignee-select { border-bottom-color: #fbbf24; font-weight: 600; }
+    .checklist-item.checked .assignee-select { color: #c4a47c; border-bottom-color: #e0c898; }
+
+    /* ── 항목 상세 버튼 ── */
+    .item-detail-btn {
+      width: 22px; height: 22px; flex-shrink: 0;
+      border: none; background: transparent; cursor: pointer;
+      font-size: .78rem; color: #e0c898; padding: 0; line-height: 1;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 4px; transition: color .15s, background .15s;
+      letter-spacing: -.5px;
+    }
+    .item-detail-btn:hover { color: #64748b; background: #fef0d8; }
+
+    /* ── 자료유형별 섹션 ── */
+    #type-section { background: #fff; border-bottom: 1px solid #f0dcc0; }
+    .type-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px 24px 26px; }
+    .type-title { font-size: .9rem; font-weight: 700; color: #1e293b; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
+    .type-grid { display: flex; gap: 14px; }
+    .type-card { flex: 1; background: #fff9f0; border-radius: 12px; border: 1.5px solid #f0dcc0; padding: 16px 18px; }
+    .type-card-name { font-size: .8rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+    .type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .type-bar-track { height: 8px; background: #f0dcc0; border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+    .type-bar-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
+    .type-stats { font-size: .73rem; color: #64748b; display: flex; justify-content: space-between; align-items: baseline; }
+    .type-pct { font-weight: 700; font-size: .88rem; }
+
+    /* ── 항목 상세 모달 ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #fff; border-radius: 16px;
+      width: 100%; max-width: 440px; margin: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+    }
+    .modal-header {
+      padding: 16px 20px; background: #fff9f0; border-bottom: 1px solid #f0dcc0;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .modal-header-texts { flex: 1; min-width: 0; }
+    .modal-header-title { font-size: .9rem; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
+    .modal-header-sub { font-size: .72rem; color: #c4a47c; }
+    .modal-close {
+      width: 28px; height: 28px; border: none; background: transparent;
+      cursor: pointer; border-radius: 50%; font-size: 1rem; color: #64748b;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: background .15s;
+    }
+    .modal-close:hover { background: #fef0d8; }
+    .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
+    .modal-field { display: flex; flex-direction: column; gap: 5px; }
+    .modal-field > label { font-size: .75rem; font-weight: 600; color: #64748b; }
+    .modal-field input, .modal-field select, .modal-field textarea {
+      border: 1.5px solid #f0dcc0; border-radius: 8px;
+      padding: 8px 12px; font-family: inherit; font-size: .82rem; color: #1e293b;
+      outline: none; transition: border-color .15s; background: #fff; width: 100%;
+    }
+    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: #d97706; }
+    .modal-field textarea { resize: vertical; min-height: 72px; }
+    .modal-status-badge {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 99px; font-size: .75rem; font-weight: 600;
+    }
+    .modal-status-badge.done { background: #dcfce7; color: #16a34a; }
+    .modal-status-badge.todo { background: #fee2e2; color: #dc2626; }
+    .modal-footer {
+      padding: 14px 20px; border-top: 1px solid #f0dcc0;
+      display: flex; gap: 8px; justify-content: flex-end;
+    }
+    .modal-btn {
+      padding: 8px 20px; border-radius: 8px; font-family: inherit;
+      font-size: .82rem; font-weight: 600; cursor: pointer; border: none;
+      transition: background .15s;
+    }
+    .modal-btn-save { background: #92400e; color: #fff; }
+    .modal-btn-save:hover { background: #78350f; }
+    .modal-btn-cancel { background: #fef0d8; color: #64748b; }
+    .modal-btn-cancel:hover { background: #f0dcc0; }
+
+    /* ── 반응형 ── */
+    @media (max-width: 640px) {
+      header { padding: 20px 18px 18px; }
+      header h1 { font-size: 1.25rem; }
+      main { padding: 24px 14px 48px; }
+      .semesters-grid { flex-wrap: wrap; }
+      .semester-block { width: 100%; }
+      .semester-cards { flex-wrap: wrap; }
+      .semester-cards .card { width: 100%; flex-shrink: 1; }
+
+      /* 담당자별 패널 모바일 */
+      .assignee-grid { flex-wrap: wrap; }
+      .assignee-card { flex: 0 0 calc(50% - 7px); }
+      .assignee-card-header { flex-wrap: wrap; gap: 5px; padding: 10px 10px 6px; }
+      .ac-toggle {
+        order: 4; width: 100%; margin-left: 0; margin-top: 2px;
+        border-radius: 6px; height: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<header id="header-top">
+  <h1>📚 스터디 자료 준비 현황 대시보드</h1>
+  <p class="subtitle">학년별 스터디 자료 준비 단계를 실시간으로 확인하고 관리하세요</p>
+  <div class="overall-bar-wrap">
+    <label>전체 완료율</label>
+    <div class="overall-bar-track">
+      <div class="overall-bar-fill" id="overallFill" style="width:0%"></div>
+    </div>
+    <span class="overall-pct" id="overallPct">0%</span>
+  </div>
+</header>
+
+<nav id="top-nav">
+  <div class="nav-wrapper">
+    <a href="#main" class="nav-item">학년별</a>
+    <a href="#type-section" class="nav-item">자료유형별</a>
+    <a href="#assignee-section" class="nav-item">담당자별</a>
+  </div>
+</nav>
+
+<section id="roadmap-section">
+  <div class="roadmap-wrapper">
+    <div class="roadmap-title">📋 자료준비 로드맵</div>
+    <div class="roadmap-body">
+      <div class="roadmap-left">
+        <div class="roadmap-band" id="roadmapBand"></div>
+      </div>
+      <div class="priority-panel" id="priority-panel">
+        <div class="pri-header">
+          ⚡ 우선작업 체크리스트
+          <span class="pri-badge" id="priBadge">0</span>
+        </div>
+        <div class="pri-list" id="priList"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="assignee-section">
+  <div class="assignee-wrapper">
+    <div class="assignee-title">👥 담당자별 담당업무</div>
+    <div class="assignee-grid" id="assigneeGrid"></div>
+  </div>
+</section>
+
+<section id="type-section">
+  <div class="type-wrapper">
+    <div class="type-title">📊 자료유형별 완료율</div>
+    <div class="type-grid" id="typeGrid"></div>
+  </div>
+</section>
+
+<main id="main"></main>
+
+<script>
+/* ─── 버전 관리: 버전이 바뀌면 저장된 상태 초기화 ─── */
+const DATA_VERSION = 'v4-vod-added';
+const CIRC = 226.19; // 2 * π * 36 (r=36, SVG 88×88)
+
+/* ─── 샘플 데이터 ─── */
+const GRADES = [
+  {
+    id: 'g3', name: '3학년', color: '#f59e0b', unitColor: '#fcd34d',
+    semesters: [
+      { name: '2학기', cards: [
+        { id: 'g3s2-study', type: 'study', title: '달크업 세트', items: [
+          { label: '1단원 달크업 미션',  done: true  },
+          { label: '2단원 달크업 미션',  done: true  },
+          { label: '3단원 달크업 노트',  done: true  },
+          { label: '4단원 달크업 노트',  done: false },
+          { label: '5단원 달크업 미션',  done: false },
+          { label: '6단원 달크업 미션',  done: false },
+        ]},
+        { id: 'g3s2-unit', type: 'unit', title: '단원평가', items: [
+          { label: '1단원 단원평가', done: false },
+          { label: '2단원 단원평가', done: false },
+          { label: '3단원 단원평가', done: false },
+          { label: '4단원 단원평가', done: false },
+          { label: '5단원 단원평가', done: false },
+          { label: '6단원 단원평가', done: false },
+        ]},
+      ]},
+    ],
+  },
+  {
+    id: 'g4', name: '4학년', color: '#ea580c', unitColor: '#fb923c',
+    semesters: [
+      { name: '1학기', cards: [
+        { id: 'g4s1-study', type: 'study', title: '달크업 세트', items: [
+          { label: '1단원 달크업 노트',    done: true },
+          { label: '2단원 달크업 노트',    done: true },
+          { label: '3단원 달크업 챌린지',  done: true },
+          { label: '4단원 달크업 미션',    done: true },
+          { label: '5단원 달크업 미션',    done: true },
+          { label: '6단원 달크업 미션',    done: true },
+        ]},
+        { id: 'g4s1-unit', type: 'unit', title: '단원평가', items: [
+          { label: '1단원 단원평가', done: true },
+          { label: '2단원 단원평가', done: true },
+          { label: '3단원 단원평가', done: true },
+          { label: '4단원 단원평가', done: true },
+          { label: '5단원 단원평가', done: true },
+          { label: '6단원 단원평가', done: true },
+        ]},
+      ]},
+      { name: '2학기', cards: [
+        { id: 'g4s2-study', type: 'study', title: '달크업 세트', items: [
+          { label: '1단원 달크업 미션', done: true },
+          { label: '2단원 달크업 노트',  done: true },
+          { label: '3단원 달크업 미션', done: true },
+          { label: '4단원 달크업 노트',  done: true },
+          { label: '5단원 달크업 미션', done: true },
+          { label: '6단원 달크업 노트',  done: true },
+        ]},
+        { id: 'g4s2-unit', type: 'unit', title: '단원평가', items: [
+          { label: '1단원 단원평가', done: true  },
+          { label: '2단원 단원평가', done: true  },
+          { label: '3단원 단원평가', done: true  },
+          { label: '4단원 단원평가', done: true  },
+          { label: '5단원 단원평가', done: false },
+          { label: '6단원 단원평가', done: false },
+        ]},
+      ]},
+    ],
+  },
+  {
+    id: 'g5', name: '5학년', color: '#b45309', unitColor: '#d97706', vodColor: '#92400e',
+    semesters: [
+      { name: '1학기', cards: [
+        { id: 'g5s1-study', type: 'study', title: '달크업 세트', items: [
+          { label: '1단원 달크업 미션', done: true },
+          { label: '2단원 달크업 노트',  done: true },
+          { label: '3단원 달크업 미션', done: true },
+          { label: '4단원 달크업 노트',  done: true },
+          { label: '5단원 달크업 미션', done: true },
+          { label: '6단원 달크업 노트',  done: true },
+        ]},
+        { id: 'g5s1-unit', type: 'unit', title: '단원평가', items: [
+          { label: '1단원 단원평가', done: false },
+          { label: '2단원 단원평가', done: false },
+          { label: '3단원 단원평가', done: false },
+          { label: '4단원 단원평가', done: false },
+          { label: '5단원 단원평가', done: false },
+          { label: '6단원 단원평가', done: false },
+        ]},
+        { id: 'g5s1-vod', type: 'vod', title: '핵심콕VOD', items: [
+          { label: '1단원 핵심콕VOD', done: false },
+          { label: '2단원 핵심콕VOD', done: false },
+          { label: '3단원 핵심콕VOD', done: false },
+          { label: '4단원 핵심콕VOD', done: false },
+          { label: '5단원 핵심콕VOD', done: false },
+          { label: '6단원 핵심콕VOD', done: false },
+        ]},
+      ]},
+      { name: '2학기', cards: [
+        { id: 'g5s2-study', type: 'study', title: '달크업 세트', items: [
+          { label: '1단원 달크업 노트',  done: true  },
+          { label: '2단원 달크업 미션', done: false },
+          { label: '3단원 달크업 노트',  done: true  },
+          { label: '4단원 달크업 미션', done: false },
+          { label: '5단원 달크업 노트',  done: false },
+          { label: '6단원 달크업 미션', done: false },
+        ]},
+        { id: 'g5s2-unit', type: 'unit', title: '단원평가', items: [
+          { label: '1단원 단원평가', done: true },
+          { label: '2단원 단원평가', done: true },
+          { label: '3단원 단원평가', done: true },
+          { label: '4단원 단원평가', done: true },
+          { label: '5단원 단원평가', done: true },
+          { label: '6단원 단원평가', done: true },
+        ]},
+        { id: 'g5s2-vod', type: 'vod', title: '핵심콕VOD', items: [
+          { label: '1단원 핵심콕VOD', done: false },
+          { label: '2단원 핵심콕VOD', done: false },
+          { label: '3단원 핵심콕VOD', done: false },
+          { label: '4단원 핵심콕VOD', done: false },
+          { label: '5단원 핵심콕VOD', done: false },
+          { label: '6단원 핵심콕VOD', done: false },
+        ]},
+      ]},
+    ],
+  },
+  {
+    id: 'g6', name: '6학년', color: '#78350f', unitColor: '#a16207', vodColor: '#7c2d12',
+    semesters: [
+      { name: '1학기', cards: [
+        { id: 'g6s1-study', type: 'study', title: '달크업 세트', items: [
+          { label: '1단원 달크업 미션', done: false },
+          { label: '2단원 달크업 노트',  done: false },
+          { label: '3단원 달크업 미션', done: false },
+          { label: '4단원 달크업 노트',  done: false },
+          { label: '5단원 달크업 미션', done: false },
+          { label: '6단원 달크업 노트',  done: false },
+        ]},
+        { id: 'g6s1-vod', type: 'vod', title: '핵심콕VOD', items: [
+          { label: '1단원 핵심콕VOD', done: false },
+          { label: '2단원 핵심콕VOD', done: false },
+          { label: '3단원 핵심콕VOD', done: false },
+          { label: '4단원 핵심콕VOD', done: false },
+          { label: '5단원 핵심콕VOD', done: false },
+          { label: '6단원 핵심콕VOD', done: false },
+        ]},
+      ]},
+      { name: '2학기', cards: [
+        { id: 'g6s2-study', type: 'study', title: '달크업 세트', items: [
+          { label: '1단원 달크업 미션', done: false },
+          { label: '2단원 달크업 미션', done: false },
+          { label: '3단원 달크업 미션', done: false },
+          { label: '4단원 달크업 노트',  done: false },
+          { label: '5단원 달크업 노트',  done: false },
+          { label: '6단원 달크업 노트',  done: false },
+        ]},
+        { id: 'g6s2-vod', type: 'vod', title: '핵심콕VOD', items: [
+          { label: '1단원 핵심콕VOD', done: false },
+          { label: '2단원 핵심콕VOD', done: false },
+          { label: '3단원 핵심콕VOD', done: false },
+          { label: '4단원 핵심콕VOD', done: false },
+          { label: '5단원 핵심콕VOD', done: false },
+          { label: '6단원 핵심콕VOD', done: false },
+        ]},
+      ]},
+    ],
+  },
+];
+
+/* ─── 진행률 색상 ─── */
+function progressColor(pct) {
+  if (pct === 100) return '#16a34a';
+  if (pct >= 67)  return '#ea580c';
+  if (pct >= 34)  return '#f59e0b';
+  return '#ef4444';
+}
+
+/* ─── 체크 아이콘 SVG ─── */
+const checkSVG = `<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg>`;
+const doneSVG  = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,9 6,13 14,3"/></svg>`;
+
+/* ─── 카드 DOM 생성 ─── */
+function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, semName) {
+  const color    = card.type === 'study' ? gradeColor : card.type === 'vod' ? vodColor : unitColor;
+  const typeName = `${gradeName} ${semName}`;
+  const total    = card.items.length;
+
+  const saved  = localStorage.getItem('card-' + card.id);
+  const states = saved ? JSON.parse(saved) : card.items.map(i => i.done);
+
+  const AOPTS = ['민주','찬희','대표님','미정'];
+  const itemsHTML = card.items.map((item, i) => {
+    const done = states[i];
+    const assignee = localStorage.getItem(`assignee-${card.id}-${i}`) || '미정';
+    const opts = AOPTS.map(n => `<option value="${n}"${assignee===n?' selected':''}>${n}</option>`).join('');
+    return `<label class="checklist-item${done ? ' checked' : ''}${assignee && assignee !== '미정' ? ' has-assignee' : ''}">
+      <input type="checkbox"${done ? ' checked' : ''}/>
+      <span class="check-box">${checkSVG}</span>
+      <span class="check-label">${item.label}</span>
+      <select class="assignee-select" data-card="${card.id}" data-idx="${i}">${opts}</select>
+      <button class="item-detail-btn" type="button" data-card="${card.id}" data-idx="${i}" title="상세 보기">···</button>
+    </label>`;
+  }).join('');
+
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.id = 'card-' + card.id;
+  el.innerHTML = `
+    <div class="card-top">
+      <div class="circle-wrap">
+        <svg viewBox="0 0 88 88">
+          <circle class="circle-bg" cx="44" cy="44" r="36"/>
+          <circle class="circle-prog" id="prog-${card.id}" cx="44" cy="44" r="36"
+            stroke-dasharray="${CIRC}" stroke-dashoffset="${CIRC}" stroke="${color}"/>
+        </svg>
+        <div class="circle-pct-text">
+          <span class="num" id="num-${card.id}">0</span>
+          <span class="unit">%</span>
+        </div>
+      </div>
+      <div class="card-info">
+        <span class="card-type-badge" style="background:${color}">${typeName}</span>
+        <div class="card-title">${card.title}</div>
+        <div class="card-count"><span class="done-num" id="cnt-${card.id}">0</span> / ${total} 완료</div>
+      </div>
+    </div>
+    <div class="checklist" id="cl-${card.id}">${itemsHTML}</div>
+    <div class="complete-badge">${doneSVG} 모든 준비가 완료되었습니다!</div>`;
+
+  el.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+    cb.addEventListener('change', () => updateCard(card.id, gradeId));
+  });
+
+  el.querySelectorAll('.assignee-select').forEach(sel => {
+    sel.addEventListener('click', e => e.stopPropagation());
+    sel.addEventListener('change', () => {
+      const val = sel.value;
+      const key = `assignee-${sel.dataset.card}-${sel.dataset.idx}`;
+      if (val) localStorage.setItem(key, val);
+      else localStorage.removeItem(key);
+      sel.closest('.checklist-item').classList.toggle('has-assignee', val !== '' && val !== '미정');
+      document.dispatchEvent(new CustomEvent('assignee-updated'));
+    });
+  });
+  el.querySelectorAll('.item-detail-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.preventDefault(); e.stopPropagation();
+      openDetailModal(btn.dataset.card, +btn.dataset.idx);
+    });
+  });
+
+  return el;
+}
+
+/* ─── UI 전체 생성 ─── */
+function buildUI() {
+  const main = document.getElementById('main');
+  GRADES.forEach(grade => {
+    const sec = document.createElement('section');
+    sec.className = 'grade-section';
+    sec.style.setProperty('--grade-color', grade.color);
+    sec.innerHTML = `
+      <div class="grade-header">
+        <div class="grade-badge">${grade.name[0]}</div>
+        <h2>${grade.name}</h2>
+        <div class="grade-mini-bar"><div class="grade-mini-fill" id="gfill-${grade.id}" style="width:0%"></div></div>
+        <span class="grade-mini-pct" id="gpct-${grade.id}">0%</span>
+        <button class="grade-toggle" type="button" aria-label="접기/펼치기"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,5 8,11 13,5"/></svg></button>
+      </div>`;
+    sec.classList.add('collapsed');
+    sec.querySelector('.grade-toggle').addEventListener('click', () => sec.classList.toggle('collapsed'));
+
+    const semGrid = document.createElement('div');
+    semGrid.className = 'semesters-grid';
+    grade.semesters.forEach(sem => {
+      const block = document.createElement('div');
+      block.className = 'semester-block';
+      block.innerHTML = `<div class="semester-label">${sem.name}</div>`;
+
+      const stack = document.createElement('div');
+      stack.className = 'semester-cards';
+      sem.cards.forEach(card => stack.appendChild(buildCard(card, grade.color, grade.unitColor, grade.vodColor || grade.unitColor, grade.id, grade.name, sem.name)));
+      block.appendChild(stack);
+      semGrid.appendChild(block);
+    });
+    sec.appendChild(semGrid);
+
+    main.appendChild(sec);
+  });
+}
+
+/* ─── 카드 업데이트 ─── */
+function updateCard(cardId, gradeId) {
+  const items = document.querySelectorAll(`#cl-${cardId} .checklist-item`);
+  let done = 0;
+  items.forEach(item => {
+    const checked = item.querySelector('input').checked;
+    item.classList.toggle('checked', checked);
+    if (checked) done++;
+  });
+
+  const pct = items.length ? Math.round(done / items.length * 100) : 0;
+  const prog = document.getElementById('prog-' + cardId);
+  prog.style.strokeDashoffset = CIRC * (1 - pct / 100);
+  prog.style.stroke = progressColor(pct);
+  document.getElementById('num-' + cardId).textContent = pct;
+  document.getElementById('cnt-' + cardId).textContent = done;
+  document.getElementById('card-' + cardId).classList.toggle('all-done', pct === 100);
+
+  localStorage.setItem('card-' + cardId, JSON.stringify([...items].map(i => i.querySelector('input').checked)));
+  updateGrade(gradeId);
+  updateOverall();
+}
+
+/* ─── 학년 완료율 업데이트 ─── */
+function updateGrade(gradeId) {
+  const grade = GRADES.find(g => g.id === gradeId);
+  let total = 0, done = 0;
+  grade.semesters.forEach(sem => sem.cards.forEach(card => {
+    document.querySelectorAll(`#cl-${card.id} .checklist-item`).forEach(item => {
+      total++;
+      if (item.querySelector('input').checked) done++;
+    });
+  }));
+  const pct = total ? Math.round(done / total * 100) : 0;
+  document.getElementById('gfill-' + gradeId).style.width = pct + '%';
+  document.getElementById('gpct-'  + gradeId).textContent = pct + '%';
+}
+
+/* ─── 전체 완료율 업데이트 ─── */
+function updateOverall() {
+  const all  = document.querySelectorAll('.checklist-item');
+  let done = 0;
+  all.forEach(item => { if (item.querySelector('input').checked) done++; });
+  const pct = all.length ? Math.round(done / all.length * 100) : 0;
+  document.getElementById('overallFill').style.width = pct + '%';
+  document.getElementById('overallPct').textContent  = pct + '%';
+}
+
+/* ─── 초기화 ─── */
+if (localStorage.getItem('_dv') !== DATA_VERSION) {
+  Object.keys(localStorage).filter(k => k.startsWith('card-')).forEach(k => localStorage.removeItem(k));
+  localStorage.setItem('_dv', DATA_VERSION);
+}
+
+buildUI();
+
+GRADES.forEach(grade =>
+  grade.semesters.forEach(sem =>
+    sem.cards.forEach(card => updateCard(card.id, grade.id))
+  )
+);
+
+/* ─── 자료준비 로드맵 v2 ─── */
+(function () {
+  /* 구간 정의 */
+  const SEGS = [
+    { id: 's1', label: '26.06~08',    cards: ['g4s2-study', 'g5s1-study', 'g5s1-vod'] },
+    { id: 's2', label: '26.07~11',    cards: ['g3s2-study'] },
+    { id: 's3', label: '26.09~11',    cards: ['g4s2-unit',  'g5s2-study', 'g5s2-vod'] },
+    { id: 's4', label: '26.12~27.02', cards: ['g5s1-unit',  'g6s1-study', 'g6s1-vod'] },
+    { id: 's5', label: '27.03~05',    cards: ['g5s1-unit',  'g6s2-study', 'g6s2-vod'] },
+  ];
+
+  /* 카드 ID → 표시명 매핑 */
+  const CINFO = {};
+  GRADES.forEach(g => g.semesters.forEach(s => s.cards.forEach(c => {
+    CINFO[c.id] = { name: `${g.name} ${s.name} ${c.title}`, color: g.color };
+  })));
+
+  /* 카드의 체크리스트 아이템 배열 */
+  const clItems = id => [...document.querySelectorAll(`#cl-${id} .checklist-item`)];
+
+  /* 구간 통계 */
+  function segStat(seg) {
+    let total = 0, done = 0;
+    seg.cards.forEach(id => clItems(id).forEach(it => {
+      total++;
+      if (it.querySelector('input').checked) done++;
+    }));
+    return { total, done, pct: total ? Math.round(done / total * 100) : 0 };
+  }
+
+  /* ── 타임라인 띠 구축 ── */
+  function buildBand() {
+    const band = document.getElementById('roadmapBand');
+    if (!band) return;
+    band.innerHTML = '';
+    SEGS.forEach(seg => {
+      const st = segStat(seg);
+      const cls = st.pct === 100 ? 'seg-green' : st.pct >= 50 ? 'seg-yellow' : 'seg-red';
+
+      /* 툴팁 카드 목록 */
+      const ttRows = seg.cards.map(id => {
+        const its = clItems(id);
+        const d = its.filter(i => i.querySelector('input').checked).length;
+        const info = CINFO[id] || { name: id, color: '#c4a47c' };
+        return `<div class="rm-tt-row">
+          <span class="rm-tt-dot ${d === its.length ? 'done' : 'todo'}"></span>
+          <span>${info.name} (${d}/${its.length})</span>
+        </div>`;
+      }).join('');
+
+      const cell = document.createElement('div');
+      cell.className = `rm-seg ${cls}`;
+      cell.id = 'rmseg-' + seg.id;
+      cell.innerHTML = `
+        <div class="rm-seg-period">${seg.label}</div>
+        <div class="rm-seg-pct">${st.pct}<span style="font-size:.6rem;font-weight:600">%</span></div>
+        <div class="rm-bar-track"><div class="rm-bar-fill" style="width:${st.pct}%"></div></div>
+        <div class="rm-seg-count">${st.done}/${st.total} 완료</div>
+        <div class="rm-tooltip">
+          <div class="rm-tt-title">📂 ${seg.label} 자료목록</div>
+          ${ttRows}
+        </div>`;
+      band.appendChild(cell);
+    });
+  }
+
+  /* ── 우선작업 체크리스트 구축 ── */
+  function buildPriority() {
+    const list = document.getElementById('priList');
+    const badge = document.getElementById('priBadge');
+    if (!list) return;
+
+    /* 미완료 항목 수집 — 카드가 여러 구간에 있어도 첫 구간 기준으로 1번만 */
+    const seen = new Set();
+    const items = [];
+    SEGS.forEach(seg => {
+      seg.cards.forEach(cardId => {
+        clItems(cardId).forEach((it, idx) => {
+          const key = `${cardId}__${idx}`;
+          if (!it.querySelector('input').checked && !seen.has(key)) {
+            seen.add(key);
+            const info = CINFO[cardId] || { name: cardId, color: '#c4a47c' };
+            const assignee = localStorage.getItem(`assignee-${cardId}-${idx}`) || '';
+            items.push({ cardId, idx, period: seg.label, cardName: info.name, color: info.color,
+              itemLabel: it.querySelector('.check-label').textContent, assignee });
+          }
+        });
+      });
+    });
+
+    if (badge) badge.textContent = items.length;
+
+    if (items.length === 0) {
+      list.innerHTML = '<div class="pri-empty">🎉 모든 우선 자료가<br>완료되었습니다!</div>';
+      return;
+    }
+
+    list.innerHTML = items.map(it => `
+      <div class="pri-item" data-card="${it.cardId}" data-idx="${it.idx}">
+        <label>
+          <input type="checkbox"/>
+          <span class="pri-chk"><svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></span>
+          <span class="pri-text">
+            <span class="pri-period" style="color:${it.color};background:${it.color}1a">${it.period}</span>
+            <div class="pri-card-name">${it.cardName}</div>
+            <div class="pri-item-name">${it.itemLabel}${it.assignee ? `<span class="pri-assignee-tip">👤 ${it.assignee}</span>` : ''}</div>
+          </span>
+        </label>
+      </div>`).join('');
+
+    /* 체크박스 이벤트 — 메인 대시보드와 연동 */
+    list.querySelectorAll('.pri-item').forEach(priEl => {
+      const { card: cardId, idx } = priEl.dataset;
+      const cb = priEl.querySelector('input');
+      cb.addEventListener('change', () => {
+        const mainCb = clItems(cardId)[+idx]?.querySelector('input');
+        if (mainCb && !mainCb.checked) {
+          mainCb.checked = true;
+          mainCb.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+      });
+    });
+  }
+
+  /* ── 전체 갱신 ── */
+  function refresh() { buildBand(); buildPriority(); }
+
+  refresh();
+
+  /* 메인 대시보드 체크 변경 시 갱신 (priority 내부 이벤트는 제외) */
+  document.addEventListener('change', e => {
+    if (e.target.type === 'checkbox' && !e.target.closest('#priList'))
+      requestAnimationFrame(refresh);
+  });
+
+  /* priority 체크 후 메인이 갱신되면 priority도 재구성 */
+  document.getElementById('priList')?.addEventListener('change', () =>
+    requestAnimationFrame(refresh)
+  );
+
+  /* 담당자 변경 시 우선작업 툴팁 갱신 */
+  document.addEventListener('assignee-updated', () => requestAnimationFrame(buildPriority));
+})();
+
+/* ─── 담당자별 담당업무 ─── */
+(function () {
+  const ASSIGNEES = [
+    { name: '민주',   color: '#f59e0b' },
+    { name: '찬희',   color: '#ea580c' },
+    { name: '대표님', color: '#92400e' },
+    { name: '미정',   color: '#c4a47c' },
+  ];
+
+  const collapsedCards = new Set(ASSIGNEES.map(a => a.name));
+  const toggleSVG = `<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,5 8,11 13,5"/></svg>`;
+
+  function buildAssigneeSection() {
+    const grid = document.getElementById('assigneeGrid');
+    if (!grid) return;
+
+    const tasksByPerson = {};
+    ASSIGNEES.forEach(a => { tasksByPerson[a.name] = []; });
+
+    GRADES.forEach(grade => {
+      grade.semesters.forEach(sem => {
+        sem.cards.forEach(card => {
+          card.items.forEach((item, idx) => {
+            const stored = (localStorage.getItem(`assignee-${card.id}-${idx}`) || '미정').trim();
+            const matched = ASSIGNEES.find(a => a.name === stored);
+            if (!matched) return;
+            const clItem = document.querySelectorAll(`#cl-${card.id} .checklist-item`)[idx];
+            const isDone = clItem ? clItem.querySelector('input').checked : false;
+            if (isDone) return;
+            tasksByPerson[matched.name].push({
+              cardName: `${grade.name} ${sem.name} ${card.title}`,
+              label: item.label,
+            });
+          });
+        });
+      });
+    });
+
+    grid.innerHTML = ASSIGNEES.map(a => {
+      const tasks = tasksByPerson[a.name];
+      const itemsHTML = tasks.length === 0
+        ? '<div class="assignee-empty">배정된 업무가 없습니다</div>'
+        : tasks.map(t => `
+            <div class="assignee-task">
+              <div class="assignee-task-dot" style="background:${a.color}"></div>
+              <div class="assignee-task-info">
+                <div class="assignee-task-card">${t.cardName}</div>
+                <div class="assignee-task-label">${t.label}</div>
+              </div>
+            </div>`).join('');
+
+      const countText = tasks.length === 0 ? '0건' : `${tasks.length}건`;
+
+      return `
+        <div class="assignee-card" data-assignee="${a.name}">
+          <div class="assignee-card-header">
+            <div class="assignee-avatar" style="background:${a.color}">${a.name[0]}</div>
+            ${a.name}
+            <span class="assignee-count">${countText}</span>
+            <button class="ac-toggle" type="button">${toggleSVG}</button>
+          </div>
+          <div class="assignee-items">${itemsHTML}</div>
+        </div>`;
+    }).join('');
+
+    ASSIGNEES.forEach(a => {
+      const card = grid.querySelector(`.assignee-card[data-assignee="${a.name}"]`);
+      if (!card) return;
+      if (collapsedCards.has(a.name)) card.classList.add('collapsed');
+      card.querySelector('.ac-toggle').addEventListener('click', () => {
+        card.classList.toggle('collapsed');
+        if (card.classList.contains('collapsed')) collapsedCards.add(a.name);
+        else collapsedCards.delete(a.name);
+      });
+    });
+  }
+
+  buildAssigneeSection();
+
+  document.addEventListener('assignee-updated', buildAssigneeSection);
+  document.addEventListener('change', e => {
+    if (e.target.type === 'checkbox')
+      requestAnimationFrame(buildAssigneeSection);
+  });
+})();
+
+/* ─── 자료유형별 완료율 ─── */
+(function () {
+  const TYPES = [
+    { id: 'study', name: '달크업 세트', color: '#f59e0b' },
+    { id: 'unit',  name: '단원평가',    color: '#ea580c' },
+    { id: 'vod',   name: '핵심콕VOD',   color: '#b45309' },
+  ];
+
+  function buildTypeSection() {
+    const grid = document.getElementById('typeGrid');
+    if (!grid) return;
+    const stats = {};
+    TYPES.forEach(t => { stats[t.id] = { total: 0, done: 0 }; });
+    GRADES.forEach(grade => {
+      grade.semesters.forEach(sem => {
+        sem.cards.forEach(card => {
+          if (!stats[card.type]) return;
+          document.querySelectorAll(`#cl-${card.id} .checklist-item`).forEach(item => {
+            stats[card.type].total++;
+            if (item.querySelector('input').checked) stats[card.type].done++;
+          });
+        });
+      });
+    });
+    grid.innerHTML = TYPES.map(t => {
+      const st = stats[t.id];
+      const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
+      return `<div class="type-card">
+        <div class="type-card-name"><span class="type-dot" style="background:${t.color}"></span>${t.name}</div>
+        <div class="type-bar-track"><div class="type-bar-fill" style="width:${pct}%;background:${t.color}"></div></div>
+        <div class="type-stats"><span>${st.done}/${st.total} 완료</span><span class="type-pct" style="color:${t.color}">${pct}%</span></div>
+      </div>`;
+    }).join('');
+  }
+
+  buildTypeSection();
+  document.addEventListener('change', e => {
+    if (e.target.type === 'checkbox') requestAnimationFrame(buildTypeSection);
+  });
+})();
+
+/* ─── 항목 상세 모달 ─── */
+(function () {
+  let _cardId = null, _idx = null;
+  const CINFO_MODAL = {};
+  GRADES.forEach(g => g.semesters.forEach(s => s.cards.forEach(c => {
+    CINFO_MODAL[c.id] = { name: `${g.name} ${s.name} ${c.title}`, items: c.items };
+  })));
+
+  const overlay     = document.getElementById('detail-modal');
+  const labelEl     = document.getElementById('modal-item-label');
+  const cardEl      = document.getElementById('modal-item-card');
+  const statusEl    = document.getElementById('modal-status-badge');
+  const assigneeSel = document.getElementById('modal-assignee-select');
+  const deadlineInp = document.getElementById('modal-deadline-input');
+  const memoInp     = document.getElementById('modal-memo-input');
+  const linkInp     = document.getElementById('modal-link-input');
+
+  window.openDetailModal = function (cardId, idx) {
+    _cardId = cardId; _idx = idx;
+    const info = CINFO_MODAL[cardId];
+    if (!info) return;
+    labelEl.textContent = info.items[idx]?.label || '';
+    cardEl.textContent  = info.name;
+    const clItem = document.querySelectorAll(`#cl-${cardId} .checklist-item`)[idx];
+    const isDone = clItem ? clItem.querySelector('input').checked : false;
+    statusEl.textContent = isDone ? '완료' : '미완료';
+    statusEl.className   = 'modal-status-badge ' + (isDone ? 'done' : 'todo');
+    assigneeSel.value    = localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정';
+    deadlineInp.value    = localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || '';
+    memoInp.value        = localStorage.getItem(`detail-${cardId}-${idx}-memo`) || '';
+    linkInp.value        = localStorage.getItem(`detail-${cardId}-${idx}-link`) || '';
+    overlay.classList.add('open');
+  };
+
+  function closeModal() { overlay.classList.remove('open'); _cardId = null; _idx = null; }
+
+  function saveModal() {
+    if (_cardId === null) return;
+    const newAssignee = assigneeSel.value;
+    const oldAssignee = localStorage.getItem(`assignee-${_cardId}-${_idx}`) || '';
+    if (newAssignee) localStorage.setItem(`assignee-${_cardId}-${_idx}`, newAssignee);
+    else localStorage.removeItem(`assignee-${_cardId}-${_idx}`);
+    if (deadlineInp.value) localStorage.setItem(`detail-${_cardId}-${_idx}-deadline`, deadlineInp.value);
+    else localStorage.removeItem(`detail-${_cardId}-${_idx}-deadline`);
+    if (memoInp.value.trim()) localStorage.setItem(`detail-${_cardId}-${_idx}-memo`, memoInp.value.trim());
+    else localStorage.removeItem(`detail-${_cardId}-${_idx}-memo`);
+    if (linkInp.value.trim()) localStorage.setItem(`detail-${_cardId}-${_idx}-link`, linkInp.value.trim());
+    else localStorage.removeItem(`detail-${_cardId}-${_idx}-link`);
+    const sel = document.querySelector(`.assignee-select[data-card="${_cardId}"][data-idx="${_idx}"]`);
+    if (sel) { sel.value = newAssignee; sel.closest('.checklist-item')?.classList.toggle('has-assignee', newAssignee !== '' && newAssignee !== '미정'); }
+    if (newAssignee !== oldAssignee) document.dispatchEvent(new CustomEvent('assignee-updated'));
+    closeModal();
+  }
+
+  document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+  document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
+  document.getElementById('modal-save-btn').addEventListener('click', saveModal);
+  overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
+})();
+</script>
+<div id="detail-modal" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-header-texts">
+        <div class="modal-header-title" id="modal-item-label">항목 상세</div>
+        <div class="modal-header-sub" id="modal-item-card"></div>
+      </div>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-field">
+        <label>상태</label>
+        <div><span class="modal-status-badge todo" id="modal-status-badge">미완료</span></div>
+      </div>
+      <div class="modal-field">
+        <label>담당자</label>
+        <select id="modal-assignee-select">
+          <option value="미정">미정</option>
+          <option value="민주">민주</option>
+          <option value="찬희">찬희</option>
+          <option value="대표님">대표님</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label>마감일</label>
+        <input type="date" id="modal-deadline-input"/>
+      </div>
+      <div class="modal-field">
+        <label>메모</label>
+        <textarea id="modal-memo-input" placeholder="검수 메모, 수정 요청 등을 남겨주세요"></textarea>
+      </div>
+      <div class="modal-field">
+        <label>제작여부 링크</label>
+        <input type="url" id="modal-link-input" placeholder="https://..."/>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn modal-btn-cancel" id="modal-cancel-btn">취소</button>
+      <button class="modal-btn modal-btn-save" id="modal-save-btn">저장</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
