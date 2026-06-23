@@ -303,7 +303,25 @@
     .pri-item-name { font-size: .67rem; color: #64748b; }
 
     /* ── 담당자 입력 ── */
-    .check-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+    .check-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    /* 마감기한 인라인 입력 */
+    .deadline-input {
+      display: none;
+      border: none; outline: none; background: transparent; font-family: inherit;
+      font-size: .6rem; color: #d97706; padding: 0; cursor: pointer;
+      border-bottom: 1px dashed #fde68a; max-width: 92px;
+    }
+    .deadline-input::-webkit-calendar-picker-indicator {
+      width: 8px; height: 8px; opacity: .45; cursor: pointer; padding: 0; margin-left: 2px;
+    }
+    .deadline-input:focus { outline: none; border-bottom-color: #fbbf24; }
+    .deadline-input:focus::-webkit-calendar-picker-indicator { opacity: .8; }
+    .checklist-item.has-deadline .deadline-input { display: block; }
+    .checklist-item:hover .deadline-input { display: block; }
+    .checklist-item:focus-within .deadline-input { display: block; }
+    .checklist-item.checked .deadline-input { color: #c4a47c; border-bottom-color: #f0dcc0; }
     .assignee-colon { font-size: .75rem; color: #c4a47c; flex-shrink: 0; }
     .assignee-input {
       width: 40px; flex-shrink: 0; user-select: text;
@@ -897,11 +915,15 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
   const itemsHTML = card.items.map((item, i) => {
     const done = states[i];
     const assignee = localStorage.getItem(`assignee-${card.id}-${i}`) || '미정';
+    const deadline = localStorage.getItem(`detail-${card.id}-${i}-deadline`) || '';
     const opts = AOPTS.map(n => `<option value="${n}"${assignee===n?' selected':''}>${n}</option>`).join('');
-    return `<label class="checklist-item${done ? ' checked' : ''}${assignee && assignee !== '미정' ? ' has-assignee' : ''}">
+    return `<label class="checklist-item${done ? ' checked' : ''}${assignee && assignee !== '미정' ? ' has-assignee' : ''}${deadline ? ' has-deadline' : ''}">
       <input type="checkbox"${done ? ' checked' : ''}/>
       <span class="check-box">${checkSVG}</span>
-      <span class="check-label">${item.label}</span>
+      <div class="item-col">
+        <span class="check-label">${item.label}</span>
+        <input type="date" class="deadline-input" data-card="${card.id}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
+      </div>
       <select class="assignee-select" data-card="${card.id}" data-idx="${i}">${opts}</select>
       <button class="item-detail-btn" type="button" data-card="${card.id}" data-idx="${i}" title="상세 보기">···</button>
     </label>`;
@@ -948,6 +970,18 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       document.dispatchEvent(new CustomEvent('assignee-updated'));
     });
   });
+  el.querySelectorAll('.deadline-input').forEach(inp => {
+    inp.addEventListener('click', e => e.stopPropagation());
+    inp.addEventListener('change', () => {
+      const val = inp.value;
+      const key = `detail-${inp.dataset.card}-${inp.dataset.idx}-deadline`;
+      if (val) localStorage.setItem(key, val);
+      else localStorage.removeItem(key);
+      inp.closest('.checklist-item').classList.toggle('has-deadline', !!val);
+      saveItemToSupabase(inp.dataset.card, +inp.dataset.idx);
+    });
+  });
+
   el.querySelectorAll('.item-detail-btn').forEach(btn => {
     btn.addEventListener('click', e => {
       e.preventDefault(); e.stopPropagation();
