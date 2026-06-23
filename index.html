@@ -308,7 +308,7 @@
 
     /* 마감기한 인라인 입력 */
     .deadline-input {
-      display: none;
+      display: block;
       border: none; outline: none; background: transparent; font-family: inherit;
       font-size: .6rem; color: #d97706; padding: 0; cursor: pointer;
       border-bottom: 1px dashed #fde68a; max-width: 92px;
@@ -318,9 +318,6 @@
     }
     .deadline-input:focus { outline: none; border-bottom-color: #fbbf24; }
     .deadline-input:focus::-webkit-calendar-picker-indicator { opacity: .8; }
-    .checklist-item.has-deadline .deadline-input { display: block; }
-    .checklist-item:hover .deadline-input { display: block; }
-    .checklist-item:focus-within .deadline-input { display: block; }
     .checklist-item.checked .deadline-input { color: #c4a47c; border-bottom-color: #f0dcc0; }
     .assignee-colon { font-size: .75rem; color: #c4a47c; flex-shrink: 0; }
     .assignee-input {
