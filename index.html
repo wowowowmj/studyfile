@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>스터디 자료 준비 현황 대시보드</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -515,6 +516,22 @@
     .modal-btn-cancel { background: #fef0d8; color: #64748b; }
     .modal-btn-cancel:hover { background: #f0dcc0; }
 
+    /* ── 로딩 오버레이 ── */
+    #loading-overlay {
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(253,246,237,.94);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 10px;
+    }
+    #loading-overlay .loading-text { font-size: .95rem; font-weight: 600; color: #92400e; }
+    #loading-overlay .loading-sub  { font-size: .75rem; color: #c4a47c; }
+    .spinner {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 4px solid #f0dcc0; border-top-color: #b45309;
+      animation: spin .75s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
     /* ── 반응형 ── */
     @media (max-width: 640px) {
       header { padding: 20px 18px 18px; }
@@ -537,6 +554,12 @@
   </style>
 </head>
 <body>
+
+<div id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text">📡 데이터 불러오는 중...</div>
+  <div class="loading-sub">Supabase에서 최신 데이터를 가져옵니다</div>
+</div>
 
 <header id="header-top">
   <h1>📚 스터디 자료 준비 현황 대시보드</h1>
@@ -593,9 +616,17 @@
 <main id="main"></main>
 
 <script>
+/* ─── Supabase 설정 ─── */
+const SUPABASE_URL = 'https://iftxmndiikmirmgvxuxg.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_xYfo9iYv0daheWRodcL11g_Il3-3cn6';
+const _sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 /* ─── 버전 관리: 버전이 바뀌면 저장된 상태 초기화 ─── */
 const DATA_VERSION = 'v4-vod-added';
 const CIRC = 226.19; // 2 * π * 36 (r=36, SVG 88×88)
+
+/* 초기화 중에는 Supabase 저장 호출 차단 */
+let _isInitializing = true;
 
 /* ─── 샘플 데이터 ─── */
 const GRADES = [
@@ -763,6 +794,84 @@ const GRADES = [
   },
 ];
 
+/* ─── Supabase: 전체 로드 ─── */
+async function loadAllFromSupabase() {
+  try {
+    const { data, error } = await _sb.from('item_states').select('*');
+    if (error) throw error;
+    if (!data || data.length === 0) return false;
+
+    const byCard = {};
+    data.forEach(row => {
+      if (!byCard[row.card_id]) byCard[row.card_id] = [];
+      byCard[row.card_id][row.item_index] = row;
+    });
+
+    Object.entries(byCard).forEach(([cardId, items]) => {
+      localStorage.setItem('card-' + cardId, JSON.stringify(items.map(it => it ? it.done : false)));
+      items.forEach((it, idx) => {
+        if (!it) return;
+        localStorage.setItem(`assignee-${cardId}-${idx}`, it.assignee || '미정');
+        it.deadline ? localStorage.setItem(`detail-${cardId}-${idx}-deadline`, it.deadline)
+                    : localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
+        it.memo     ? localStorage.setItem(`detail-${cardId}-${idx}-memo`, it.memo)
+                    : localStorage.removeItem(`detail-${cardId}-${idx}-memo`);
+        it.link     ? localStorage.setItem(`detail-${cardId}-${idx}-link`, it.link)
+                    : localStorage.removeItem(`detail-${cardId}-${idx}-link`);
+      });
+    });
+    return true;
+  } catch (e) {
+    console.warn('[Supabase] 로드 실패 → localStorage 사용:', e.message);
+    return false;
+  }
+}
+
+/* ─── Supabase: 카드 전체 일괄 저장 ─── */
+async function saveCardToSupabase(cardId) {
+  if (_isInitializing) return;
+  const items = [...document.querySelectorAll(`#cl-${cardId} .checklist-item`)];
+  if (!items.length) return;
+  const rows = items.map((item, idx) => ({
+    card_id:    cardId,
+    item_index: idx,
+    done:       item.querySelector('input').checked,
+    assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
+    deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
+    memo:       localStorage.getItem(`detail-${cardId}-${idx}-memo`)     || null,
+    link:       localStorage.getItem(`detail-${cardId}-${idx}-link`)     || null,
+    updated_at: new Date().toISOString()
+  }));
+  try {
+    const { error } = await _sb.from('item_states').upsert(rows, { onConflict: 'card_id,item_index' });
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[Supabase] 카드 저장 실패:', e.message);
+  }
+}
+
+/* ─── Supabase: 단일 항목 저장 ─── */
+async function saveItemToSupabase(cardId, idx) {
+  if (_isInitializing) return;
+  const clItem = document.querySelectorAll(`#cl-${cardId} .checklist-item`)[idx];
+  if (!clItem) return;
+  try {
+    const { error } = await _sb.from('item_states').upsert({
+      card_id:    cardId,
+      item_index: idx,
+      done:       clItem.querySelector('input').checked,
+      assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
+      deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
+      memo:       localStorage.getItem(`detail-${cardId}-${idx}-memo`)     || null,
+      link:       localStorage.getItem(`detail-${cardId}-${idx}-link`)     || null,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'card_id,item_index' });
+    if (error) throw error;
+  } catch (e) {
+    console.warn('[Supabase] 항목 저장 실패:', e.message);
+  }
+}
+
 /* ─── 진행률 색상 ─── */
 function progressColor(pct) {
   if (pct === 100) return '#16a34a';
@@ -835,6 +944,7 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       if (val) localStorage.setItem(key, val);
       else localStorage.removeItem(key);
       sel.closest('.checklist-item').classList.toggle('has-assignee', val !== '' && val !== '미정');
+      saveItemToSupabase(sel.dataset.card, +sel.dataset.idx);
       document.dispatchEvent(new CustomEvent('assignee-updated'));
     });
   });
@@ -904,6 +1014,7 @@ function updateCard(cardId, gradeId) {
   document.getElementById('card-' + cardId).classList.toggle('all-done', pct === 100);
 
   localStorage.setItem('card-' + cardId, JSON.stringify([...items].map(i => i.querySelector('input').checked)));
+  saveCardToSupabase(cardId);
   updateGrade(gradeId);
   updateOverall();
 }
@@ -934,18 +1045,32 @@ function updateOverall() {
 }
 
 /* ─── 초기화 ─── */
-if (localStorage.getItem('_dv') !== DATA_VERSION) {
-  Object.keys(localStorage).filter(k => k.startsWith('card-')).forEach(k => localStorage.removeItem(k));
-  localStorage.setItem('_dv', DATA_VERSION);
-}
+(async function init() {
+  // 버전 변경 시 localStorage 초기화
+  if (localStorage.getItem('_dv') !== DATA_VERSION) {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('card-') || k.startsWith('assignee-') || k.startsWith('detail-'))
+      .forEach(k => localStorage.removeItem(k));
+    localStorage.setItem('_dv', DATA_VERSION);
+  }
 
-buildUI();
+  // Supabase에서 최신 데이터 로드 → localStorage에 반영
+  await loadAllFromSupabase();
 
-GRADES.forEach(grade =>
-  grade.semesters.forEach(sem =>
-    sem.cards.forEach(card => updateCard(card.id, grade.id))
-  )
-);
+  // UI 구성 (localStorage 기반)
+  buildUI();
+
+  GRADES.forEach(grade =>
+    grade.semesters.forEach(sem =>
+      sem.cards.forEach(card => updateCard(card.id, grade.id))
+    )
+  );
+
+  // 초기화 완료 → 이후 변경사항부터 Supabase에 저장
+  _isInitializing = false;
+
+  document.getElementById('loading-overlay').style.display = 'none';
+})();
 
 /* ─── 자료준비 로드맵 v2 ─── */
 (function () {
@@ -1269,6 +1394,7 @@ GRADES.forEach(grade =>
     const sel = document.querySelector(`.assignee-select[data-card="${_cardId}"][data-idx="${_idx}"]`);
     if (sel) { sel.value = newAssignee; sel.closest('.checklist-item')?.classList.toggle('has-assignee', newAssignee !== '' && newAssignee !== '미정'); }
     if (newAssignee !== oldAssignee) document.dispatchEvent(new CustomEvent('assignee-updated'));
+    saveItemToSupabase(_cardId, _idx);
     closeModal();
   }
 
