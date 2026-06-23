@@ -236,26 +236,19 @@
 
     .rm-seg-count { font-size: .62rem; color: #c4a47c; }
 
-    /* 툴팁 */
+    /* 자료목록 (상시 표시) */
     .rm-tooltip {
-      display: none; position: absolute; top: calc(100% + 8px); left: 50%;
-      transform: translateX(-50%); min-width: 200px;
-      background: #1e293b; color: #f0dcc0; border-radius: 10px;
-      padding: 10px 13px; font-size: .72rem; z-index: 300;
-      box-shadow: 0 6px 20px rgba(0,0,0,.25); pointer-events: none;
+      display: block; position: static; transform: none;
+      margin-top: 10px; min-width: unset;
+      background: rgba(30,41,59,.07); color: #334155; border-radius: 8px;
+      padding: 8px 10px; font-size: .68rem; pointer-events: none;
     }
-    .rm-tooltip::before {
-      content: ''; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
-      border: 6px solid transparent; border-bottom-color: #1e293b;
-    }
-    .rm-seg:hover .rm-tooltip { display: block; }
-    .rm-seg:last-child .rm-tooltip { left: auto; right: 0; transform: none; }
-    .rm-seg:last-child .rm-tooltip::before { left: auto; right: 16px; transform: none; }
-    .rm-tt-title { font-weight: 700; color: #c4a47c; font-size: .63rem; margin-bottom: 7px; letter-spacing: .04em; }
+    .rm-tooltip::before { display: none; }
+    .rm-tt-title { font-weight: 700; color: #92400e; font-size: .63rem; margin-bottom: 6px; letter-spacing: .04em; }
     .rm-tt-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
     .rm-tt-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-    .rm-tt-dot.done { background: #34d399; }
-    .rm-tt-dot.todo { background: #f87171; }
+    .rm-tt-dot.done { background: #16a34a; }
+    .rm-tt-dot.todo { background: #ef4444; }
 
     /* 우선작업 체크리스트 패널 */
     .priority-panel {
@@ -336,13 +329,16 @@
     }
     .checklist-item.checked.has-assignee .check-label { border-bottom-color: #e0c898; }
 
-    /* 우선작업 담당자 태그 */
-    .pri-assignee-tip {
+    /* 우선작업 담당자·마감일 태그 */
+    .pri-assignee-tip, .pri-deadline-tip {
       display: inline-flex; align-items: center; gap: 2px;
-      background: #fef3c7; color: #92400e; border: 1px solid #fde68a;
       font-size: .6rem; font-weight: 600; padding: 1px 6px; border-radius: 4px;
       margin-left: 4px; vertical-align: middle;
     }
+    .pri-assignee-tip { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .pri-deadline-tip { background: #fff1f2; color: #dc2626; border: 1px solid #fecdd3; }
+    .pri-deadline-tip.soon { background: #fef9c3; color: #a16207; border-color: #fde68a; }
+    .pri-deadline-tip.ok   { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
 
     /* ── 담당자별 담당업무 ── */
     #assignee-section {
@@ -976,6 +972,7 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       else localStorage.removeItem(key);
       inp.closest('.checklist-item').classList.toggle('has-deadline', !!val);
       saveItemToSupabase(inp.dataset.card, +inp.dataset.idx);
+      document.dispatchEvent(new CustomEvent('deadline-updated'));
     });
   });
 
@@ -1197,11 +1194,20 @@ function updateOverall() {
             seen.add(key);
             const info = CINFO[cardId] || { name: cardId, color: '#c4a47c' };
             const assignee = localStorage.getItem(`assignee-${cardId}-${idx}`) || '';
+            const deadline = localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || '';
             items.push({ cardId, idx, period: seg.label, cardName: info.name, color: info.color,
-              itemLabel: it.querySelector('.check-label').textContent, assignee });
+              itemLabel: it.querySelector('.check-label').textContent, assignee, deadline });
           }
         });
       });
+    });
+
+    /* 마감일 임박 순 정렬 (마감일 있는 것 → 없는 것) */
+    items.sort((a, b) => {
+      if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
+      if (a.deadline) return -1;
+      if (b.deadline) return 1;
+      return 0;
     });
 
     if (badge) badge.textContent = items.length;
@@ -1209,6 +1215,17 @@ function updateOverall() {
     if (items.length === 0) {
       list.innerHTML = '<div class="pri-empty">🎉 모든 우선 자료가<br>완료되었습니다!</div>';
       return;
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    function deadlineBadge(dl) {
+      if (!dl) return '';
+      const [y, m, d] = dl.split('-');
+      const label = `${+m}/${+d}`;
+      const diff = Math.ceil((new Date(dl) - new Date(today)) / 86400000);
+      const cls = diff < 0 ? '' : diff <= 7 ? 'soon' : 'ok';
+      const prefix = diff < 0 ? '⚠️ ' : diff === 0 ? '🔴 오늘 ' : diff <= 7 ? '🟡 ' : '📅 ';
+      return `<span class="pri-deadline-tip ${cls}">${prefix}${label}</span>`;
     }
 
     list.innerHTML = items.map(it => `
@@ -1219,7 +1236,7 @@ function updateOverall() {
           <span class="pri-text">
             <span class="pri-period" style="color:${it.color};background:${it.color}1a">${it.period}</span>
             <div class="pri-card-name">${it.cardName}</div>
-            <div class="pri-item-name">${it.itemLabel}${it.assignee ? `<span class="pri-assignee-tip">👤 ${it.assignee}</span>` : ''}</div>
+            <div class="pri-item-name">${it.itemLabel}${it.assignee ? `<span class="pri-assignee-tip">👤 ${it.assignee}</span>` : ''}${deadlineBadge(it.deadline)}</div>
           </span>
         </label>
       </div>`).join('');
@@ -1254,8 +1271,9 @@ function updateOverall() {
     requestAnimationFrame(refresh)
   );
 
-  /* 담당자 변경 시 우선작업 툴팁 갱신 */
+  /* 담당자·마감일 변경 시 우선작업 갱신 */
   document.addEventListener('assignee-updated', () => requestAnimationFrame(buildPriority));
+  document.addEventListener('deadline-updated',  () => requestAnimationFrame(buildPriority));
 
   /* 카드 DOM 완성 후 최초 렌더링 */
   document.addEventListener('dashboard-ready', refresh);
