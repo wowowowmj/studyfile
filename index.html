@@ -1078,6 +1078,8 @@ function updateOverall() {
 
     _isInitializing = false;
     hideOverlay();
+    // 카드 DOM이 완성된 뒤 보조 섹션(로드맵·담당자·유형) 재렌더링
+    document.dispatchEvent(new CustomEvent('dashboard-ready'));
   }
 })();
 
@@ -1223,6 +1225,9 @@ function updateOverall() {
 
   /* 담당자 변경 시 우선작업 툴팁 갱신 */
   document.addEventListener('assignee-updated', () => requestAnimationFrame(buildPriority));
+
+  /* 카드 DOM 완성 후 최초 렌더링 */
+  document.addEventListener('dashboard-ready', refresh);
 })();
 
 /* ─── 담당자별 담당업무 ─── */
@@ -1309,6 +1314,7 @@ function updateOverall() {
     if (e.target.type === 'checkbox')
       requestAnimationFrame(buildAssigneeSection);
   });
+  document.addEventListener('dashboard-ready', buildAssigneeSection);
 })();
 
 /* ─── 자료유형별 완료율 ─── */
@@ -1350,6 +1356,7 @@ function updateOverall() {
   document.addEventListener('change', e => {
     if (e.target.type === 'checkbox') requestAnimationFrame(buildTypeSection);
   });
+  document.addEventListener('dashboard-ready', buildTypeSection);
 })();
 
 /* ─── 항목 상세 모달 ─── */
