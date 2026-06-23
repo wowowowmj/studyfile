@@ -1046,30 +1046,39 @@ function updateOverall() {
 
 /* ─── 초기화 ─── */
 (async function init() {
-  // 버전 변경 시 localStorage 초기화
-  if (localStorage.getItem('_dv') !== DATA_VERSION) {
-    Object.keys(localStorage)
-      .filter(k => k.startsWith('card-') || k.startsWith('assignee-') || k.startsWith('detail-'))
-      .forEach(k => localStorage.removeItem(k));
-    localStorage.setItem('_dv', DATA_VERSION);
+  const overlay = document.getElementById('loading-overlay');
+
+  // 어떤 상황에서도 오버레이 반드시 제거
+  function hideOverlay() {
+    if (overlay) overlay.style.display = 'none';
   }
 
-  // Supabase에서 최신 데이터 로드 → localStorage에 반영
-  await loadAllFromSupabase();
+  try {
+    // 버전 변경 시 localStorage 초기화
+    if (localStorage.getItem('_dv') !== DATA_VERSION) {
+      Object.keys(localStorage)
+        .filter(k => k.startsWith('card-') || k.startsWith('assignee-') || k.startsWith('detail-'))
+        .forEach(k => localStorage.removeItem(k));
+      localStorage.setItem('_dv', DATA_VERSION);
+    }
 
-  // UI 구성 (localStorage 기반)
-  buildUI();
+    // Supabase에서 최신 데이터 로드 (실패해도 계속 진행)
+    await loadAllFromSupabase();
+  } catch (e) {
+    console.warn('[init] 초기화 중 오류, localStorage로 진행:', e.message);
+  } finally {
+    // UI 구성 (localStorage 기반)
+    buildUI();
 
-  GRADES.forEach(grade =>
-    grade.semesters.forEach(sem =>
-      sem.cards.forEach(card => updateCard(card.id, grade.id))
-    )
-  );
+    GRADES.forEach(grade =>
+      grade.semesters.forEach(sem =>
+        sem.cards.forEach(card => updateCard(card.id, grade.id))
+      )
+    );
 
-  // 초기화 완료 → 이후 변경사항부터 Supabase에 저장
-  _isInitializing = false;
-
-  document.getElementById('loading-overlay').style.display = 'none';
+    _isInitializing = false;
+    hideOverlay();
+  }
 })();
 
 /* ─── 자료준비 로드맵 v2 ─── */
