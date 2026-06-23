@@ -828,32 +828,98 @@ const GRADES = [
   },
 ];
 
+/* ─── 카드 메타데이터 조회 ─── */
+function getCardMeta(cardId, idx) {
+  for (const grade of GRADES) {
+    for (const sem of grade.semesters) {
+      for (const card of sem.cards) {
+        if (card.id === cardId) {
+          return {
+            grade_id:   grade.id,
+            grade_name: grade.name,
+            semester:   sem.name,
+            card_type:  card.type,
+            card_title: card.title,
+            item_label: card.items[idx]?.label || ''
+          };
+        }
+      }
+    }
+  }
+  return {};
+}
+
+/* ─── Supabase 데이터 → localStorage 반영 ─── */
+function applyToLocalStorage(data) {
+  const byCard = {};
+  data.forEach(row => {
+    if (!byCard[row.card_id]) byCard[row.card_id] = [];
+    byCard[row.card_id][row.item_index] = row;
+  });
+  Object.entries(byCard).forEach(([cardId, items]) => {
+    localStorage.setItem('card-' + cardId, JSON.stringify(items.map(it => it ? it.done : false)));
+    items.forEach((it, idx) => {
+      if (!it) return;
+      localStorage.setItem(`assignee-${cardId}-${idx}`, it.assignee || '미정');
+      it.deadline ? localStorage.setItem(`detail-${cardId}-${idx}-deadline`, it.deadline)
+                  : localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
+      it.memo     ? localStorage.setItem(`detail-${cardId}-${idx}-memo`, it.memo)
+                  : localStorage.removeItem(`detail-${cardId}-${idx}-memo`);
+      it.link     ? localStorage.setItem(`detail-${cardId}-${idx}-link`, it.link)
+                  : localStorage.removeItem(`detail-${cardId}-${idx}-link`);
+    });
+  });
+}
+
+/* ─── 초기 데이터 시드 (테이블 비어있을 때) ─── */
+async function seedSupabase() {
+  const rows = [];
+  GRADES.forEach(grade => {
+    grade.semesters.forEach(sem => {
+      sem.cards.forEach(card => {
+        const saved = localStorage.getItem('card-' + card.id);
+        const states = saved ? JSON.parse(saved) : card.items.map(i => i.done);
+        card.items.forEach((item, idx) => {
+          rows.push({
+            card_id:    card.id,
+            item_index: idx,
+            grade_id:   grade.id,
+            grade_name: grade.name,
+            semester:   sem.name,
+            card_type:  card.type,
+            card_title: card.title,
+            item_label: item.label,
+            done:       states[idx] ?? item.done,
+            assignee:   localStorage.getItem(`assignee-${card.id}-${idx}`) || '미정',
+            deadline:   localStorage.getItem(`detail-${card.id}-${idx}-deadline`) || null,
+            memo:       localStorage.getItem(`detail-${card.id}-${idx}-memo`)     || null,
+            link:       localStorage.getItem(`detail-${card.id}-${idx}-link`)     || null,
+            updated_at: new Date().toISOString()
+          });
+        });
+      });
+    });
+  });
+  const { error } = await _sb.from('item_states').upsert(rows, { onConflict: 'card_id,item_index' });
+  if (error) throw error;
+  console.log(`[Supabase] ${rows.length}개 항목 시드 완료`);
+}
+
 /* ─── Supabase: 전체 로드 ─── */
 async function loadAllFromSupabase() {
   try {
     const { data, error } = await _sb.from('item_states').select('*');
     if (error) throw error;
-    if (!data || data.length === 0) return false;
 
-    const byCard = {};
-    data.forEach(row => {
-      if (!byCard[row.card_id]) byCard[row.card_id] = [];
-      byCard[row.card_id][row.item_index] = row;
-    });
+    if (!data || data.length === 0) {
+      // 테이블이 비어있으면 현재 상태로 시드
+      await seedSupabase();
+      const { data: seeded } = await _sb.from('item_states').select('*');
+      if (seeded?.length) applyToLocalStorage(seeded);
+      return true;
+    }
 
-    Object.entries(byCard).forEach(([cardId, items]) => {
-      localStorage.setItem('card-' + cardId, JSON.stringify(items.map(it => it ? it.done : false)));
-      items.forEach((it, idx) => {
-        if (!it) return;
-        localStorage.setItem(`assignee-${cardId}-${idx}`, it.assignee || '미정');
-        it.deadline ? localStorage.setItem(`detail-${cardId}-${idx}-deadline`, it.deadline)
-                    : localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
-        it.memo     ? localStorage.setItem(`detail-${cardId}-${idx}-memo`, it.memo)
-                    : localStorage.removeItem(`detail-${cardId}-${idx}-memo`);
-        it.link     ? localStorage.setItem(`detail-${cardId}-${idx}-link`, it.link)
-                    : localStorage.removeItem(`detail-${cardId}-${idx}-link`);
-      });
-    });
+    applyToLocalStorage(data);
     return true;
   } catch (e) {
     console.warn('[Supabase] 로드 실패 → localStorage 사용:', e.message);
@@ -869,6 +935,7 @@ async function saveCardToSupabase(cardId) {
   const rows = items.map((item, idx) => ({
     card_id:    cardId,
     item_index: idx,
+    ...getCardMeta(cardId, idx),
     done:       item.querySelector('input').checked,
     assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
     deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
@@ -893,6 +960,7 @@ async function saveItemToSupabase(cardId, idx) {
     const { error } = await _sb.from('item_states').upsert({
       card_id:    cardId,
       item_index: idx,
+      ...getCardMeta(cardId, idx),
       done:       clItem.querySelector('input').checked,
       assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
       deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
