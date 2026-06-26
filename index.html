@@ -605,7 +605,7 @@
       transition: color .15s, border-color .15s, background .15s;
     }
     .nav-item:hover { color: #42B08A; border-left-color: #5068B5; background: #F0F4FF; }
-    #nav-priority { display: none; }
+    #nav-priority { display: block; }
     #mob-page-title { display: none; }
     .nav-sub-item {
       display: block; padding: 6px 16px 6px 28px;
@@ -1374,13 +1374,13 @@
 <nav id="top-nav">
   <div class="nav-logo">📚 MENU</div>
   <div class="nav-wrapper">
+    <a href="#schedule-section" class="nav-item" id="nav-schedule">일정</a>
     <a href="#" class="nav-item" id="nav-priority">우선순위</a>
     <a href="#add-task-section" class="nav-item" id="nav-add">신규업무추가</a>
     <a href="#assignee-section" class="nav-item" id="nav-assignee">담당자별</a>
     <div id="assigneeSubMenu"></div>
     <a href="#type-section" class="nav-item" id="nav-type">자료유형별</a>
     <a href="#main" class="nav-item" id="nav-grade">학년별</a>
-    <a href="#schedule-section" class="nav-item" id="nav-schedule">일정</a>
   </div>
 </nav>
 <div id="mob-page-title"></div>
