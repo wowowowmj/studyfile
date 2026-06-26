@@ -1324,6 +1324,18 @@
     .cal-modal-label { font-size: .72rem; font-weight: 600; color: #94A7E8; min-width: 44px; padding-top: 1px; }
     .cal-modal-value { font-size: .82rem; color: #334155; flex: 1; line-height: 1.5; }
 
+    /* 날짜 일정 목록 모달 */
+    .cal-day { cursor: pointer; }
+    .cal-day-list-body { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; max-height: 55vh; overflow-y: auto; }
+    .cal-day-list-empty { color: #94A7E8; font-size: .8rem; text-align: center; padding: 24px 0; }
+    .cal-day-list-item { border-radius: 8px; padding: 9px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; transition: opacity .15s; border: none; text-align: left; width: 100%; box-sizing: border-box; }
+    .cal-day-list-item:hover { opacity: .8; }
+    .cal-day-list-title { font-size: .87rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-day-list-meta { font-size: .72rem; opacity: .8; }
+    .cal-day-list-footer { padding: 8px 12px 14px; }
+    .cal-day-list-add { width: 100%; padding: 9px; border: 2px dashed #94A7E8; border-radius: 8px; background: transparent; color: #5068B5; font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .15s; }
+    .cal-day-list-add:hover { background: #EEF2FF; border-color: #5068B5; }
+
     /* ── 캘린더 반응형 ── */
     /* 셀 높이를 뷰포트 너비에 비례해 부드럽게 조정 */
     .cal-day { min-height: clamp(52px, 11vw, 90px); }
@@ -1633,6 +1645,18 @@
     <div class="modal-footer">
       <button class="modal-btn modal-btn-cancel" id="modal-cancel-btn">취소</button>
       <button class="modal-btn modal-btn-save" id="modal-save-btn">저장</button>
+    </div>
+  </div>
+</div>
+<div id="cal-day-modal" class="cal-modal-overlay">
+  <div class="cal-modal-box">
+    <div class="cal-modal-header">
+      <div class="cal-modal-title-text" id="calDayModalTitle"></div>
+      <button class="cal-modal-close" id="calDayModalClose">✕</button>
+    </div>
+    <div class="cal-day-list-body" id="calDayModalBody"></div>
+    <div class="cal-day-list-footer" id="calDayModalFooter" style="display:none">
+      <button class="cal-day-list-add" id="calDayModalAddBtn">+ 일정 추가</button>
     </div>
   </div>
 </div>
@@ -4491,6 +4515,7 @@ function renderCalendar(events) {
     var cls  = ['cal-day'];
     if (cell.other)                cls.push('other-month');
     if (cell.dateKey === todayKey) cls.push('today');
+    if (calEditMode)               cls.push('edit-mode');
     el.className = cls.join(' ');
     el.dataset.dateKey = cell.dateKey;
 
@@ -4524,6 +4549,7 @@ function renderCalendar(events) {
       }
       el.appendChild(wrap);
     }
+    el.addEventListener('click', function() { openCalDayModal(cell.dateKey); });
     grid.appendChild(el);
   });
 
@@ -4548,11 +4574,6 @@ function makeEventEl(ev) {
   txt.style.overflow = 'hidden'; txt.style.textOverflow = 'ellipsis'; txt.style.whiteSpace = 'nowrap';
   el.appendChild(txt);
 
-  el.addEventListener('click', function(e) {
-    e.stopPropagation();
-    if (calEditMode) { openCalForm(null, ev.id, ev._grade); }
-    else             { openCalEventModal(ev); }
-  });
   return el;
 }
 
@@ -4705,17 +4726,84 @@ document.getElementById('calEditBtn')?.addEventListener('click', function() {
   }
 });
 
-/* 날짜 셀 클릭 → 일정 추가 */
-function enableDayCellClick() {
-  document.querySelectorAll('.cal-day').forEach(function(cell) {
-    cell.classList.add('edit-mode');
-    cell.addEventListener('click', function(e) {
-      if (!calEditMode) return;
-      if (e.target.closest('.cal-event')) return;
-      openCalForm(cell.dataset.dateKey, null, null);
-    });
+/* enableDayCellClick: renderCalendar 내부에서 처리됨 */
+function enableDayCellClick() {}
+
+/* 날짜 일정 목록 모달 */
+function openCalDayModal(dateKey) {
+  var body    = document.getElementById('calDayModalBody');
+  var footer  = document.getElementById('calDayModalFooter');
+  var addBtn  = document.getElementById('calDayModalAddBtn');
+  var titleEl = document.getElementById('calDayModalTitle');
+  if (!body) return;
+
+  var d = new Date(dateKey + 'T12:00:00');
+  var weekdays = ['일','월','화','수','목','금','토'];
+  titleEl.textContent = d.getFullYear() + '년 ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일 (' + weekdays[d.getDay()] + ')';
+
+  var evs = (calAllEvents || []).filter(function(ev) {
+    return getEventDateKeys(ev).indexOf(dateKey) >= 0;
   });
+
+  body.innerHTML = '';
+  if (!evs.length) {
+    var empty = document.createElement('div');
+    empty.className = 'cal-day-list-empty';
+    empty.textContent = '등록된 일정이 없어요';
+    body.appendChild(empty);
+  } else {
+    evs.forEach(function(ev) {
+      var col  = CAL_COLORS[ev._grade];
+      var item = document.createElement('button');
+      item.className = 'cal-day-list-item';
+      item.style.background = col.bg;
+      item.style.color = col.text;
+
+      var t = document.createElement('div');
+      t.className = 'cal-day-list-title';
+      t.textContent = ev.summary || '(제목 없음)';
+      item.appendChild(t);
+
+      var m = document.createElement('div');
+      m.className = 'cal-day-list-meta';
+      var isAllDay = ev.start && ev.start.date && !ev.start.dateTime;
+      if (isAllDay) {
+        m.textContent = col.name + ' · 종일';
+      } else {
+        var pad = function(n) { return String(n).padStart(2,'0'); };
+        var st  = new Date(ev.start.dateTime);
+        m.textContent = col.name + ' · ' + pad(st.getHours()) + ':' + pad(st.getMinutes());
+      }
+      item.appendChild(m);
+
+      item.addEventListener('click', function() {
+        document.getElementById('cal-day-modal').classList.remove('open');
+        if (calEditMode) { openCalForm(null, ev.id, ev._grade); }
+        else             { openCalEventModal(ev); }
+      });
+      body.appendChild(item);
+    });
+  }
+
+  if (calEditMode) {
+    footer.style.display = '';
+    addBtn.onclick = function() {
+      document.getElementById('cal-day-modal').classList.remove('open');
+      openCalForm(dateKey, null, null);
+    };
+  } else {
+    footer.style.display = 'none';
+  }
+
+  document.getElementById('cal-day-modal').classList.add('open');
 }
+
+document.getElementById('calDayModalClose')?.addEventListener('click', function() {
+  document.getElementById('cal-day-modal')?.classList.remove('open');
+});
+document.getElementById('cal-day-modal')?.addEventListener('click', function(e) {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+});
 
 /* 폼 열기 */
 function openCalForm(dateKey, eventId, grade) {
