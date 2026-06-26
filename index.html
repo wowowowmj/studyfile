@@ -11,7 +11,7 @@
 
     body {
       font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: #fdf6ed;
+      background: #F4F7FF;
       color: #1e293b;
       min-height: 100vh;
       padding-left: 108px;
@@ -19,13 +19,13 @@
 
     /* ── 헤더 ── */
     header {
-      background: linear-gradient(135deg, #7c2d12 0%, #b45309 100%);
+      background: linear-gradient(135deg, #5068B5 0%, #42B08A 100%);
       color: #fff;
-      padding: 28px 40px 24px;
+      padding: 14px 40px 12px;
       box-shadow: 0 4px 16px rgba(30,58,138,.25);
     }
-    header h1 { font-size: 1.6rem; font-weight: 700; letter-spacing: -.5px; margin-bottom: 4px; }
-    header p.subtitle { font-size: .85rem; opacity: .75; margin-bottom: 20px; }
+    header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; margin-bottom: 2px; }
+    header p.subtitle { font-size: .78rem; opacity: .75; margin-bottom: 10px; }
 
     .overall-bar-wrap { display: flex; align-items: center; gap: 14px; }
     .overall-bar-wrap label { font-size: .8rem; opacity: .85; white-space: nowrap; }
@@ -35,13 +35,13 @@
       border-radius: 99px; overflow: hidden;
     }
     .overall-bar-fill {
-      height: 100%; background: #fbbf24;
+      height: 100%; background: #F8B84A;
       border-radius: 99px; transition: width .5s ease;
     }
     .overall-pct { font-size: .85rem; font-weight: 700; min-width: 38px; text-align: right; }
 
     /* ── 메인 ── */
-    main { max-width: 1140px; margin: 0 auto; padding: 36px 24px 60px; }
+    main { max-width: 1200px; margin: 0 auto; padding: 0 24px 60px; }
 
     /* ── 학년 섹션 ── */
     .grade-section { margin-bottom: 52px; }
@@ -52,16 +52,16 @@
     .grade-badge {
       display: inline-flex; align-items: center; justify-content: center;
       width: 36px; height: 36px; border-radius: 50%;
-      background: var(--grade-color, #c4a47c);
+      background: var(--grade-color, #94A7E8);
       color: #fff; font-size: .85rem; font-weight: 700; flex-shrink: 0;
     }
     .grade-header h2 { font-size: 1.18rem; font-weight: 700; color: #1e293b; }
     .grade-mini-bar {
-      flex: 1; height: 6px; background: #f0dcc0;
+      flex: 1; height: 6px; background: #DDE5FF;
       border-radius: 99px; overflow: hidden; max-width: 200px;
     }
     .grade-mini-fill {
-      height: 100%; background: var(--grade-color, #c4a47c);
+      height: 100%; background: var(--grade-color, #94A7E8);
       border-radius: 99px; transition: width .4s ease;
     }
     .grade-mini-pct { font-size: .78rem; font-weight: 600; color: #64748b; min-width: 36px; }
@@ -69,49 +69,44 @@
     /* ── 학기 그리드 (같은 학년 1학기·2학기 나란히) ── */
     .semesters-grid {
       display: flex;
-      flex-wrap: nowrap;
+      flex-wrap: wrap;
       gap: 24px;
       align-items: start;
     }
     .semester-block {
-      flex: 0 0 auto;
+      width: 100%;
     }
     .semester-label {
       display: flex; align-items: center; gap: 8px;
       font-size: .82rem; font-weight: 600; color: #64748b;
       padding-bottom: 10px; margin-bottom: 14px;
-      border-bottom: 1.5px solid #f0dcc0;
+      border-bottom: 1.5px solid #DDE5FF;
     }
     .semester-label::before {
       content: '';
       display: inline-block; width: 3px; height: 14px;
-      background: var(--grade-color, #c4a47c); border-radius: 99px;
+      background: var(--grade-color, #94A7E8); border-radius: 99px;
     }
     .semester-cards {
-      display: flex;
-      flex-wrap: wrap;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 14px;
-    }
-
-    .semester-cards .card {
-      width: 250px;
-      flex-shrink: 0;
     }
 
     /* ── 카드 ── */
     .card {
       background: #fff; border-radius: 16px;
       box-shadow: 0 2px 12px rgba(0,0,0,.07);
-      padding: 22px 22px 18px; transition: box-shadow .2s;
+      padding: 22px 14px 18px; transition: box-shadow .2s;
     }
     .card:hover { box-shadow: 0 6px 24px rgba(0,0,0,.12); }
 
     .card-top { display: flex; align-items: center; gap: 18px; margin-bottom: 16px; }
 
     /* 원형 진행률 */
-    .circle-wrap { position: relative; flex-shrink: 0; width: 84px; height: 84px; }
-    .circle-wrap svg { transform: rotate(-90deg); width: 84px; height: 84px; }
-    .circle-bg  { fill: none; stroke: #fef0d8; stroke-width: 8; }
+    .circle-wrap { position: relative; flex-shrink: 0; width: 68px; height: 68px; }
+    .circle-wrap svg { transform: rotate(-90deg); width: 68px; height: 68px; }
+    .circle-bg  { fill: none; stroke: #EEF2FF; stroke-width: 8; }
     .circle-prog {
       fill: none; stroke-width: 8; stroke-linecap: round;
       transition: stroke-dashoffset .5s ease, stroke .4s ease;
@@ -121,53 +116,118 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       line-height: 1;
     }
-    .circle-pct-text .num  { font-size: 1.2rem; font-weight: 700; color: #1e293b; }
-    .circle-pct-text .unit { font-size: .6rem; color: #c4a47c; margin-top: 2px; }
+    .circle-pct-text .num  { font-size: 1.0rem; font-weight: 700; color: #1e293b; }
+    .circle-pct-text .unit { font-size: .52rem; color: #94A7E8; margin-top: 2px; }
 
     .card-info { flex: 1; min-width: 0; }
     .card-type-badge {
       display: inline-block; font-size: .68rem; font-weight: 600;
-      padding: 2px 8px; border-radius: 99px; margin-bottom: 5px; color: #fff;
+      padding: 2px 8px; border-radius: 99px; margin-bottom: 4px; color: #fff;
     }
-    .card-title  { font-size: .95rem; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
-    .card-count  { font-size: .78rem; color: #64748b; }
+    .card-title-row { display: flex; align-items: baseline; gap: 8px; }
+    .card-title  { font-size: .92rem; font-weight: 700; color: #1e293b; flex: 1; min-width: 0; }
+    .card-count  { display: none; }
     .card-count .done-num { font-weight: 700; color: #1e293b; }
 
     /* ── 체크리스트 ── */
     .checklist { display: flex; flex-direction: column; gap: 3px; }
 
+    .item-main { display: flex; align-items: center; width: 100%; }
     .checklist-item {
-      display: flex; align-items: center; gap: 10px;
+      display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0;
       cursor: pointer; padding: 5px 8px; border-radius: 8px;
       transition: background .15s; user-select: none;
     }
-    .checklist-item:hover { background: #fff9f0; }
+    .item-main:hover .checklist-item { background: #F0F4FF; }
     .checklist-item input[type="checkbox"] { display: none; }
+    .item-delete-btn {
+      background: none; border: none; cursor: pointer; color: #B0C0EC;
+      font-size: .8rem; padding: 0 2px; flex-shrink: 0;
+      opacity: 0; transition: opacity .15s; line-height: 1; border-radius: 3px;
+    }
+    .item-main:hover .item-delete-btn { opacity: 1; }
+    .item-delete-btn:hover { color: #dc2626; background: #fee2e2; }
+    .drag-handle {
+      color: #94A7E8; font-size: .85rem; cursor: grab; flex-shrink: 0;
+      padding: 0 2px; line-height: 1; user-select: none;
+      display: none;
+    }
+    .card.sort-mode .drag-handle { display: block; }
+    .card.sort-mode .checklist-item { cursor: default; }
+    .card.sort-mode .checklist-item input[type="checkbox"] { pointer-events: none; }
+    .item-wrap.dragging { opacity: .45; }
+    .sort-toggle-btn {
+      font-size: .68rem; color: #94A7E8; background: none; border: 1px solid #C0CFFF;
+      border-radius: 5px; padding: 2px 7px; cursor: pointer; transition: color .15s, background .15s;
+      flex-shrink: 0;
+    }
+    .sort-toggle-btn:hover { color: #42B08A; background: #EEF2FF; }
+    .card.sort-mode .sort-toggle-btn { color: #fff; background: #94A7E8; border-color: #94A7E8; }
 
-    .check-box {
-      width: 20px; height: 20px; border-radius: 6px;
-      border: 2px solid #e8c8a0; flex-shrink: 0;
-      display: flex; align-items: center; justify-content: center;
-      transition: background .2s, border-color .2s;
+    .item-expand-btn {
+      background: none; border: none; cursor: pointer; color: #B0C0EC;
+      font-size: .75rem; padding: 0 3px; flex-shrink: 0; border-radius: 3px;
+      opacity: 0; transition: opacity .15s, color .15s; line-height: 1;
+      position: relative;
     }
-    .check-box svg {
-      width: 11px; height: 11px; fill: none;
-      stroke: #fff; stroke-width: 2.5;
-      stroke-linecap: round; stroke-linejoin: round;
-      opacity: 0; transition: opacity .15s;
+    .item-main:hover .item-expand-btn,
+    .item-main.memo-open .item-expand-btn { opacity: 1; }
+    .item-expand-btn:hover,
+    .item-main.memo-open .item-expand-btn { color: #5068B5; }
+    .item-expand-btn.has-memo { opacity: 1; color: #5068B5; }
+    .item-expand-btn.has-memo::after {
+      content: ''; position: absolute; top: 0; right: -1px;
+      width: 5px; height: 5px; background: #dc2626; border-radius: 50%;
     }
 
-    /* 완료 상태 */
-    .checklist-item.checked .check-box {
-      background: var(--grade-color, #64748b);
-      border-color: var(--grade-color, #64748b);
+    #memo-tooltip {
+      position: fixed; z-index: 9999; pointer-events: none;
+      background: #1e293b; color: #f8fafc;
+      font-size: .7rem; line-height: 1.5;
+      padding: 6px 9px; border-radius: 6px;
+      white-space: pre-wrap; word-break: break-word;
+      max-width: 220px; box-shadow: 0 4px 12px rgba(0,0,0,.25);
+      display: none;
     }
-    .checklist-item.checked .check-box svg { opacity: 1; }
+    .pri-memo-dot {
+      display: inline-block; width: 6px; height: 6px;
+      background: #dc2626; border-radius: 50%;
+      margin-left: 4px; vertical-align: middle;
+      flex-shrink: 0; cursor: default;
+    }
+
+    .item-memo-row {
+      display: none; padding: 0 8px 8px 38px;
+    }
+    .item-memo-row.open { display: flex; gap: 6px; align-items: flex-start; }
+    .item-memo {
+      flex: 1; resize: none; min-height: 48px; border: 1px solid #DDE5FF;
+      border-radius: 6px; padding: 6px 8px; font-size: .78rem; color: #334155;
+      background: #F0F4FF; font-family: inherit; line-height: 1.4;
+    }
+    .item-memo:focus { outline: none; border-color: #5068B5; background: #fff; }
+    .item-memo-delete {
+      background: none; border: 1px solid #fecaca; border-radius: 6px;
+      cursor: pointer; color: #dc2626; font-size: .75rem; padding: 4px 8px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+    .item-memo-delete:hover { background: #fee2e2; }
+
+    .status-btn {
+      flex-shrink: 0; width: 46px; height: 22px; border-radius: 11px;
+      border: 1px solid #C0CFFF; background: #f9f5ef; color: transparent;
+      font-size: .6rem; font-weight: 700; cursor: pointer; padding: 0;
+      transition: background .15s, color .15s, border-color .15s;
+      white-space: nowrap; letter-spacing: -.3px;
+    }
+    .status-btn[data-status="진행"] { background: #dbeafe; border-color: #93c5fd; color: #1d4ed8; }
+    .status-btn[data-status="검수/촬영"] { background: #ede9fe; border-color: #c4b5fd; color: #7c3aed; }
+    .status-btn[data-status="완료"] { background: #dcfce7; border-color: #86efac; color: #15803d; }
     .check-label { font-size: .82rem; color: #475569; transition: color .2s; }
     .checklist-item.checked .check-label {
       text-decoration: line-through;
       text-decoration-thickness: 1.5px;
-      color: #c4a47c;
+      color: #94A7E8;
     }
 
     /* 완료 배지 */
@@ -178,11 +238,53 @@
     }
     .complete-badge svg { width: 14px; height: 14px; }
     .card.all-done .complete-badge { display: flex; }
+    .detail-toggle-wrap { display: none; flex-shrink: 0; }
+    .detail-toggle-btn {
+      font-size: .72rem; color: #94A7E8; background: none; border: none;
+      cursor: pointer; text-decoration: underline; padding: 0;
+    }
+    .detail-toggle-btn:hover { color: #42B08A; }
+    /* type-expandable / grade-section all-done 카드: 버튼 표시 */
+    .type-expandable .card.all-done .detail-toggle-wrap,
+    .grade-section .card.all-done .detail-toggle-wrap { display: block; }
+    /* all-done 카드 여백 축소 */
+    .type-expandable .card.all-done,
+    .grade-section .card.all-done { padding-top: 12px; padding-bottom: 10px; align-self: start; }
+    .type-expandable .card.all-done .card-top,
+    .grade-section .card.all-done .card-top { margin-bottom: 0; }
+    /* show-detail 시 숨겨졌던 내용 복원 + 여백 원복 */
+    .type-expandable .card.all-done.show-detail,
+    .grade-section .card.all-done.show-detail { padding-top: 22px; padding-bottom: 18px; align-self: stretch; }
+    .type-expandable .card.all-done.show-detail .card-top,
+    .grade-section .card.all-done.show-detail .card-top { margin-bottom: 16px; }
+    .type-expandable .card.all-done.show-detail .checklist,
+    .type-expandable .card.all-done.show-detail .add-item-row { display: flex; }
+    .type-expandable .card.all-done.show-detail .complete-badge { display: flex; }
+    .grade-section .card.all-done.show-detail .checklist,
+    .grade-section .card.all-done.show-detail .add-item-row { display: flex; }
+    .grade-section .card.all-done.show-detail .complete-badge { display: flex; }
+    .card-pending-footer {
+      display: none; align-items: center; justify-content: flex-end; gap: 8px;
+      margin: 10px -14px -18px; padding: 8px 14px 12px;
+      border-top: 1px solid #DDE5FF; background: #fffdf7; border-radius: 0 0 16px 16px;
+    }
+    .card-pending-footer.visible { display: flex; }
+    .cpf-cancel {
+      padding: 4px 10px; border-radius: 8px; border: 1px solid #C0CFFF;
+      background: #fff; color: #78716c; font-size: .75rem; cursor: pointer;
+    }
+    .cpf-apply {
+      padding: 4px 12px; border-radius: 8px; border: 1px solid #22c55e;
+      background: #f0fdf4; color: #15803d; font-size: .75rem; font-weight: 600; cursor: pointer;
+    }
+    .cpf-cancel:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+    .cpf-apply:hover  { background: #dcfce7; }
+    .item-wrap.card-item-pending { background: #F0F4FF; border-radius: 8px; }
 
     /* ─── 자료준비 로드맵 ─── */
     #roadmap-section {
       background: #fff;
-      border-bottom: 1px solid #f0dcc0;
+      border-bottom: 1px solid #DDE5FF;
       box-shadow: 0 2px 6px rgba(0,0,0,.04);
     }
     .roadmap-wrapper { max-width: 1200px; margin: 0 auto; padding: 24px 24px 28px; }
@@ -196,11 +298,11 @@
     /* 구간 띠 */
     .roadmap-band {
       display: flex; min-width: max-content;
-      border: 1.5px solid #f0dcc0; border-radius: 12px; overflow: visible;
+      border: 1.5px solid #DDE5FF; border-radius: 12px; overflow: visible;
     }
     .rm-seg {
       flex: 1; min-width: 130px; padding: 20px 16px;
-      position: relative; border-right: 1px solid #f0dcc0;
+      position: relative; border-right: 1px solid #DDE5FF;
       cursor: default; transition: filter .15s;
     }
     .rm-seg:first-child { border-radius: 10px 0 0 10px; }
@@ -235,7 +337,7 @@
     .rm-seg.seg-yellow .rm-bar-fill { background: #eab308; }
     .rm-seg.seg-red    .rm-bar-fill { background: #ef4444; }
 
-    .rm-seg-count { font-size: .62rem; color: #c4a47c; }
+    .rm-seg-count { font-size: .62rem; color: #94A7E8; }
 
     /* 자료목록 (상시 표시) */
     .rm-tooltip {
@@ -245,7 +347,7 @@
       padding: 8px 10px; font-size: .68rem; pointer-events: none;
     }
     .rm-tooltip::before { display: none; }
-    .rm-tt-title { font-weight: 700; color: #92400e; font-size: .63rem; margin-bottom: 6px; letter-spacing: .04em; }
+    .rm-tt-title { font-weight: 700; color: #42B08A; font-size: .63rem; margin-bottom: 6px; letter-spacing: .04em; }
     .rm-tt-row { display: flex; align-items: center; gap: 6px; padding: 2px 0; }
     .rm-tt-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
     .rm-tt-dot.done { background: #16a34a; }
@@ -253,15 +355,15 @@
 
     /* 우선작업 체크리스트 패널 */
     .priority-panel {
-      width: 246px; flex-shrink: 0;
-      border: 1.5px solid #f0dcc0; border-radius: 12px;
+      width: 280px; flex-shrink: 0;
+      border: 1.5px solid #DDE5FF; border-radius: 12px;
       display: flex; flex-direction: column; overflow: hidden; background: #fff;
     }
     .pri-header {
-      padding: 10px 14px; border-bottom: 1px solid #fef0d8;
+      padding: 10px 14px; border-bottom: 1px solid #EEF2FF;
       font-size: .78rem; font-weight: 700; color: #1e293b;
       display: flex; align-items: center; gap: 5px; flex-shrink: 0;
-      background: #fff9f2;
+      background: #F5F7FF;
     }
     .pri-badge {
       margin-left: auto; font-size: .65rem; font-weight: 700;
@@ -269,66 +371,92 @@
     }
     .pri-list { overflow-y: auto; flex: 1; padding: 4px 0; min-height: 80px; max-height: 260px; }
     .pri-empty {
-      padding: 20px 14px; text-align: center; font-size: .75rem; color: #c4a47c; line-height: 1.6;
+      padding: 20px 14px; text-align: center; font-size: .75rem; color: #94A7E8; line-height: 1.6;
     }
-    .pri-item { padding: 5px 12px; }
-    .pri-item label {
-      display: flex; align-items: flex-start; gap: 8px; cursor: pointer; user-select: none;
+    .pri-item { padding: 5px 12px; display: flex; align-items: flex-start; gap: 8px; }
+    .pri-check-label { flex-shrink: 0; display: flex; cursor: pointer; user-select: none; padding-top: 1px; }
+    .pri-body { flex: 1; min-width: 0; }
+    .pri-top-row { display: flex; align-items: center; gap: 4px; margin-bottom: 2px; }
+    /* ── 우선작업 마감기한·담당자 태그 & 더블클릭 편집 ── */
+    .pri-controls {
+      display: flex; flex-direction: row; align-items: center;
+      gap: 3px; flex-shrink: 0; margin-left: auto;
     }
-    .pri-item input[type="checkbox"] { display: none; }
-    .pri-chk {
-      width: 16px; height: 16px; border-radius: 4px; border: 2px solid #e8c8a0;
-      flex-shrink: 0; margin-top: 1px; display: flex; align-items: center;
-      justify-content: center; transition: background .15s, border-color .15s;
+    .pri-ctrl-wrap { position: relative; display: inline-flex; }
+    .pri-meta-tag {
+      display: inline-flex; align-items: center; justify-content: center; gap: 3px;
+      width: 52px; height: 20px; flex-shrink: 0;
+      font-size: .65rem; font-weight: 600; border-radius: 4px; overflow: hidden;
+      cursor: pointer; user-select: none; white-space: nowrap; transition: opacity .15s;
     }
-    .pri-chk svg {
-      width: 9px; height: 9px; fill: none; stroke: #fff;
-      stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; opacity: 0;
+    .pri-meta-tag:hover { opacity: .75; }
+    .pri-meta-tag.date-empty   { background: #EEF2FF; color: #94A7E8; border: 1px dashed #B8C8F5; }
+    .pri-meta-tag.date-overdue { background: #fff1f2; color: #dc2626; border: 1px solid #fecdd3; }
+    .pri-meta-tag.date-soon    { background: #fef9c3; color: #a16207; border: 1px solid #fde68a; }
+    .pri-meta-tag.date-ok      { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; }
+    /* 편집 입력 — 기본 숨김, .editing 시 노출 */
+    .pri-ctrl-wrap .pri-edit-input { display: none; }
+    .pri-ctrl-wrap.editing .pri-meta-tag { display: none; }
+    .pri-ctrl-wrap.editing .pri-edit-input {
+      display: inline-block; font-family: inherit; font-size: .65rem;
+      border: 1.5px solid #5068B5; border-radius: 4px;
+      padding: 2px 5px; outline: none; color: #1e293b; background: #fff;
     }
-    .pri-item.pri-checked .pri-chk { background: #d97706; border-color: #d97706; }
-    .pri-item.pri-checked .pri-chk svg { opacity: 1; }
-    .pri-item.pri-checked .pri-item-name { text-decoration: line-through; color: #c4a47c; }
-    .pri-text { flex: 1; min-width: 0; }
-    .pri-period {
-      display: inline-block; font-size: .58rem; font-weight: 700;
-      padding: 1px 5px; border-radius: 4px; margin-bottom: 2px;
+    .pri-ctrl-wrap.editing input[type="date"] { width: 100px; }
+    .pri-ctrl-wrap.editing select[size] {
+      position: absolute; right: 0; top: 100%; z-index: 50;
+      display: block; background: #fff; border: 1.5px solid #5068B5 !important;
+      border-radius: 8px; min-width: 88px; padding: 3px 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,.14); outline: none;
+      font-family: inherit; font-size: .72rem; color: #1e293b;
     }
-    .pri-card-name { font-size: .7rem; font-weight: 600; color: #334155; margin-bottom: 1px; }
-    .pri-item-name { font-size: .67rem; color: #64748b; }
+    .pri-ctrl-wrap.editing select[size] option { padding: 5px 12px; cursor: pointer; }
+    .pri-item .status-btn { margin-top: 1px; }
+    .pri-card-name { font-size: .7rem; font-weight: 600; color: #334155; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .pri-name-row { display: flex; align-items: center; gap: 4px; }
+    .pri-item-name { font-size: .67rem; color: #64748b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; min-width: 0; }
 
     /* ── 담당자 입력 ── */
-    .item-col { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
-    .check-label { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .item-col { flex: 1; min-width: 0; display: flex; flex-direction: row; align-items: center; gap: 4px; }
+    .check-label { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
     /* 마감기한 인라인 입력 */
+    .deadline-display {
+      flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center;
+      width: 52px; height: 18px; border: 1px solid #DDE5FF; border-radius: 4px;
+      background: #F0F4FF; font-size: .6rem; color: #5068B5; cursor: pointer;
+      font-family: inherit; box-sizing: border-box;
+    }
+    .checklist-item.checked .deadline-display { color: #94A7E8; border-color: #ece7e0; background: #fafafa; }
     .deadline-input {
-      display: block;
+      position: fixed; left: -9999px; top: -9999px;
+      width: 0; height: 0; opacity: 0; pointer-events: none;
       border: none; outline: none; background: transparent; font-family: inherit;
-      font-size: .6rem; color: #d97706; padding: 0; cursor: pointer;
-      border-bottom: 1px dashed #fde68a; max-width: 92px;
+      font-size: .6rem; color: #5068B5; padding: 0; cursor: pointer;
+      border-bottom: 1px dashed #C0CFFF; max-width: 92px;
     }
     .deadline-input::-webkit-calendar-picker-indicator {
       width: 8px; height: 8px; opacity: .45; cursor: pointer; padding: 0; margin-left: 2px;
     }
-    .deadline-input:focus { outline: none; border-bottom-color: #fbbf24; }
+    .deadline-input:focus { outline: none; border-bottom-color: #F8B84A; }
     .deadline-input:focus::-webkit-calendar-picker-indicator { opacity: .8; }
-    .checklist-item.checked .deadline-input { color: #c4a47c; border-bottom-color: #f0dcc0; }
-    .assignee-colon { font-size: .75rem; color: #c4a47c; flex-shrink: 0; }
+    .checklist-item.checked .deadline-input { color: #94A7E8; border-bottom-color: #DDE5FF; }
+    .assignee-colon { font-size: .75rem; color: #94A7E8; flex-shrink: 0; }
     .assignee-input {
       width: 40px; flex-shrink: 0; user-select: text;
       border: none; outline: none; background: transparent; font-family: inherit;
-      font-size: .72rem; color: #92400e;
-      border-bottom: 1.5px dashed #e0c898; padding: 0 2px;
+      font-size: .72rem; color: #42B08A;
+      border-bottom: 1.5px dashed #B8C8F5; padding: 0 2px;
       transition: width .2s ease, border-color .15s;
       cursor: text;
     }
-    .assignee-input::placeholder { color: #e0c898; font-size: .65rem; }
-    .assignee-input:focus { width: 70px; border-bottom-color: #fbbf24; }
-    .assignee-input:not(:placeholder-shown) { border-bottom-color: #fbbf24; font-weight: 600; }
+    .assignee-input::placeholder { color: #B8C8F5; font-size: .65rem; }
+    .assignee-input:focus { width: 70px; border-bottom-color: #F8B84A; }
+    .assignee-input:not(:placeholder-shown) { border-bottom-color: #F8B84A; font-weight: 600; }
     .checklist-item.has-assignee .check-label {
-      border-bottom: 2px solid #fbbf24; padding-bottom: 1px;
+      border-bottom: 2px solid #F8B84A; padding-bottom: 1px;
     }
-    .checklist-item.checked.has-assignee .check-label { border-bottom-color: #e0c898; }
+    .checklist-item.checked.has-assignee .check-label { border-bottom-color: #B8C8F5; }
 
     /* 우선작업 담당자·마감일 태그 */
     .pri-assignee-tip, .pri-deadline-tip {
@@ -336,15 +464,15 @@
       font-size: .6rem; font-weight: 600; padding: 1px 6px; border-radius: 4px;
       margin-left: 4px; vertical-align: middle;
     }
-    .pri-assignee-tip { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+    .pri-assignee-tip { background: #fef3c7; color: #42B08A; border: 1px solid #C0CFFF; }
     .pri-deadline-tip { background: #fff1f2; color: #dc2626; border: 1px solid #fecdd3; }
     .pri-deadline-tip.soon { background: #fef9c3; color: #a16207; border-color: #fde68a; }
     .pri-deadline-tip.ok   { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
 
     /* ── 담당자별 담당업무 ── */
     #assignee-section {
-      background: #fff9f0;
-      border-bottom: 1px solid #f0dcc0;
+      background: #F0F4FF;
+      border-bottom: 1px solid #DDE5FF;
     }
     .assignee-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px 24px 26px; }
     .assignee-title {
@@ -354,10 +482,10 @@
     .assignee-grid { display: flex; gap: 14px; }
     .assignee-card {
       flex: 1; background: #fff; border-radius: 12px;
-      border: 1.5px solid #f0dcc0; overflow: hidden;
+      border: 1.5px solid #DDE5FF; overflow: hidden;
     }
     .assignee-card-header {
-      padding: 10px 14px; background: #fff9f0; border-bottom: 1px solid #f0dcc0;
+      padding: 10px 14px; background: #F0F4FF; border-bottom: 1px solid #DDE5FF;
       font-size: .82rem; font-weight: 700; color: #1e293b;
       display: flex; align-items: center; gap: 7px;
     }
@@ -368,49 +496,84 @@
     }
     .assignee-count {
       margin-left: auto; font-size: .65rem; font-weight: 600;
-      background: #f0dcc0; color: #64748b; padding: 1px 7px; border-radius: 99px;
+      background: #DDE5FF; color: #64748b; padding: 1px 7px; border-radius: 99px;
       white-space: nowrap;
     }
     .ac-toggle {
       width: 22px; height: 22px; border-radius: 50%;
-      border: 1.5px solid #f0dcc0; background: #fff;
+      border: 1.5px solid #DDE5FF; background: #fff;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; color: #64748b; flex-shrink: 0; margin-left: 6px;
       transition: background .15s, border-color .15s;
     }
-    .ac-toggle:hover { background: #fef0d8; border-color: #e8c8a0; }
+    .ac-toggle:hover { background: #EEF2FF; border-color: #C0CFFF; }
     .ac-toggle svg { transition: transform .25s ease; }
     .assignee-card.collapsed .ac-toggle svg { transform: rotate(180deg); }
     .assignee-card.collapsed .assignee-items { display: none; }
+    .assignee-card.collapsed {
+      background: transparent; border-color: transparent; box-shadow: none;
+    }
+    .assignee-card.collapsed .assignee-card-header {
+      border-bottom: none; border-radius: 12px; border: 1.5px solid #DDE5FF;
+    }
     .assignee-items { padding: 4px 0; }
     .assignee-empty {
-      padding: 18px 14px; font-size: .73rem; color: #c4a47c; text-align: center; line-height: 1.6;
+      padding: 18px 14px; font-size: .73rem; color: #94A7E8; text-align: center; line-height: 1.6;
     }
+    .at-item { border-bottom: 1px solid #EEF2FF; }
+    .at-item:last-child { border-bottom: none; }
     .assignee-task {
       padding: 6px 14px; display: flex; align-items: flex-start; gap: 8px;
-      border-bottom: 1px solid #fef0d8;
     }
-    .assignee-task:last-child { border-bottom: none; }
-    .assignee-task-dot {
-      width: 7px; height: 7px; border-radius: 50%;
-      flex-shrink: 0; margin-top: 5px;
-    }
+    .assignee-task .status-btn { margin-top: 1px; flex-shrink: 0; }
     .assignee-task-info { flex: 1; min-width: 0; }
-    .assignee-task-card { font-size: .62rem; color: #c4a47c; margin-bottom: 2px; }
+    .assignee-task-card { font-size: .62rem; color: #94A7E8; margin-bottom: 2px; }
     .assignee-task-label { font-size: .73rem; color: #334155; font-weight: 500; }
-    .assignee-task.is-done .assignee-task-label {
-      text-decoration: line-through; color: #c4a47c;
+    .at-expand-btn {
+      background: none; border: none; cursor: pointer; color: #B0C0EC;
+      font-size: .75rem; padding: 0 3px; flex-shrink: 0; border-radius: 3px;
+      opacity: .55; transition: opacity .15s, color .15s; margin-top: 2px;
+      position: relative;
     }
+    .at-expand-btn:hover { opacity: 1; color: #42B08A; }
+    .at-expand-btn.has-memo { opacity: 1; color: #B0C0EC; }
+    .at-expand-btn.has-memo::after {
+      content: ''; position: absolute; top: 0; right: 0;
+      width: 5px; height: 5px; border-radius: 50%; background: #ef4444;
+    }
+    .at-memo-row { display: none; padding: 2px 14px 8px 14px; }
+    .at-memo-row.open { display: block; }
+    .at-memo {
+      width: 100%; box-sizing: border-box; border: 1px solid #DDE5FF;
+      border-radius: 6px; padding: 5px 8px; font-size: .72rem; font-family: inherit;
+      color: #475569; resize: none; min-height: 54px; background: #F0F4FF; outline: none;
+    }
+    .at-memo:focus { border-color: #94A7E8; }
+    .at-item.at-pending { background: #F0F4FF; }
+    .at-footer {
+      display: none; align-items: center; gap: 6px; flex-shrink: 0; margin-left: 8px;
+    }
+    .at-footer.visible { display: flex; }
+    .at-cancel-btn {
+      padding: 4px 10px; border-radius: 8px; border: 1px solid #C0CFFF;
+      background: #fff; color: #78716c; font-size: .75rem; cursor: pointer; white-space: nowrap;
+    }
+    .at-apply-btn {
+      padding: 4px 12px; border-radius: 8px; border: 1px solid #22c55e;
+      background: #f0fdf4; color: #15803d; font-size: .75rem; font-weight: 600; cursor: pointer; white-space: nowrap;
+    }
+    .at-cancel-btn:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+    .at-apply-btn:hover  { background: #dcfce7; }
 
     /* ── 학년 토글 ── */
     .grade-toggle {
       width: 28px; height: 28px; border-radius: 50%;
-      border: 1.5px solid #f0dcc0; background: #fff;
+      border: 1.5px solid #DDE5FF; background: #fff;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer; flex-shrink: 0; margin-left: 8px; color: #64748b;
       transition: background .15s, border-color .15s;
     }
-    .grade-toggle:hover { background: #fef0d8; border-color: #e8c8a0; }
+    .grade-toggle:hover { background: #EEF2FF; border-color: #C0CFFF; }
     .grade-toggle svg { transition: transform .25s ease; }
     .grade-section.collapsed .grade-toggle svg { transform: rotate(180deg); }
     .grade-section.collapsed .semesters-grid { display: none; }
@@ -421,14 +584,14 @@
     /* ── 좌측 사이드바 내비게이션 ── */
     #top-nav {
       position: fixed; left: 0; top: 0; bottom: 0; width: 108px;
-      background: #fff; border-right: 1px solid #f0dcc0;
+      background: #fff; border-right: 1px solid #DDE5FF;
       z-index: 200; display: flex; flex-direction: column;
       box-shadow: 2px 0 8px rgba(0,0,0,.05); overflow-y: auto;
     }
     .nav-logo {
       padding: 20px 14px 14px;
-      font-size: .65rem; font-weight: 700; color: #c4a47c;
-      letter-spacing: .08em; border-bottom: 1px solid #f0dcc0;
+      font-size: .65rem; font-weight: 700; color: #94A7E8;
+      letter-spacing: .08em; border-bottom: 1px solid #DDE5FF;
     }
     .nav-wrapper {
       display: flex; flex-direction: column; padding: 8px 0; margin: 0;
@@ -440,43 +603,141 @@
       border-left: 3px solid transparent; border-bottom: none;
       transition: color .15s, border-color .15s, background .15s;
     }
-    .nav-item:hover { color: #92400e; border-left-color: #d97706; background: #fff9f0; }
+    .nav-item:hover { color: #42B08A; border-left-color: #5068B5; background: #F0F4FF; }
+    #nav-priority { display: none; }
+    #mob-page-title { display: none; }
+    .nav-sub-item {
+      display: block; padding: 6px 16px 6px 28px;
+      font-size: .72rem; font-weight: 500; color: #94a3b8;
+      text-decoration: none; cursor: pointer; white-space: nowrap;
+      border-left: 3px solid transparent;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .nav-sub-item:hover { color: #42B08A; border-left-color: #C0CFFF; background: #F0F4FF; }
 
     /* ── 담당자 선택 (드롭다운) ── */
     .assignee-select {
       flex-shrink: 0; cursor: pointer; max-width: 54px;
       border: none; outline: none; background: transparent; font-family: inherit;
-      font-size: .72rem; color: #92400e;
-      border-bottom: 1.5px dashed #e0c898; padding: 0 2px;
+      font-size: .72rem; color: #42B08A;
+      border-bottom: 1.5px dashed #B8C8F5; padding: 0 2px;
       transition: border-color .15s;
     }
-    .assignee-select:focus { border-bottom-color: #fbbf24; }
-    .checklist-item.has-assignee .assignee-select { border-bottom-color: #fbbf24; font-weight: 600; }
-    .checklist-item.checked .assignee-select { color: #c4a47c; border-bottom-color: #e0c898; }
+    .assignee-select:focus { border-bottom-color: #F8B84A; }
+    .item-main:has(.checklist-item.has-assignee) .assignee-select { border-bottom-color: #F8B84A; font-weight: 600; }
+    .item-main:has(.checklist-item.checked) .assignee-select { color: #94A7E8; border-bottom-color: #B8C8F5; }
 
     /* ── 항목 상세 버튼 ── */
     .item-detail-btn {
       width: 22px; height: 22px; flex-shrink: 0;
       border: none; background: transparent; cursor: pointer;
-      font-size: .78rem; color: #e0c898; padding: 0; line-height: 1;
+      font-size: .78rem; color: #B8C8F5; padding: 0; line-height: 1;
       display: flex; align-items: center; justify-content: center;
       border-radius: 4px; transition: color .15s, background .15s;
       letter-spacing: -.5px;
     }
-    .item-detail-btn:hover { color: #64748b; background: #fef0d8; }
+    .item-detail-btn:hover { color: #64748b; background: #EEF2FF; }
 
     /* ── 자료유형별 섹션 ── */
-    #type-section { background: #fff; border-bottom: 1px solid #f0dcc0; }
+    /* ── 신규 업무 추가 폼 ── */
+    #add-task-section { background: #fff; border-bottom: 1px solid #DDE5FF; }
+    .at-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px 24px 26px; }
+    .at-header {
+      display: flex; align-items: center; justify-content: space-between;
+      cursor: pointer; user-select: none; margin-bottom: 14px;
+    }
+    .at-title { font-size: .9rem; font-weight: 700; color: #1e293b; display: flex; align-items: center; gap: 6px; }
+    .at-toggle-btn {
+      background: none; border: 1.5px solid #DDE5FF; border-radius: 50%;
+      width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: #64748b; flex-shrink: 0; transition: background .15s, border-color .15s;
+    }
+    .at-toggle-btn:hover { background: #EEF2FF; border-color: #C0CFFF; }
+    .at-toggle-btn svg { transition: transform .25s ease; }
+    #add-task-section.collapsed .at-toggle-btn svg { transform: rotate(180deg); }
+    #add-task-section.collapsed .at-body { display: none; }
+    .at-fields {
+      display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;
+      background: #fffdf9; border: 1.5px solid #DDE5FF; border-radius: 12px; padding: 16px 18px;
+    }
+    .at-field { display: flex; flex-direction: column; gap: 5px; }
+    .at-field-hidden { display: none !important; }
+    /* 직접입력 선택 시에만 유형명 입력 칸 표시 */
+    #atTypeCustom { display: none; margin-top: 4px; }
+    .at-fields[data-custom="1"] #atTypeCustom { display: block; }
+    .at-field-grow { flex: 1; min-width: 160px; }
+    .at-field-label { font-size: .63rem; font-weight: 700; color: #94A7E8; letter-spacing: .04em; }
+    .at-select, .at-input {
+      border: 1.5px solid #DDE5FF; border-radius: 6px;
+      padding: 5px 8px; font-family: inherit; font-size: .78rem;
+      outline: none; background: #fff; color: #1e293b; transition: border-color .15s;
+    }
+    .at-select:focus, .at-input:focus { border-color: #5068B5; }
+    .at-select:disabled { opacity: .45; cursor: not-allowed; background: #F4F7FF; }
+    .at-input-date { width: 128px; }
+    /* ── 커스텀 담당자 드롭다운 ── */
+    .at-custom-select-wrap { position: relative; }
+    .at-custom-select-btn {
+      display: flex; align-items: center; gap: 6px;
+      border: 1.5px solid #DDE5FF; border-radius: 6px;
+      padding: 5px 8px; font-family: inherit; font-size: .78rem;
+      background: #fff; color: #1e293b; cursor: pointer;
+      min-width: 72px; white-space: nowrap; transition: border-color .15s;
+    }
+    .at-custom-select-btn:hover { border-color: #5068B5; }
+    .at-custom-select-btn::after { content: '▾'; font-size: .65rem; color: #94a3b8; margin-left: auto; }
+    .at-custom-select-dropdown {
+      display: none; position: absolute; top: 100%; left: 0; z-index: 300;
+      background: #fff; border: 1.5px solid #DDE5FF; border-radius: 8px;
+      box-shadow: 0 4px 16px rgba(0,0,0,.12); min-width: 100%; overflow: hidden;
+    }
+    .at-custom-select-wrap.open .at-custom-select-dropdown { display: block; }
+    .at-custom-select-option {
+      padding: 7px 12px; font-size: .78rem; font-family: inherit;
+      color: #1e293b; cursor: pointer; transition: background .12s;
+    }
+    .at-custom-select-option:hover { background: #F0F4FF; color: #42B08A; }
+    .at-custom-select-option.selected { font-weight: 600; color: #42B08A; }
+    .at-submit {
+      padding: 6px 20px; background: #42B08A; color: #fff;
+      border: none; border-radius: 8px; font-family: inherit;
+      font-size: .78rem; font-weight: 700; cursor: pointer;
+      transition: background .15s; align-self: flex-end; white-space: nowrap;
+    }
+    .at-submit:hover { background: #5068B5; }
+    .at-submit:disabled { background: #B0C0EC; cursor: not-allowed; }
+    #type-section { background: #F0F4FF; border-bottom: 1px solid #DDE5FF; }
     .type-wrapper { max-width: 1200px; margin: 0 auto; padding: 20px 24px 26px; }
     .type-title { font-size: .9rem; font-weight: 700; color: #1e293b; margin-bottom: 14px; display: flex; align-items: center; gap: 6px; }
     .type-grid { display: flex; gap: 14px; }
-    .type-card { flex: 1; background: #fff9f0; border-radius: 12px; border: 1.5px solid #f0dcc0; padding: 16px 18px; }
+    .type-card { flex: 1; background: transparent; border-radius: 12px; border: 1.5px solid #DDE5FF; padding: 16px 18px; }
     .type-card-name { font-size: .8rem; font-weight: 700; color: #1e293b; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
-    .type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-    .type-bar-track { height: 8px; background: #f0dcc0; border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
+    .type-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; overflow: hidden; font-size: 0; }
+    .type-bar-track { height: 8px; background: #DDE5FF; border-radius: 99px; overflow: hidden; margin-bottom: 8px; }
     .type-bar-fill { height: 100%; border-radius: 99px; transition: width .5s ease; }
     .type-stats { font-size: .73rem; color: #64748b; display: flex; justify-content: space-between; align-items: baseline; }
     .type-pct { font-weight: 700; font-size: .88rem; }
+    .type-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .type-card-header .type-card-name { margin-bottom: 0; }
+    .type-expand-btn { display: flex; align-items: center; background: none; border: none; padding: 4px; cursor: pointer; color: #42B08A; line-height: 1; flex-shrink: 0; }
+    .type-expand-btn svg { transition: transform .2s; display: block; }
+    .type-card.type-open .type-expand-btn svg { transform: rotate(180deg); }
+    .type-expandable { display: none; margin-top: 14px; border-top: 1px solid #DDE5FF; padding-top: 12px; }
+    .type-card.type-open .type-expandable { display: block; }
+    .type-expandable .card { margin-bottom: 10px; padding: 14px 10px 12px; }
+    .type-expandable .circle-wrap,
+    .type-expandable .circle-wrap svg { width: 50px; height: 50px; }
+    .type-expandable .card-top { gap: 10px; margin-bottom: 12px; }
+    .type-expandable .card-title { font-size: .82rem; }
+    .type-expandable .add-item-input { min-width: 0; }
+    .type-expandable .card.all-done .checklist,
+    .type-expandable .card.all-done .add-item-row,
+    .type-expandable .card.all-done .add-item-input-row,
+    .type-expandable .card.all-done .complete-badge,
+    .grade-section .card.all-done .checklist,
+    .grade-section .card.all-done .add-item-row,
+    .grade-section .card.all-done .add-item-input-row,
+    .grade-section .card.all-done .complete-badge { display: none; }
 
     /* ── 항목 상세 모달 ── */
     .modal-overlay {
@@ -491,28 +752,28 @@
       box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
     }
     .modal-header {
-      padding: 16px 20px; background: #fff9f0; border-bottom: 1px solid #f0dcc0;
+      padding: 16px 20px; background: #F0F4FF; border-bottom: 1px solid #DDE5FF;
       display: flex; align-items: flex-start; gap: 10px;
     }
     .modal-header-texts { flex: 1; min-width: 0; }
     .modal-header-title { font-size: .9rem; font-weight: 700; color: #1e293b; margin-bottom: 2px; }
-    .modal-header-sub { font-size: .72rem; color: #c4a47c; }
+    .modal-header-sub { font-size: .72rem; color: #94A7E8; }
     .modal-close {
       width: 28px; height: 28px; border: none; background: transparent;
       cursor: pointer; border-radius: 50%; font-size: 1rem; color: #64748b;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
       transition: background .15s;
     }
-    .modal-close:hover { background: #fef0d8; }
+    .modal-close:hover { background: #EEF2FF; }
     .modal-body { padding: 20px; display: flex; flex-direction: column; gap: 14px; }
     .modal-field { display: flex; flex-direction: column; gap: 5px; }
     .modal-field > label { font-size: .75rem; font-weight: 600; color: #64748b; }
     .modal-field input, .modal-field select, .modal-field textarea {
-      border: 1.5px solid #f0dcc0; border-radius: 8px;
+      border: 1.5px solid #DDE5FF; border-radius: 8px;
       padding: 8px 12px; font-family: inherit; font-size: .82rem; color: #1e293b;
       outline: none; transition: border-color .15s; background: #fff; width: 100%;
     }
-    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: #d97706; }
+    .modal-field input:focus, .modal-field select:focus, .modal-field textarea:focus { border-color: #5068B5; }
     .modal-field textarea { resize: vertical; min-height: 72px; }
     .modal-status-badge {
       display: inline-flex; align-items: center; gap: 5px;
@@ -521,7 +782,7 @@
     .modal-status-badge.done { background: #dcfce7; color: #16a34a; }
     .modal-status-badge.todo { background: #fee2e2; color: #dc2626; }
     .modal-footer {
-      padding: 14px 20px; border-top: 1px solid #f0dcc0;
+      padding: 14px 20px; border-top: 1px solid #DDE5FF;
       display: flex; gap: 8px; justify-content: flex-end;
     }
     .modal-btn {
@@ -529,10 +790,10 @@
       font-size: .82rem; font-weight: 600; cursor: pointer; border: none;
       transition: background .15s;
     }
-    .modal-btn-save { background: #92400e; color: #fff; }
-    .modal-btn-save:hover { background: #78350f; }
-    .modal-btn-cancel { background: #fef0d8; color: #64748b; }
-    .modal-btn-cancel:hover { background: #f0dcc0; }
+    .modal-btn-save { background: #42B08A; color: #fff; }
+    .modal-btn-save:hover { background: #2D9676; }
+    .modal-btn-cancel { background: #EEF2FF; color: #64748b; }
+    .modal-btn-cancel:hover { background: #DDE5FF; }
 
     /* ── 로딩 오버레이 ── */
     #loading-overlay {
@@ -541,11 +802,11 @@
       display: flex; align-items: center; justify-content: center;
       flex-direction: column; gap: 10px;
     }
-    #loading-overlay .loading-text { font-size: .95rem; font-weight: 600; color: #92400e; }
-    #loading-overlay .loading-sub  { font-size: .75rem; color: #c4a47c; }
+    #loading-overlay .loading-text { font-size: .95rem; font-weight: 600; color: #42B08A; }
+    #loading-overlay .loading-sub  { font-size: .75rem; color: #94A7E8; }
     .spinner {
       width: 34px; height: 34px; border-radius: 50%;
-      border: 4px solid #f0dcc0; border-top-color: #b45309;
+      border: 4px solid #DDE5FF; border-top-color: #42B08A;
       animation: spin .75s linear infinite;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
@@ -553,37 +814,429 @@
     /* ── 반응형 ── */
     @media (max-width: 640px) {
       body { padding-left: 0; }
-      header { padding: 20px 18px 18px; }
-      header h1 { font-size: 1.25rem; }
-      main { padding: 24px 14px 48px; }
+      header { display: none; }
+      main { padding: 16px 14px 48px; }
       .semesters-grid { flex-wrap: wrap; }
       .semester-block { width: 100%; }
       .semester-cards { flex-wrap: wrap; }
       .semester-cards .card { width: 100%; flex-shrink: 1; }
+      /* 모바일 자료유형별: 학년별과 동일한 섹션 구조 */
+      #type-section.mob-visible .type-wrapper { padding: 14px 14px 48px; }
+      #type-section.mob-visible .type-grid { flex-direction: column; gap: 36px; }
+      #type-section.mob-visible .type-card {
+        flex: none; background: transparent; border: none; padding: 0; border-radius: 0;
+      }
+      /* 헤더: grade-header와 동일한 스타일 */
+      #type-section.mob-visible .type-card-header {
+        display: flex; align-items: center; gap: 10px;
+        margin-bottom: 14px; padding: 0; background: transparent; border: none;
+      }
+      #type-section.mob-visible .type-card-name {
+        font-size: 1.1rem; font-weight: 700; color: #1e293b; margin-bottom: 0;
+      }
+      #type-section.mob-visible .type-dot {
+        width: 32px; height: 32px; border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; font-size: .8rem; font-weight: 700; color: #fff;
+      }
+      /* 진행률 바: grade-mini-bar와 동일 */
+      #type-section.mob-visible .type-bar-track {
+        flex: 1; height: 6px; max-width: 180px; margin-bottom: 0;
+      }
+      #type-section.mob-visible .type-stats { display: none; }
+      /* 토글 버튼: grade-toggle과 동일 */
+      #type-section.mob-visible .type-expand-btn {
+        display: flex; width: 28px; height: 28px; border-radius: 50%;
+        border: 1.5px solid #DDE5FF; background: #fff;
+        align-items: center; justify-content: center;
+        cursor: pointer; flex-shrink: 0; margin-left: auto; color: #64748b;
+        transition: background .15s, border-color .15s;
+      }
+      #type-section.mob-visible .type-expand-btn:hover { background: #EEF2FF; border-color: #C0CFFF; }
+      #type-section.mob-visible .type-card.type-open .type-expand-btn svg { transform: rotate(180deg); }
+      /* 펼침 영역: 카드 전체 너비 */
+      #type-section.mob-visible .type-expandable {
+        margin-top: 0; border-top: none; padding-top: 0;
+        display: none;
+      }
+      #type-section.mob-visible .type-card.type-open .type-expandable { display: block; }
+      #type-section.mob-visible .type-expandable .card {
+        width: 100%; box-sizing: border-box; margin-bottom: 14px;
+      }
+      #type-section.mob-visible .type-expandable .card:last-child { margin-bottom: 0; }
 
-      /* 모바일: 사이드바 → 상단 바 */
+      /* 모바일 탭 뷰: 섹션 기본 숨김 */
+      #roadmap-section, #assignee-section, #type-section, #main, #add-task-section, #schedule-section { display: none; }
+      #roadmap-section.mob-visible, #assignee-section.mob-visible,
+      #type-section.mob-visible, #main.mob-visible,
+      #add-task-section.mob-visible, #schedule-section.mob-visible { display: block; }
+
+      /* 모바일: 사이드바 → 상단 고정 탭 바 */
       #top-nav {
-        position: sticky; left: auto; bottom: auto; width: auto;
+        position: sticky; top: 0; left: auto; bottom: auto; width: 100%;
         flex-direction: row; border-right: none;
-        border-bottom: 1px solid #f0dcc0; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        border-bottom: 1px solid #DDE5FF; box-shadow: 0 1px 4px rgba(0,0,0,.06);
+        z-index: 200;
       }
       .nav-logo { display: none; }
       .nav-wrapper { flex-direction: row; overflow-x: auto; padding: 0; }
-      .nav-item {
+      #assigneeSubMenu { display: contents; }
+      .nav-item, .nav-sub-item {
         border-left: none; border-bottom: 2px solid transparent;
-        padding: 13px 18px;
+        padding: 12px 14px; font-size: .78rem; font-weight: 600; color: #64748b;
+        white-space: nowrap;
       }
-      .nav-item:hover { border-left-color: transparent; border-bottom-color: #d97706; }
+      .nav-item:hover, .nav-sub-item:hover,
+      .nav-item.mob-active, .nav-sub-item.mob-active {
+        border-left-color: transparent; border-bottom-color: #5068B5;
+        color: #42B08A; background: #F0F4FF;
+      }
+      /* 탭 순서: 일정 → 우선순위 → 담당자들 → 자료유형별 → 학년별 → 신규업무추가 */
+      #nav-schedule  { display: block; order: 1; }
+      #nav-priority  { display: block; order: 2; }
+      #nav-assignee  { display: none; }
+      .nav-sub-item  { order: 3; }
+      #nav-type      { order: 4; }
+      #nav-grade     { order: 5; }
+      #nav-add       { order: 6; }
+      /* 로드맵 제목·내부탭 숨김 */
+      .roadmap-title { display: none; }
+      #mobileTabs    { display: none !important; }
+      /* 담당자 추가 버튼 숨김 */
+      #assigneeAddRow { display: none !important; }
+      /* 우선작업 체크리스트 높이 제한 해제 */
+      .pri-list { max-height: none; }
+      /* 페이지 타이틀 */
+      #mob-page-title {
+        display: block; padding: 12px 16px 8px;
+        font-size: .9rem; font-weight: 700; color: #1e293b;
+        border-bottom: 1px solid #EEF2FF; background: #fff;
+      }
 
       /* 담당자별 패널 모바일 */
       .assignee-grid { flex-wrap: wrap; }
-      .assignee-card { flex: 0 0 calc(50% - 7px); }
+      .assignee-card { flex: 0 0 100%; }
+      .ac-delete { display: none; }
       .assignee-card-header { flex-wrap: wrap; gap: 5px; padding: 10px 10px 6px; }
-      .ac-toggle {
-        order: 4; width: 100%; margin-left: 0; margin-top: 2px;
-        border-radius: 6px; height: 24px;
+      .ac-toggle { display: none; }
+      .assignee-card.collapsed .assignee-items { display: block; }
+      /* 자료유형별 모바일 */
+      .type-grid { flex-direction: column; }
+      .type-expand-btn { display: flex; align-items: center; }
+      /* 우선작업: 헤더 고정 + 목록만 스크롤 */
+      .priority-panel {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        grid-template-rows: auto 1fr;
+        grid-template-areas: "header actions" "list list";
+        height: calc(100vh - 76px);
+        height: calc(100dvh - 76px);
+        overflow: hidden;
       }
+      .pri-header { grid-area: header; border-bottom: none; }
+      .pri-footer {
+        grid-area: actions; border-top: none;
+        border-bottom: 1px solid #EEF2FF; background: #F5F7FF;
+        padding: 0 8px; align-items: center; gap: 4px;
+      }
+      .pri-list {
+        grid-area: list;
+        border-top: 1px solid #EEF2FF;
+        overflow-y: auto;
+        min-height: 0;
+        max-height: none;
+      }
+      .pri-badge { display: none; }
+      .pri-apply-btn { flex: none; padding: 4px 10px; font-size: .72rem; }
+      .pri-cancel-btn { padding: 4px 8px; font-size: .72rem; }
+      /* 학년별·유형별 공통: 100% 완료 카드는 헤더만 표시 */
+      .grade-section .card.all-done .checklist,
+      .grade-section .card.all-done .add-item-row,
+      .grade-section .card.all-done .add-item-input-row,
+      .grade-section .card.all-done .complete-badge { display: none; }
+      /* 체크리스트 아이템: 일정·담당자·메모 태그 인라인 표시 */
+      .item-col { flex-direction: row; align-items: center; gap: 4px; }
+      .check-label { flex: 1; min-width: 40px; }
+      .deadline-display {
+        flex-shrink: 0; width: 60px; height: 18px;
+        display: inline-flex; align-items: center; justify-content: center;
+        border: 1px solid #DDE5FF; border-radius: 4px; background: #F0F4FF;
+        font-size: .6rem; color: #5068B5; cursor: pointer;
+        font-family: inherit; box-sizing: border-box;
+      }
+      .checklist-item.checked .deadline-display {
+        color: #94A7E8; border-color: #ece7e0; background: #fafafa;
+      }
+      .assignee-select {
+        flex-shrink: 0; width: 54px; height: 18px;
+        border: 1px solid #DDE5FF !important;
+        border-bottom: 1px solid #DDE5FF !important;
+        border-radius: 4px; background: #F0F4FF;
+        padding: 0 2px; font-size: .6rem; box-sizing: border-box;
+      }
+      .item-main:has(.checklist-item.checked) .assignee-select {
+        border-color: #DDE5FF !important; background: #fafafa;
+      }
+      .item-main .item-expand-btn { opacity: 1 !important; font-size: .78rem; }
+      .item-main .item-delete-btn { display: none; }
+      .card.sort-mode .drag-handle { opacity: 1 !important; }
+      .status-btn { width: 40px; height: 18px; font-size: .58rem; }
     }
+
+    /* ── 업무 추가 ── */
+    .add-item-row { padding: 4px 8px 2px; display: flex; align-items: center; justify-content: space-between; }
+    .add-item-btn {
+      display: flex; align-items: center; gap: 4px;
+      font-size: .72rem; color: #94A7E8; background: none; border: none;
+      cursor: pointer; padding: 4px 8px; border-radius: 6px;
+      transition: color .15s, background .15s;
+    }
+    .add-item-btn:hover { color: #42B08A; background: #EEF2FF; }
+    .add-item-input-row {
+      display: none; align-items: center; gap: 5px;
+      padding: 4px 8px 8px;
+    }
+    .add-item-input-row.active { display: flex; }
+    .add-item-input {
+      flex: 1; border: 1.5px solid #DDE5FF; border-radius: 6px;
+      padding: 4px 8px; font-family: inherit; font-size: .78rem; outline: none;
+      transition: border-color .15s;
+    }
+    .add-item-input:focus { border-color: #5068B5; }
+    .add-item-confirm, .add-item-cancel {
+      padding: 3px 9px; border-radius: 6px; border: none; flex-shrink: 0;
+      font-family: inherit; font-size: .72rem; font-weight: 600; cursor: pointer;
+    }
+    .add-item-confirm { background: #42B08A; color: #fff; }
+    .add-item-cancel  { background: #DDE5FF; color: #64748b; }
+
+    /* ── 우선작업 반영/취소 ── */
+    .pri-footer {
+      display: none; gap: 6px; padding: 8px 12px;
+      border-top: 1px solid #EEF2FF; flex-shrink: 0;
+    }
+    .pri-footer.visible { display: flex; }
+    .pri-apply-btn {
+      flex: 1; padding: 6px 0; border-radius: 7px; border: none;
+      background: #42B08A; color: #fff; font-family: inherit;
+      font-size: .78rem; font-weight: 700; cursor: pointer;
+      transition: background .15s;
+    }
+    .pri-apply-btn:hover { background: #2D9676; }
+    .pri-cancel-btn {
+      padding: 6px 14px; border-radius: 7px; border: none;
+      background: #EEF2FF; color: #64748b; font-family: inherit;
+      font-size: .78rem; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+    }
+    .pri-cancel-btn:hover { background: #DDE5FF; }
+    .pri-item.pri-pending { background: #F0F4FF; border-radius: 6px; }
+
+    /* ── 담당자 추가/삭제 ── */
+    .assignee-title-wrap {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+      position: sticky; top: 0; z-index: 10;
+      background: #F0F4FF;
+      margin: -20px -24px 10px;
+      padding: 20px 24px 10px;
+    }
+    .assignee-title { margin-bottom: 0 !important; }
+    /* 접힌 상태: 작은 버튼 */
+    .assignee-add-row { margin-bottom: 14px; }
+    .assignee-add-trigger {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: .73rem; color: #94A7E8; background: none;
+      border: 1.5px dashed #B8C8F5; cursor: pointer;
+      padding: 4px 12px; border-radius: 6px; font-family: inherit;
+      transition: color .15s, border-color .15s; user-select: none;
+    }
+    .assignee-add-trigger:hover { color: #42B08A; border-color: #5068B5; }
+    /* 펼쳐진 상태 */
+    .assignee-add-form {
+      display: none; align-items: center; gap: 8px;
+      background: #fffdf9; border: 1.5px dashed #C0CFFF;
+      border-radius: 8px; padding: 7px 12px;
+    }
+    .assignee-add-row.open .assignee-add-trigger { display: none; }
+    .assignee-add-row.open .assignee-add-form { display: flex; }
+    .assignee-new-input {
+      flex: 1; min-width: 0;
+      border: 1.5px solid #DDE5FF; border-radius: 6px;
+      padding: 4px 8px; font-family: inherit; font-size: .78rem; outline: none;
+      transition: border-color .15s; background: #fff;
+    }
+    .assignee-new-input:focus { border-color: #5068B5; }
+    .assignee-new-confirm, .assignee-new-cancel {
+      padding: 4px 10px; border-radius: 6px; border: none;
+      font-family: inherit; font-size: .73rem; font-weight: 600; cursor: pointer;
+      white-space: nowrap;
+    }
+    .assignee-new-confirm { background: #42B08A; color: #fff; }
+    .assignee-new-cancel  { background: #DDE5FF; color: #64748b; }
+    /* 담당자 삭제 버튼 */
+    .ac-delete {
+      background: none; border: none; cursor: pointer;
+      color: #B0C0EC; font-size: .85rem; line-height: 1;
+      padding: 2px 5px; border-radius: 4px; flex-shrink: 0;
+      transition: color .15s; margin-left: 2px;
+    }
+    .ac-delete:hover { color: #dc2626; }
+
+    /* ── 모바일 탭 ── */
+    .mobile-tabs {
+      display: none; overflow-x: auto; gap: 6px; margin-bottom: 14px;
+      -webkit-overflow-scrolling: touch; padding-bottom: 2px;
+    }
+    .mobile-tab {
+      flex-shrink: 0; padding: 6px 16px; border-radius: 20px;
+      font-size: .78rem; font-weight: 600; cursor: pointer;
+      border: 1.5px solid #DDE5FF; background: #fff; color: #64748b;
+      font-family: inherit; transition: all .15s;
+    }
+    .mobile-tab.active { background: #42B08A; color: #fff; border-color: #42B08A; }
+    .mobile-assignee-panel {
+      display: none; border: 1.5px solid #DDE5FF;
+      border-radius: 12px; overflow: hidden; background: #fff;
+    }
+    .mobile-ap-header {
+      padding: 10px 14px; border-bottom: 1px solid #DDE5FF;
+      display: flex; align-items: center; gap: 7px; background: #F0F4FF;
+      position: sticky; top: 0; z-index: 5;
+    }
+    @media (max-width: 640px) {
+      .mobile-tabs { display: flex; }
+      .roadmap-left { display: none !important; }
+      .priority-panel { width: 100%; max-height: none; }
+      #assignee-section { display: none; }
+    }
+
+    /* ── 일정 캘린더 섹션 ── */
+    #schedule-section {
+      background: #fff;
+      border-bottom: 1px solid #DDE5FF;
+      box-shadow: 0 2px 6px rgba(0,0,0,.04);
+    }
+    .schedule-wrapper { max-width: 1200px; margin: 0 auto; padding: 24px 24px 32px; }
+    .schedule-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .schedule-title { font-size: .9rem; font-weight: 700; color: #1e293b; }
+    .cal-nav-group { display: flex; align-items: center; gap: 8px; }
+    .cal-nav-btn {
+      width: 30px; height: 30px; border: 1.5px solid #DDE5FF;
+      border-radius: 50%; background: #fff; cursor: pointer;
+      color: #64748b; font-size: 1.1rem; display: flex; align-items: center; justify-content: center;
+      transition: background .15s, border-color .15s; flex-shrink: 0;
+    }
+    .cal-nav-btn:hover { background: #EEF2FF; border-color: #C0CFFF; }
+    .cal-month-label {
+      font-size: .92rem; font-weight: 700; color: #1e293b;
+      min-width: 90px; text-align: center;
+    }
+    .cal-today-btn {
+      font-size: .72rem; color: #5068B5; border: 1.5px solid #C0CFFF;
+      background: #fff; border-radius: 99px; padding: 3px 10px; cursor: pointer;
+      transition: background .15s;
+    }
+    .cal-today-btn:hover { background: #EEF2FF; }
+    .cal-legend { display: flex; gap: 12px; align-items: center; margin-left: auto; }
+    .cal-legend-dot {
+      display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0;
+    }
+    .cal-legend-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: .74rem; color: #64748b;
+    }
+    .cal-grid-wrap {
+      border: 1.5px solid #DDE5FF; border-radius: 12px; overflow: hidden;
+    }
+    .cal-weekdays {
+      display: grid; grid-template-columns: repeat(7, 1fr);
+      background: #F0F4FF; border-bottom: 1.5px solid #DDE5FF;
+    }
+    .cal-weekday {
+      text-align: center; padding: 8px 4px;
+      font-size: .74rem; font-weight: 700; color: #64748b;
+    }
+    .cal-weekday:first-child { color: #dc2626; }
+    .cal-weekday:last-child  { color: #2563eb; }
+    .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+    .cal-day {
+      min-height: 90px; border-right: 1px solid #EEF2FF; border-bottom: 1px solid #EEF2FF;
+      padding: 6px 6px 4px; background: #fff; transition: background .15s;
+    }
+    .cal-day:nth-child(7n) { border-right: none; }
+    .cal-day.other-month { background: #FAFBFF; }
+    .cal-day.other-month .cal-day-num { color: #C0CFFF; }
+    .cal-day.today { background: #FFFBF0; }
+    .cal-day:hover { background: #F8FAFF; }
+    .cal-day.sunday  .cal-day-num:not(.today-num) { color: #dc2626; }
+    .cal-day.saturday .cal-day-num:not(.today-num) { color: #2563eb; }
+    .cal-day-num {
+      font-size: .82rem; font-weight: 600; color: #334155;
+      line-height: 1; margin-bottom: 4px;
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 22px; height: 22px; border-radius: 50%;
+    }
+    .cal-day.today .cal-day-num { background: #5068B5; color: #fff; }
+    .cal-events { display: flex; flex-direction: column; gap: 2px; }
+    .cal-event {
+      font-size: .68rem; font-weight: 500;
+      padding: 2px 5px; border-radius: 4px;
+      cursor: pointer; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+      transition: opacity .15s; line-height: 1.3;
+    }
+    .cal-event:hover { opacity: .75; }
+    .cal-event.more {
+      background: none !important; color: #94A7E8 !important;
+      font-size: .65rem; padding: 1px 5px; cursor: pointer;
+    }
+    .cal-loading {
+      grid-column: 1/-1; text-align: center;
+      padding: 40px; color: #94A7E8; font-size: .85rem;
+    }
+    .cal-error {
+      grid-column: 1/-1; text-align: center; padding: 20px;
+      color: #dc2626; font-size: .8rem;
+      background: #fef2f2; border-radius: 8px; margin: 12px;
+    }
+    .cal-config-notice {
+      grid-column: 1/-1; padding: 16px; text-align: center;
+      color: #94A7E8; font-size: .8rem; border-top: 1px dashed #DDE5FF;
+    }
+    /* 일정 상세 모달 */
+    .cal-modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 600;
+      align-items: center; justify-content: center;
+    }
+    .cal-modal-overlay.open { display: flex; }
+    .cal-modal-box {
+      background: #fff; border-radius: 16px;
+      width: 100%; max-width: 380px; margin: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+    }
+    .cal-modal-header {
+      padding: 14px 16px; border-bottom: 1px solid #DDE5FF;
+      display: flex; align-items: center; gap: 10px;
+      background: #F0F4FF;
+    }
+    .cal-modal-grade-dot {
+      width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0;
+    }
+    .cal-modal-title-text { flex: 1; font-size: .9rem; font-weight: 700; color: #1e293b; }
+    .cal-modal-close {
+      width: 28px; height: 28px; border: none; background: transparent;
+      cursor: pointer; border-radius: 50%; font-size: 1rem; color: #64748b;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .cal-modal-close:hover { background: #EEF2FF; }
+    .cal-modal-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; }
+    .cal-modal-row { display: flex; gap: 8px; align-items: flex-start; }
+    .cal-modal-label { font-size: .72rem; font-weight: 600; color: #94A7E8; min-width: 44px; padding-top: 1px; }
+    .cal-modal-value { font-size: .82rem; color: #334155; flex: 1; line-height: 1.5; }
   </style>
 </head>
 <body>
@@ -609,15 +1262,60 @@
 <nav id="top-nav">
   <div class="nav-logo">📚 MENU</div>
   <div class="nav-wrapper">
-    <a href="#main" class="nav-item">학년별</a>
-    <a href="#type-section" class="nav-item">자료유형별</a>
-    <a href="#assignee-section" class="nav-item">담당자별</a>
+    <a href="#" class="nav-item" id="nav-priority">우선순위</a>
+    <a href="#add-task-section" class="nav-item" id="nav-add">신규업무추가</a>
+    <a href="#assignee-section" class="nav-item" id="nav-assignee">담당자별</a>
+    <div id="assigneeSubMenu"></div>
+    <a href="#type-section" class="nav-item" id="nav-type">자료유형별</a>
+    <a href="#main" class="nav-item" id="nav-grade">학년별</a>
+    <a href="#schedule-section" class="nav-item" id="nav-schedule">일정</a>
   </div>
 </nav>
+<div id="mob-page-title"></div>
+
+<section id="schedule-section">
+  <div class="schedule-wrapper">
+    <div class="schedule-header">
+      <div class="schedule-title">📅 일정 캘린더</div>
+      <div class="cal-nav-group">
+        <button class="cal-nav-btn" id="calPrevBtn">&#8249;</button>
+        <span class="cal-month-label" id="calMonthLabel"></span>
+        <button class="cal-nav-btn" id="calNextBtn">&#8250;</button>
+        <button class="cal-today-btn" id="calTodayBtn">오늘</button>
+      </div>
+      <div class="cal-legend">
+        <span class="cal-legend-item">
+          <span class="cal-legend-dot" style="background:#F9A8D4"></span>3학년 일정
+        </span>
+        <span class="cal-legend-item">
+          <span class="cal-legend-dot" style="background:#FCD34D"></span>4학년 일정
+        </span>
+      </div>
+    </div>
+    <div class="cal-grid-wrap">
+      <div class="cal-weekdays">
+        <div class="cal-weekday">일</div>
+        <div class="cal-weekday">월</div>
+        <div class="cal-weekday">화</div>
+        <div class="cal-weekday">수</div>
+        <div class="cal-weekday">목</div>
+        <div class="cal-weekday">금</div>
+        <div class="cal-weekday">토</div>
+      </div>
+      <div class="cal-grid" id="calGrid">
+        <div class="cal-loading">캘린더를 불러오는 중...</div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="roadmap-section">
   <div class="roadmap-wrapper">
     <div class="roadmap-title">📋 자료준비 로드맵</div>
+    <div class="mobile-tabs" id="mobileTabs">
+      <button class="mobile-tab active" data-tab="priority">⚡ 우선순위</button>
+    </div>
+    <div id="mobileAssigneePanel" class="mobile-assignee-panel"></div>
     <div class="roadmap-body">
       <div class="roadmap-left">
         <div class="roadmap-band" id="roadmapBand"></div>
@@ -628,6 +1326,10 @@
           <span class="pri-badge" id="priBadge">0</span>
         </div>
         <div class="pri-list" id="priList"></div>
+        <div class="pri-footer" id="priFooter">
+          <button class="pri-cancel-btn" id="priCancelBtn">취소</button>
+          <button class="pri-apply-btn" id="priApplyBtn">✓ 반영</button>
+        </div>
       </div>
     </div>
   </div>
@@ -635,19 +1337,93 @@
 
 <section id="assignee-section">
   <div class="assignee-wrapper">
-    <div class="assignee-title">👥 담당자별 담당업무</div>
+    <div class="assignee-title-wrap" id="assigneeTitleWrap">
+      <div class="assignee-title">👥 담당자별 담당업무</div>
+      <div class="at-footer" id="atFooter">
+        <button class="at-cancel-btn" type="button">취소</button>
+        <button class="at-apply-btn" type="button">✓ 반영</button>
+      </div>
+    </div>
+    <div class="assignee-add-row" id="assigneeAddRow">
+      <span class="assignee-add-trigger" id="assigneeAddTrigger">+ 담당자 추가</span>
+      <div class="assignee-add-form">
+        <input class="assignee-new-input" id="assigneeNewInput" type="text" placeholder="이름을 입력하세요..." maxlength="10"/>
+        <button class="assignee-new-confirm" id="assigneeNewConfirm" type="button">추가</button>
+        <button class="assignee-new-cancel" id="assigneeNewCancel" type="button">취소</button>
+      </div>
+    </div>
     <div class="assignee-grid" id="assigneeGrid"></div>
   </div>
 </section>
 
 <section id="type-section">
   <div class="type-wrapper">
-    <div class="type-title">📊 자료유형별 완료율</div>
+    <div class="type-title">📂 자료유형별 현황</div>
     <div class="type-grid" id="typeGrid"></div>
   </div>
 </section>
 
 <main id="main"></main>
+
+<section id="add-task-section">
+  <div class="at-wrapper">
+    <div class="at-header" id="atHeader">
+      <div class="at-title">📝 신규 업무 추가</div>
+      <button class="at-toggle-btn" type="button">
+        <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,5 8,11 13,5"/></svg>
+      </button>
+    </div>
+    <div class="at-body" id="atBody">
+      <div class="at-fields" id="atFields">
+        <div class="at-field">
+          <div class="at-field-label">학년·학기</div>
+          <select class="at-select" id="atSem" onchange="toggleAtTypeField(this.value)">
+            <option value="">선택</option>
+            <option value="g3s2">3학년 2학기</option>
+            <option value="g4s1">4학년 1학기</option>
+            <option value="g4s2">4학년 2학기</option>
+            <option value="g5s1">5학년 1학기</option>
+            <option value="g5s2">5학년 2학기</option>
+            <option value="g6s1">6학년 1학기</option>
+            <option value="g6s2">6학년 2학기</option>
+            <option value="etc">기타</option>
+          </select>
+        </div>
+        <div class="at-field">
+          <div class="at-field-label">자료유형</div>
+          <select class="at-select" id="atType" onchange="toggleAtCustom(this)">
+            <option value="">선택</option>
+            <option value="study">달크업 세트</option>
+            <option value="unit">단원평가</option>
+            <option value="vod">핵심콕VOD</option>
+            <option value="custom">직접입력</option>
+          </select>
+          <input class="at-input" type="text" id="atTypeCustom"
+            placeholder="유형명을 입력하세요..." maxlength="20" style="display:none;margin-top:4px"/>
+        </div>
+        <div class="at-field at-field-grow">
+          <div class="at-field-label">자료명</div>
+          <input class="at-input" type="text" id="atLabel" placeholder="자료명을 입력하세요..." maxlength="40" onkeydown="if(event.key==='Enter')doAtSubmit()"/>
+        </div>
+        <div class="at-field">
+          <div class="at-field-label">담당자</div>
+          <select class="at-select" id="atAssignee">
+            <option value="" disabled selected>선택</option>
+            <option value="민주">민주</option>
+            <option value="찬희">찬희</option>
+            <option value="대표님">대표님</option>
+            <option value="미정">미정</option>
+          </select>
+        </div>
+        <div class="at-field">
+          <div class="at-field-label">마감기한</div>
+          <input class="at-input at-input-date" type="date" id="atDeadline"/>
+        </div>
+        <button class="at-submit" id="atSubmitBtn" type="button" onclick="doAtSubmit()">추가</button>
+      </div>
+    </div>
+  </div>
+</section>
 
 <script>
 /* ─── Supabase 설정 ─── */
@@ -665,7 +1441,7 @@ let _isInitializing = true;
 /* ─── 샘플 데이터 ─── */
 const GRADES = [
   {
-    id: 'g3', name: '3학년', color: '#f59e0b', unitColor: '#fcd34d',
+    id: 'g3', name: '3학년', color: '#F8B84A', unitColor: '#FFD166',
     semesters: [
       { name: '2학기', cards: [
         { id: 'g3s2-study', type: 'study', title: '달크업 세트', items: [
@@ -688,7 +1464,7 @@ const GRADES = [
     ],
   },
   {
-    id: 'g4', name: '4학년', color: '#ea580c', unitColor: '#fb923c',
+    id: 'g4', name: '4학년', color: '#E86050', unitColor: '#FF9080',
     semesters: [
       { name: '1학기', cards: [
         { id: 'g4s1-study', type: 'study', title: '달크업 세트', items: [
@@ -729,7 +1505,7 @@ const GRADES = [
     ],
   },
   {
-    id: 'g5', name: '5학년', color: '#b45309', unitColor: '#d97706', vodColor: '#92400e',
+    id: 'g5', name: '5학년', color: '#42B08A', unitColor: '#6ED4B2', vodColor: '#2D9676',
     semesters: [
       { name: '1학기', cards: [
         { id: 'g5s1-study', type: 'study', title: '달크업 세트', items: [
@@ -786,7 +1562,7 @@ const GRADES = [
     ],
   },
   {
-    id: 'g6', name: '6학년', color: '#78350f', unitColor: '#a16207', vodColor: '#7c2d12',
+    id: 'g6', name: '6학년', color: '#5068B5', unitColor: '#7B8FD8', vodColor: '#3A55A0',
     semesters: [
       { name: '1학기', cards: [
         { id: 'g6s1-study', type: 'study', title: '달크업 세트', items: [
@@ -828,19 +1604,133 @@ const GRADES = [
   },
 ];
 
+/* ─── 전역 담당자 목록 ─── */
+const ASSIGNEE_COLOR_MAP = {
+  '민주': '#F8B84A', '찬희': '#E86050', '대표님': '#42B08A', '미정': '#94A7E8'
+};
+const _EXTRA_COLORS = ['#7c3aed','#2563eb','#0891b2','#059669','#dc2626','#be185d'];
+let _nextColorIdx = 0;
+let AOPTS = ['민주','찬희','대표님','미정'];
+(function () {
+  const extra  = JSON.parse(localStorage.getItem('extra-assignees')  || '[]');
+  const hidden = JSON.parse(localStorage.getItem('hidden-assignees') || '[]');
+  extra.forEach(n => {
+    if (!AOPTS.includes(n)) {
+      /* '미정'이 항상 맨 끝에 오도록 그 앞에 삽입 */
+      const mi = AOPTS.indexOf('미정');
+      if (mi !== -1) AOPTS.splice(mi, 0, n); else AOPTS.push(n);
+      ASSIGNEE_COLOR_MAP[n] = _EXTRA_COLORS[_nextColorIdx++ % _EXTRA_COLORS.length];
+    }
+  });
+  hidden.forEach(n => {
+    const i = AOPTS.indexOf(n);
+    if (i !== -1) { AOPTS.splice(i, 1); delete ASSIGNEE_COLOR_MAP[n]; }
+  });
+})();
+
+/* 신규업무추가 — 직접입력 칸 토글 (전역, IIFE 외부) */
+function toggleAtCustom(sel) {
+  var inp = document.getElementById('atTypeCustom');
+  if (!inp) return;
+  inp.style.display = sel.value === 'custom' ? 'block' : 'none';
+  if (sel.value === 'custom') inp.focus();
+}
+
+function addAssignee(name) {
+  name = name.trim();
+  if (!name || AOPTS.includes(name)) return false;
+  const color = _EXTRA_COLORS[_nextColorIdx++ % _EXTRA_COLORS.length];
+  /* '미정'이 항상 맨 끝에 오도록 그 앞에 삽입 */
+  const mijeongIdx = AOPTS.indexOf('미정');
+  if (mijeongIdx !== -1) AOPTS.splice(mijeongIdx, 0, name);
+  else AOPTS.push(name);
+  ASSIGNEE_COLOR_MAP[name] = color;
+  /* extra-assignees에 저장, hidden-assignees에서 제거 */
+  const extras = JSON.parse(localStorage.getItem('extra-assignees') || '[]');
+  if (!extras.includes(name)) { extras.push(name); localStorage.setItem('extra-assignees', JSON.stringify(extras)); }
+  const hidden = JSON.parse(localStorage.getItem('hidden-assignees') || '[]');
+  const newHidden = hidden.filter(n => n !== name);
+  localStorage.setItem('hidden-assignees', JSON.stringify(newHidden));
+  /* 모든 선택 드롭다운에 옵션 추가 — '미정' 앞에 삽입 */
+  document.querySelectorAll('.assignee-select, #modal-assignee-select, .pri-assignee-select, #atAssignee').forEach(sel => {
+    if ([...sel.options].some(o => o.value === name)) return;
+    const opt = document.createElement('option');
+    opt.value = name; opt.textContent = name;
+    const mijeongOpt = [...sel.options].find(o => o.value === '미정');
+    if (mijeongOpt) sel.insertBefore(opt, mijeongOpt);
+    else sel.appendChild(opt);
+  });
+  return true;
+}
+
+function removeAssignee(name) {
+  if (name === '미정') return; /* 미정은 삭제 불가 */
+  const idx = AOPTS.indexOf(name);
+  if (idx === -1) return;
+
+  /* 해당 담당자가 맡은 업무를 미정으로 재배정 */
+  for (const grade of GRADES) {
+    for (const sem of grade.semesters) {
+      for (const card of sem.cards) {
+        const totalItems = card.items.length +
+          (JSON.parse(localStorage.getItem('extra-items-' + card.id) || '[]')).length;
+        for (let i = 0; i < totalItems; i++) {
+          const key = `assignee-${card.id}-${i}`;
+          if (localStorage.getItem(key) === name) {
+            localStorage.setItem(key, '미정');
+            /* DOM 드롭다운도 즉시 반영 */
+            const sel = document.querySelector(`.assignee-select[data-card="${card.id}"][data-idx="${i}"]`);
+            if (sel) { sel.value = '미정'; sel.closest('.item-main')?.querySelector('.checklist-item')?.classList.remove('has-assignee'); }
+          }
+        }
+      }
+    }
+  }
+
+  AOPTS.splice(idx, 1);
+  delete ASSIGNEE_COLOR_MAP[name];
+  /* 기본 담당자는 hidden-assignees, 추가 담당자는 extra-assignees에서 제거 */
+  const base = ['민주','찬희','대표님','미정'];
+  if (base.includes(name)) {
+    const hidden = JSON.parse(localStorage.getItem('hidden-assignees') || '[]');
+    if (!hidden.includes(name)) { hidden.push(name); localStorage.setItem('hidden-assignees', JSON.stringify(hidden)); }
+  } else {
+    const extras = JSON.parse(localStorage.getItem('extra-assignees') || '[]');
+    localStorage.setItem('extra-assignees', JSON.stringify(extras.filter(n => n !== name)));
+  }
+  /* DOM에서 카드 제거 */
+  document.querySelector(`.assignee-card[data-assignee="${name}"]`)?.remove();
+  /* 모든 드롭다운에서 옵션 제거 */
+  document.querySelectorAll('.assignee-select, #modal-assignee-select, .pri-assignee-select, #atAssignee').forEach(sel => {
+    const opt = [...sel.options].find(o => o.value === name);
+    if (opt) sel.removeChild(opt);
+  });
+}
+
 /* ─── 카드 메타데이터 조회 ─── */
 function getCardMeta(cardId, idx) {
   for (const grade of GRADES) {
     for (const sem of grade.semesters) {
       for (const card of sem.cards) {
         if (card.id === cardId) {
+          if (idx < card.items.length) {
+            return {
+              grade_id:   grade.id,
+              grade_name: grade.name,
+              semester:   sem.name,
+              card_type:  card.type,
+              card_title: card.title,
+              item_label: card.items[idx]?.label || ''
+            };
+          }
+          const extras = JSON.parse(localStorage.getItem('extra-items-' + cardId) || '[]');
           return {
             grade_id:   grade.id,
             grade_name: grade.name,
             semester:   sem.name,
             card_type:  card.type,
             card_title: card.title,
-            item_label: card.items[idx]?.label || ''
+            item_label: extras[idx - card.items.length] || ''
           };
         }
       }
@@ -977,8 +1867,8 @@ async function saveItemToSupabase(cardId, idx) {
 /* ─── 진행률 색상 ─── */
 function progressColor(pct) {
   if (pct === 100) return '#16a34a';
-  if (pct >= 67)  return '#ea580c';
-  if (pct >= 34)  return '#f59e0b';
+  if (pct >= 67)  return '#42B08A';
+  if (pct >= 34)  return '#F8B84A';
   return '#ef4444';
 }
 
@@ -986,32 +1876,145 @@ function progressColor(pct) {
 const checkSVG = `<svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg>`;
 const doneSVG  = `<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2,9 6,13 14,3"/></svg>`;
 
+/* ─── 체크리스트 항목 HTML 생성 ─── */
+function fmtMD(d) { if (!d) return '기한입력'; const p = d.split('-'); return (+p[1]) + '/' + (+p[2]); }
+
+const STATUS_CYCLE = ['', '진행', '검수/촬영', '완료'];
+
+function buildItemHTML(cardId, i, label, status, assignee, deadline, canDelete) {
+  const done = status === '완료';
+  const opts = AOPTS.map(n => `<option value="${n}"${assignee===n?' selected':''}>${n}</option>`).join('');
+  return `<div class="item-wrap">
+  <div class="item-main">
+    <label class="checklist-item${done ? ' checked' : ''}${assignee && assignee !== '미정' ? ' has-assignee' : ''}${deadline ? ' has-deadline' : ''}">
+      <span class="drag-handle" title="드래그하여 순서 변경">⠿</span>
+      <input type="checkbox"${done ? ' checked' : ''}/>
+      <button class="status-btn" type="button" data-card="${cardId}" data-idx="${i}" data-status="${status||''}">${status||''}</button>
+      <div class="item-col">
+        <span class="check-label">${label}</span>
+        <span class="deadline-display">${deadline ? fmtMD(deadline) : '기한입력'}</span>
+        <input type="date" class="deadline-input" data-card="${cardId}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
+      </div>
+    </label>
+    <select class="assignee-select" data-card="${cardId}" data-idx="${i}">${opts}</select>
+    <button class="item-expand-btn" type="button" title="메모">···</button>
+    ${canDelete ? `<button class="item-delete-btn" type="button" title="삭제">×</button>` : ''}
+  </div>
+  <div class="item-memo-row">
+    <textarea class="item-memo" placeholder="메모를 입력하세요..."></textarea>
+    <button class="item-memo-delete" type="button">메모 삭제</button>
+  </div>
+</div>`;
+}
+
+/* ─── 카드 상태배지 스테이징 ─── */
+const pendingCardChanges = new Map(); // "cardId__idx" → { newStatus, originalStatus }
+
+function updateCardFooter(cardId) {
+  const hasPending = [...pendingCardChanges.keys()].some(k => k.startsWith(cardId + '__'));
+  document.getElementById(`cpf-${cardId}`)?.classList.toggle('visible', hasPending);
+}
+
+function applyCardChanges(cardId) {
+  let hasDeadline = false, hasAssignee = false;
+  pendingCardChanges.forEach((val, key) => {
+    if (!key.startsWith(cardId + '__')) return;
+    const parts = key.split('__');
+    const idx = +parts[1];
+    const type = parts[2];
+    if (type === 'dl') {
+      if (val.newValue) localStorage.setItem(`detail-${cardId}-${idx}-deadline`, val.newValue);
+      else              localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
+      saveItemToSupabase(cardId, idx);
+      hasDeadline = true;
+    } else if (type === 'as') {
+      if (val.newValue) localStorage.setItem(`assignee-${cardId}-${idx}`, val.newValue);
+      else              localStorage.removeItem(`assignee-${cardId}-${idx}`);
+      saveItemToSupabase(cardId, idx);
+      hasAssignee = true;
+    } else {
+      const { newStatus } = val;
+      if (newStatus) localStorage.setItem(`detail-${cardId}-${idx}-status`, newStatus);
+      else           localStorage.removeItem(`detail-${cardId}-${idx}-status`);
+      const itemEl = document.querySelectorAll(`#cl-${cardId} .checklist-item`)[idx];
+      if (itemEl) itemEl.querySelector('input').checked = (newStatus === '완료');
+      saveItemToSupabase(cardId, idx);
+    }
+  });
+  [...pendingCardChanges.keys()].filter(k => k.startsWith(cardId + '__'))
+    .forEach(k => pendingCardChanges.delete(k));
+  const info = getCardObject(cardId);
+  if (info) updateCard(cardId, info.grade.id);
+  document.dispatchEvent(new CustomEvent('status-updated'));
+  if (hasDeadline) document.dispatchEvent(new CustomEvent('deadline-updated'));
+  if (hasAssignee) document.dispatchEvent(new CustomEvent('assignee-updated'));
+}
+
+function cancelCardChanges(cardId) {
+  document.querySelectorAll(`#cl-${cardId} .checklist-item`).forEach((itemEl, idx) => {
+    const statusKey = `${cardId}__${idx}`;
+    const dlKey     = `${cardId}__${idx}__dl`;
+    const asKey     = `${cardId}__${idx}__as`;
+    if (pendingCardChanges.has(statusKey)) {
+      const orig = pendingCardChanges.get(statusKey).originalStatus;
+      const btn = itemEl.querySelector('.status-btn');
+      if (btn) { btn.dataset.status = orig; btn.textContent = orig; }
+    }
+    if (pendingCardChanges.has(dlKey)) {
+      const orig = pendingCardChanges.get(dlKey).originalValue;
+      const inp  = itemEl.querySelector('.deadline-input');
+      const disp = itemEl.querySelector('.deadline-display');
+      if (inp)  inp.value = orig || '';
+      if (disp) disp.textContent = orig ? fmtMD(orig) : '기한입력';
+      itemEl.classList.toggle('has-deadline', !!orig);
+    }
+    if (pendingCardChanges.has(asKey)) {
+      const orig = pendingCardChanges.get(asKey).originalValue;
+      const sel  = itemEl.parentElement?.querySelector('.assignee-select');
+      if (sel) sel.value = orig || '';
+      itemEl.classList.toggle('has-assignee', !!orig && orig !== '미정');
+    }
+    if (pendingCardChanges.has(statusKey) || pendingCardChanges.has(dlKey) || pendingCardChanges.has(asKey)) {
+      itemEl.closest('.item-wrap')?.classList.remove('card-item-pending');
+    }
+  });
+  [...pendingCardChanges.keys()].filter(k => k.startsWith(cardId + '__'))
+    .forEach(k => pendingCardChanges.delete(k));
+  updateCardFooter(cardId);
+}
+
 /* ─── 카드 DOM 생성 ─── */
 function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, semName) {
   const color    = card.type === 'study' ? gradeColor : card.type === 'vod' ? vodColor : unitColor;
   const typeName = `${gradeName} ${semName}`;
-  const total    = card.items.length;
+
+  /* 마이그레이션 여부: 한 번이라도 항목을 삭제하면 모든 항목이 extra-items로 통합 */
+  const isMigrated     = localStorage.getItem('card-migrated-' + card.id) === '1';
+  const effectiveBase  = isMigrated ? [] : card.items;
+  const effectiveBaseCount = effectiveBase.length;
 
   const saved  = localStorage.getItem('card-' + card.id);
-  const states = saved ? JSON.parse(saved) : card.items.map(i => i.done);
+  const states = saved ? JSON.parse(saved) : effectiveBase.map(i => i.done);
 
-  const AOPTS = ['민주','찬희','대표님','미정'];
-  const itemsHTML = card.items.map((item, i) => {
-    const done = states[i];
+  const baseHTML = effectiveBase.map((item, i) => {
+    const done     = !!states[i];
+    const status   = localStorage.getItem(`detail-${card.id}-${i}-status`) || (done ? '완료' : '');
     const assignee = localStorage.getItem(`assignee-${card.id}-${i}`) || '미정';
     const deadline = localStorage.getItem(`detail-${card.id}-${i}-deadline`) || '';
-    const opts = AOPTS.map(n => `<option value="${n}"${assignee===n?' selected':''}>${n}</option>`).join('');
-    return `<label class="checklist-item${done ? ' checked' : ''}${assignee && assignee !== '미정' ? ' has-assignee' : ''}${deadline ? ' has-deadline' : ''}">
-      <input type="checkbox"${done ? ' checked' : ''}/>
-      <span class="check-box">${checkSVG}</span>
-      <div class="item-col">
-        <span class="check-label">${item.label}</span>
-        <input type="date" class="deadline-input" data-card="${card.id}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
-      </div>
-      <select class="assignee-select" data-card="${card.id}" data-idx="${i}">${opts}</select>
-      <button class="item-detail-btn" type="button" data-card="${card.id}" data-idx="${i}" title="상세 보기">···</button>
-    </label>`;
+    return buildItemHTML(card.id, i, item.label, status, assignee, deadline, true);
   }).join('');
+
+  const extraLabels = JSON.parse(localStorage.getItem('extra-items-' + card.id) || '[]');
+  const extraHTML = extraLabels.map((label, ei) => {
+    const i        = effectiveBaseCount + ei;
+    const done     = !!states[i];
+    const status   = localStorage.getItem(`detail-${card.id}-${i}-status`) || (done ? '완료' : '');
+    const assignee = localStorage.getItem(`assignee-${card.id}-${i}`) || '미정';
+    const deadline = localStorage.getItem(`detail-${card.id}-${i}-deadline`) || '';
+    return buildItemHTML(card.id, i, label, status, assignee, deadline, true);
+  }).join('');
+
+  const totalCount = effectiveBaseCount + extraLabels.length;
 
   const el = document.createElement('div');
   el.className = 'card';
@@ -1031,47 +2034,326 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       </div>
       <div class="card-info">
         <span class="card-type-badge" style="background:${color}">${typeName}</span>
-        <div class="card-title">${card.title}</div>
-        <div class="card-count"><span class="done-num" id="cnt-${card.id}">0</span> / ${total} 완료</div>
+        <div class="card-title-row">
+          <div class="card-title">${card.title}</div>
+          <div class="detail-toggle-wrap">
+            <button class="detail-toggle-btn" type="button">세부내용 보기</button>
+          </div>
+        </div>
+        <div class="card-count"><span class="done-num" id="cnt-${card.id}">0</span> / <span id="total-${card.id}">${totalCount}</span> 완료</div>
       </div>
     </div>
-    <div class="checklist" id="cl-${card.id}">${itemsHTML}</div>
-    <div class="complete-badge">${doneSVG} 모든 준비가 완료되었습니다!</div>`;
+    <div class="checklist" id="cl-${card.id}">${baseHTML}${extraHTML}</div>
+    <div class="add-item-row">
+      <button class="sort-toggle-btn" type="button">↕ 순서 변경</button>
+      <button class="add-item-btn" data-card="${card.id}" type="button">+ 업무 추가</button>
+    </div>
+    <div class="add-item-input-row" id="add-row-${card.id}">
+      <input class="add-item-input" type="text" placeholder="업무 이름 입력..." maxlength="40"/>
+      <button class="add-item-confirm" data-card="${card.id}" type="button">추가</button>
+      <button class="add-item-cancel" data-card="${card.id}" type="button">취소</button>
+    </div>
+    <div class="complete-badge">${doneSVG} 모든 준비가 완료되었습니다!</div>
+    <div class="card-pending-footer" id="cpf-${card.id}">
+      <button class="cpf-cancel" type="button">취소</button>
+      <button class="cpf-apply" type="button">✓ 반영</button>
+    </div>`;
 
-  el.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-    cb.addEventListener('change', () => updateCard(card.id, gradeId));
-  });
-
-  el.querySelectorAll('.assignee-select').forEach(sel => {
-    sel.addEventListener('click', e => e.stopPropagation());
+  /* 기존 이벤트 연결 헬퍼 */
+  function bindItem(itemEl, idx, canDelete) {
+    const statusBtn = itemEl.querySelector('.status-btn');
+    const cbInput   = itemEl.querySelector('input[type="checkbox"]');
+    if (statusBtn) {
+      statusBtn.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        const key            = `${card.id}__${idx}`;
+        const currentShown   = statusBtn.dataset.status || '';
+        const next           = STATUS_CYCLE[(STATUS_CYCLE.indexOf(currentShown) + 1) % STATUS_CYCLE.length];
+        const originalStatus = pendingCardChanges.has(key)
+          ? pendingCardChanges.get(key).originalStatus
+          : (localStorage.getItem(`detail-${card.id}-${idx}-status`) || '');
+        statusBtn.dataset.status = next;
+        statusBtn.textContent    = next;
+        if (next !== originalStatus) {
+          pendingCardChanges.set(key, { newStatus: next, originalStatus });
+          itemEl.closest('.item-wrap')?.classList.add('card-item-pending');
+        } else {
+          pendingCardChanges.delete(key);
+          itemEl.closest('.item-wrap')?.classList.remove('card-item-pending');
+        }
+        updateCardFooter(card.id);
+      });
+    }
+    const itemMain = itemEl.parentElement; // .item-main
+    const sel = itemMain.querySelector('.assignee-select');
     sel.addEventListener('change', () => {
       const val = sel.value;
-      const key = `assignee-${sel.dataset.card}-${sel.dataset.idx}`;
-      if (val) localStorage.setItem(key, val);
-      else localStorage.removeItem(key);
-      sel.closest('.checklist-item').classList.toggle('has-assignee', val !== '' && val !== '미정');
-      saveItemToSupabase(sel.dataset.card, +sel.dataset.idx);
-      document.dispatchEvent(new CustomEvent('assignee-updated'));
+      const asKey = `${card.id}__${idx}__as`;
+      const rawOrig = localStorage.getItem(`assignee-${card.id}-${idx}`);
+      if (rawOrig === null && !pendingCardChanges.has(asKey)) {
+        if (val) localStorage.setItem(`assignee-${card.id}-${idx}`, val);
+        else     localStorage.removeItem(`assignee-${card.id}-${idx}`);
+        itemEl.classList.toggle('has-assignee', val !== '' && val !== '미정');
+        saveItemToSupabase(card.id, idx);
+        document.dispatchEvent(new CustomEvent('assignee-updated'));
+        return;
+      }
+      const originalValue = pendingCardChanges.has(asKey)
+        ? pendingCardChanges.get(asKey).originalValue
+        : (rawOrig || '');
+      itemEl.classList.toggle('has-assignee', val !== '' && val !== '미정');
+      if (val !== originalValue) {
+        pendingCardChanges.set(asKey, { newValue: val, originalValue });
+        itemEl.closest('.item-wrap')?.classList.add('card-item-pending');
+      } else {
+        pendingCardChanges.delete(asKey);
+        itemEl.closest('.item-wrap')?.classList.remove('card-item-pending');
+      }
+      updateCardFooter(card.id);
     });
-  });
-  el.querySelectorAll('.deadline-input').forEach(inp => {
+    const inp = itemEl.querySelector('.deadline-input');
     inp.addEventListener('click', e => e.stopPropagation());
     inp.addEventListener('change', () => {
       const val = inp.value;
-      const key = `detail-${inp.dataset.card}-${inp.dataset.idx}-deadline`;
-      if (val) localStorage.setItem(key, val);
-      else localStorage.removeItem(key);
-      inp.closest('.checklist-item').classList.toggle('has-deadline', !!val);
-      saveItemToSupabase(inp.dataset.card, +inp.dataset.idx);
-      document.dispatchEvent(new CustomEvent('deadline-updated'));
+      const dlKey = `${card.id}__${idx}__dl`;
+      const rawOrig = localStorage.getItem(`detail-${card.id}-${idx}-deadline`);
+      const disp2 = itemEl.querySelector('.deadline-display');
+      if (rawOrig === null && !pendingCardChanges.has(dlKey)) {
+        if (val) localStorage.setItem(`detail-${card.id}-${idx}-deadline`, val);
+        else     localStorage.removeItem(`detail-${card.id}-${idx}-deadline`);
+        itemEl.classList.toggle('has-deadline', !!val);
+        if (disp2) disp2.textContent = val ? fmtMD(val) : '기한입력';
+        saveItemToSupabase(card.id, idx);
+        document.dispatchEvent(new CustomEvent('deadline-updated'));
+        return;
+      }
+      const originalValue = pendingCardChanges.has(dlKey)
+        ? pendingCardChanges.get(dlKey).originalValue
+        : (rawOrig || '');
+      itemEl.classList.toggle('has-deadline', !!val);
+      if (disp2) disp2.textContent = val ? fmtMD(val) : '기한입력';
+      if (val !== originalValue) {
+        pendingCardChanges.set(dlKey, { newValue: val, originalValue });
+        itemEl.closest('.item-wrap')?.classList.add('card-item-pending');
+      } else {
+        pendingCardChanges.delete(dlKey);
+        itemEl.closest('.item-wrap')?.classList.remove('card-item-pending');
+      }
+      updateCardFooter(card.id);
     });
-  });
-
-  el.querySelectorAll('.item-detail-btn').forEach(btn => {
-    btn.addEventListener('click', e => {
+    const disp = itemEl.querySelector('.deadline-display');
+    if (disp) disp.addEventListener('click', e => {
+      e.stopPropagation();
+      try { inp.showPicker(); } catch(x) { inp.click(); }
+    });
+    /* 메모 토글 */
+    const memoRow   = itemEl.closest('.item-wrap').querySelector('.item-memo-row');
+    const memoTA    = memoRow?.querySelector('.item-memo');
+    const expandBtn = itemMain.querySelector('.item-expand-btn');
+    if (memoTA) {
+      const savedMemo = localStorage.getItem(`detail-${card.id}-${idx}-memo`) || '';
+      memoTA.value = savedMemo;
+      if (savedMemo) {
+        expandBtn?.classList.add('has-memo');
+        if (expandBtn) expandBtn.dataset.memo = savedMemo;
+      }
+      memoTA.addEventListener('input', () => {
+        const v = memoTA.value;
+        if (v) localStorage.setItem(`detail-${card.id}-${idx}-memo`, v);
+        else   localStorage.removeItem(`detail-${card.id}-${idx}-memo`);
+        expandBtn?.classList.toggle('has-memo', !!v);
+        if (expandBtn) expandBtn.dataset.memo = v;
+      });
+      memoTA.addEventListener('blur', function() {
+        setTimeout(function() {
+          const ae = document.activeElement;
+          if (ae && (itemEl.contains(ae) || (memoRow && memoRow.contains(ae)))) return;
+          if (memoRow) memoRow.classList.remove('open');
+          itemMain.classList.remove('memo-open');
+        }, 150);
+      });
+    }
+    expandBtn?.addEventListener('click', e => {
       e.preventDefault(); e.stopPropagation();
-      openDetailModal(btn.dataset.card, +btn.dataset.idx);
+      /* 다른 열린 메모 모두 닫기 */
+      document.querySelectorAll('.item-memo-row.open').forEach(r => {
+        if (r !== memoRow) { r.classList.remove('open'); r.previousElementSibling?.classList.remove('memo-open'); }
+      });
+      const isOpen = memoRow?.classList.toggle('open');
+      itemMain.classList.toggle('memo-open', !!isOpen);
+      if (isOpen && memoTA) memoTA.focus();
     });
+    if (canDelete) {
+      const doDelete = e => {
+        e.preventDefault(); e.stopPropagation();
+        if (!confirm('이 항목을 삭제할까요?')) return;
+        deleteItem(card.id, idx, effectiveBaseCount);
+      };
+      itemMain.querySelector('.item-delete-btn')?.addEventListener('click', doDelete);
+      memoRow?.querySelector('.item-memo-delete')?.addEventListener('click', e => {
+        e.preventDefault(); e.stopPropagation();
+        if (!memoTA) return;
+        memoTA.value = '';
+        localStorage.removeItem(`detail-${card.id}-${idx}-memo`);
+        expandBtn?.classList.remove('has-memo');
+        if (expandBtn) expandBtn.dataset.memo = '';
+        memoRow.classList.remove('open');
+        itemMain.classList.remove('memo-open');
+      });
+    }
+  }
+
+  el.querySelectorAll(`#cl-${card.id} .checklist-item`).forEach((itemEl, i) => bindItem(itemEl, i, true));
+
+  // 리빌드 후 pending 상태 복원
+  el.querySelectorAll(`#cl-${card.id} .checklist-item`).forEach((itemEl, idx) => {
+    const key = `${card.id}__${idx}`;
+    if (pendingCardChanges.has(key)) {
+      const { newStatus } = pendingCardChanges.get(key);
+      const btn = itemEl.querySelector('.status-btn');
+      if (btn) { btn.dataset.status = newStatus; btn.textContent = newStatus; }
+      itemEl.closest('.item-wrap')?.classList.add('card-item-pending');
+    }
+  });
+  el.querySelector('.cpf-cancel')?.addEventListener('click', () => cancelCardChanges(card.id));
+  el.querySelector('.cpf-apply')?.addEventListener('click', () => applyCardChanges(card.id));
+  document.addEventListener('pointerdown', function onPendingOutside(e) {
+    const footer = document.getElementById(`cpf-${card.id}`);
+    if (!footer?.classList.contains('visible')) return;
+    if (el.contains(e.target)) return;
+    if (confirm('변경사항을 반영하시겠습니까?')) applyCardChanges(card.id);
+    else cancelCardChanges(card.id);
+  });
+  el.querySelector('.detail-toggle-btn')?.addEventListener('click', () => {
+    const open = el.classList.toggle('show-detail');
+    el.querySelector('.detail-toggle-btn').textContent = open ? '세부내용 닫기' : '세부내용 보기';
+  });
+  updateCardFooter(card.id);
+
+  /* ─ 순서 변경 (drag-to-reorder) ─ */
+  (function() {
+    const sortBtn = el.querySelector('.sort-toggle-btn');
+    const clList  = el.querySelector(`#cl-${card.id}`);
+    if (!sortBtn || !clList) return;
+    let dragSrc = null, touchItem = null;
+
+    let savedSortOrder = null;
+    function exitSortMode(save) {
+      if (!el.classList.contains('sort-mode')) return;
+      el.classList.remove('sort-mode');
+      sortBtn.textContent = '↕ 순서 변경';
+      clList.querySelectorAll('.item-wrap').forEach(w => { w.draggable = false; });
+      if (save) {
+        const newOrder = [...clList.querySelectorAll('.item-wrap')].map(w =>
+          parseInt(w.querySelector('.assignee-select')?.dataset.idx ?? 0)
+        );
+        applyReorder(card.id, newOrder);
+      } else if (savedSortOrder) {
+        savedSortOrder.forEach(w => clList.appendChild(w));
+      }
+      savedSortOrder = null;
+    }
+    sortBtn.addEventListener('click', () => {
+      if (el.classList.contains('sort-mode')) { exitSortMode(true); return; }
+      savedSortOrder = [...clList.querySelectorAll('.item-wrap')];
+      el.classList.add('sort-mode');
+      sortBtn.textContent = '✓ 완료';
+      clList.querySelectorAll('.item-wrap').forEach(w => { w.draggable = true; });
+    });
+    document.addEventListener('pointerdown', function onSortOutside(e) {
+      if (!el.classList.contains('sort-mode')) return;
+      if (!el.contains(e.target)) exitSortMode(false);
+    });
+
+    /* ── HTML5 drag (desktop) ── */
+    clList.addEventListener('dragstart', e => {
+      const wrap = e.target.closest('.item-wrap');
+      if (!wrap) return;
+      dragSrc = wrap;
+      setTimeout(() => wrap.classList.add('dragging'), 0);
+      e.dataTransfer.effectAllowed = 'move';
+    });
+    clList.addEventListener('dragover', e => {
+      if (!dragSrc) return;
+      e.preventDefault();
+      const wrap = e.target.closest('.item-wrap');
+      if (!wrap || wrap === dragSrc) return;
+      const r = wrap.getBoundingClientRect();
+      clList.insertBefore(dragSrc, e.clientY < r.top + r.height / 2 ? wrap : wrap.nextSibling);
+    });
+    clList.addEventListener('dragend', () => { dragSrc?.classList.remove('dragging'); dragSrc = null; });
+
+    /* ── Touch drag (mobile) ── */
+    clList.addEventListener('touchstart', e => {
+      if (!el.classList.contains('sort-mode')) return;
+      const handle = e.target.closest('.drag-handle');
+      if (!handle) return;
+      touchItem = handle.closest('.item-wrap');
+      touchItem?.classList.add('dragging');
+    }, { passive: true });
+    clList.addEventListener('touchmove', e => {
+      if (!touchItem) return;
+      e.preventDefault();
+      const t = e.touches[0];
+      touchItem.hidden = true;
+      const target = document.elementFromPoint(t.clientX, t.clientY)?.closest('.item-wrap');
+      touchItem.hidden = false;
+      if (target && target !== touchItem && target.parentNode === clList) {
+        const r = target.getBoundingClientRect();
+        clList.insertBefore(touchItem, t.clientY < r.top + r.height / 2 ? target : target.nextSibling);
+      }
+    }, { passive: false });
+    clList.addEventListener('touchend', () => { touchItem?.classList.remove('dragging'); touchItem = null; });
+  })();
+
+  /* 업무 추가 버튼 */
+  const addRow = el.querySelector(`#add-row-${card.id}`);
+  const addInput = el.querySelector('.add-item-input');
+  function cancelAddItem() {
+    addRow.classList.remove('active');
+    addInput.value = '';
+  }
+  el.querySelector('.add-item-btn').addEventListener('click', () => {
+    if (addRow.classList.contains('active')) { cancelAddItem(); return; }
+    addRow.classList.add('active');
+    addInput.focus();
+  });
+  el.querySelector('.add-item-cancel').addEventListener('click', cancelAddItem);
+  document.addEventListener('pointerdown', function onOutside(e) {
+    if (!addRow.classList.contains('active')) return;
+    if (!el.contains(e.target)) cancelAddItem();
+  });
+  el.querySelector('.add-item-confirm').addEventListener('click', () => {
+    const inputEl = el.querySelector('.add-item-input');
+    const label = inputEl.value.trim();
+    if (!label) return;
+
+    const extras = JSON.parse(localStorage.getItem('extra-items-' + card.id) || '[]');
+    extras.push(label);
+    localStorage.setItem('extra-items-' + card.id, JSON.stringify(extras));
+
+    const idx = effectiveBaseCount + extras.length - 1;
+    const newHTML = buildItemHTML(card.id, idx, label, '', '미정', '', true);
+    const checklist = el.querySelector(`#cl-${card.id}`);
+    const tmp = document.createElement('div');
+    tmp.innerHTML = newHTML;
+    while (tmp.firstChild) checklist.appendChild(tmp.firstChild);
+    const newItem = checklist.querySelectorAll('.checklist-item')[idx];
+    bindItem(newItem, idx, true);
+
+    const states2 = JSON.parse(localStorage.getItem('card-' + card.id) || '[]');
+    states2[idx] = false;
+    localStorage.setItem('card-' + card.id, JSON.stringify(states2));
+    saveItemToSupabase(card.id, idx);
+    updateCard(card.id, gradeId);
+
+    inputEl.value = '';
+    el.querySelector(`#add-row-${card.id}`).classList.remove('active');
+    document.dispatchEvent(new CustomEvent('assignee-updated'));
+  });
+  el.querySelector('.add-item-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') el.querySelector('.add-item-confirm').click();
+    if (e.key === 'Escape') el.querySelector('.add-item-cancel').click();
   });
 
   return el;
@@ -1080,6 +2362,11 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
 /* ─── UI 전체 생성 ─── */
 function buildUI() {
   const main = document.getElementById('main');
+  const gradeTitle = document.createElement('div');
+  gradeTitle.className = 'type-title';
+  gradeTitle.style.paddingTop = '20px';
+  gradeTitle.textContent = '📖 학년별 자료 현황';
+  main.appendChild(gradeTitle);
   GRADES.forEach(grade => {
     const sec = document.createElement('section');
     sec.className = 'grade-section';
@@ -1093,7 +2380,15 @@ function buildUI() {
         <button class="grade-toggle" type="button" aria-label="접기/펼치기"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,5 8,11 13,5"/></svg></button>
       </div>`;
     sec.classList.add('collapsed');
-    sec.querySelector('.grade-toggle').addEventListener('click', () => sec.classList.toggle('collapsed'));
+    sec.querySelector('.grade-toggle').addEventListener('click', () => {
+      const isCollapsed = sec.classList.contains('collapsed');
+      if (isCollapsed && !isMobView()) {
+        // 학년별 섹션 펼칠 때: 자료유형별 카드 닫고 카드 복원
+        _restoreCardsFromTypeView();
+        document.querySelectorAll('.type-card').forEach(tc => tc.classList.remove('type-open'));
+      }
+      sec.classList.toggle('collapsed');
+    });
 
     const semGrid = document.createElement('div');
     semGrid.className = 'semesters-grid';
@@ -1104,6 +2399,7 @@ function buildUI() {
 
       const stack = document.createElement('div');
       stack.className = 'semester-cards';
+      stack.dataset.semKey = grade.id + 's' + sem.name.charAt(0);
       sem.cards.forEach(card => stack.appendChild(buildCard(card, grade.color, grade.unitColor, grade.vodColor || grade.unitColor, grade.id, grade.name, sem.name)));
       block.appendChild(stack);
       semGrid.appendChild(block);
@@ -1112,6 +2408,27 @@ function buildUI() {
 
     main.appendChild(sec);
   });
+
+  /* 기타 섹션 */
+  const etcSec = document.createElement('section');
+  etcSec.id = 'grade-section-etc';
+  etcSec.className = 'grade-section collapsed';
+  etcSec.style.setProperty('--grade-color', '#64748b');
+  etcSec.innerHTML = `
+    <div class="grade-header">
+      <div class="grade-badge">기</div>
+      <h2>기타</h2>
+      <button class="grade-toggle" type="button" aria-label="접기/펼치기"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,5 8,11 13,5"/></svg></button>
+    </div>`;
+  etcSec.querySelector('.grade-toggle').addEventListener('click', () => etcSec.classList.toggle('collapsed'));
+  const etcGrid = document.createElement('div');
+  etcGrid.className = 'semesters-grid';
+  const etcStack = document.createElement('div');
+  etcStack.className = 'semester-cards';
+  etcStack.dataset.semKey = 'etc';
+  etcGrid.appendChild(etcStack);
+  etcSec.appendChild(etcGrid);
+  main.appendChild(etcSec);
 }
 
 /* ─── 카드 업데이트 ─── */
@@ -1130,6 +2447,8 @@ function updateCard(cardId, gradeId) {
   prog.style.stroke = progressColor(pct);
   document.getElementById('num-' + cardId).textContent = pct;
   document.getElementById('cnt-' + cardId).textContent = done;
+  const totalEl = document.getElementById('total-' + cardId);
+  if (totalEl) totalEl.textContent = items.length;
   document.getElementById('card-' + cardId).classList.toggle('all-done', pct === 100);
 
   localStorage.setItem('card-' + cardId, JSON.stringify([...items].map(i => i.querySelector('input').checked)));
@@ -1141,6 +2460,7 @@ function updateCard(cardId, gradeId) {
 /* ─── 학년 완료율 업데이트 ─── */
 function updateGrade(gradeId) {
   const grade = GRADES.find(g => g.id === gradeId);
+  if (!grade) return;
   let total = 0, done = 0;
   grade.semesters.forEach(sem => sem.cards.forEach(card => {
     document.querySelectorAll(`#cl-${card.id} .checklist-item`).forEach(item => {
@@ -1196,6 +2516,17 @@ function updateOverall() {
     );
 
     _isInitializing = false;
+    /* 모달 select에 extra 담당자 동기화 */
+    const modalSel = document.getElementById('modal-assignee-select');
+    if (modalSel) {
+      AOPTS.forEach(name => {
+        if (![...modalSel.options].some(o => o.value === name)) {
+          const opt = document.createElement('option');
+          opt.value = name; opt.textContent = name;
+          modalSel.appendChild(opt);
+        }
+      });
+    }
     hideOverlay();
     // 카드 DOM이 완성된 뒤 보조 섹션(로드맵·담당자·유형) 재렌더링
     document.dispatchEvent(new CustomEvent('dashboard-ready'));
@@ -1207,16 +2538,17 @@ function updateOverall() {
   /* 구간 정의 */
   const SEGS = [
     { id: 's1', label: '26.06~08',    cards: ['g4s2-study', 'g5s1-study', 'g5s1-vod'] },
-    { id: 's2', label: '26.07~11',    cards: ['g3s2-study'] },
+    { id: 's2', label: '26.07~11',    cards: ['g3s2-study', 'g3s2-unit'] },
     { id: 's3', label: '26.09~11',    cards: ['g4s2-unit',  'g5s2-study', 'g5s2-vod'] },
     { id: 's4', label: '26.12~27.02', cards: ['g5s1-unit',  'g6s1-study', 'g6s1-vod'] },
     { id: 's5', label: '27.03~05',    cards: ['g5s1-unit',  'g6s2-study', 'g6s2-vod'] },
+    { id: 's6', label: '27.09~11',    cards: ['g5s2-unit'] },
   ];
 
   /* 카드 ID → 표시명 매핑 */
   const CINFO = {};
   GRADES.forEach(g => g.semesters.forEach(s => s.cards.forEach(c => {
-    CINFO[c.id] = { name: `${g.name} ${s.name} ${c.title}`, color: g.color };
+    CINFO[c.id] = { name: `${g.name} ${s.name} ${c.title}`, shortName: `${g.name} ${s.name}`, color: g.color };
   })));
 
   /* 카드의 체크리스트 아이템 배열 */
@@ -1239,13 +2571,14 @@ function updateOverall() {
     band.innerHTML = '';
     SEGS.forEach(seg => {
       const st = segStat(seg);
-      const cls = st.pct === 100 ? 'seg-green' : st.pct >= 50 ? 'seg-yellow' : 'seg-red';
+      if (st.pct === 100) return; /* 완료 구간 숨김 */
+      const cls = st.pct >= 50 ? 'seg-yellow' : 'seg-red';
 
       /* 툴팁 카드 목록 */
       const ttRows = seg.cards.map(id => {
         const its = clItems(id);
         const d = its.filter(i => i.querySelector('input').checked).length;
-        const info = CINFO[id] || { name: id, color: '#c4a47c' };
+        const info = CINFO[id] || { name: id, color: '#94A7E8' };
         return `<div class="rm-tt-row">
           <span class="rm-tt-dot ${d === its.length ? 'done' : 'todo'}"></span>
           <span>${info.name} (${d}/${its.length})</span>
@@ -1268,37 +2601,79 @@ function updateOverall() {
     });
   }
 
-  /* ── 우선작업 체크리스트 구축 ── */
+  /* ── 우선작업 체크리스트 구축 (스테이징 방식) ── */
+  function priDateDisplay(dl) {
+    if (!dl) return { text: '날짜', cls: 'empty' };
+    const t = new Date().toISOString().slice(0, 10);
+    const [, m, d] = dl.split('-');
+    const diff = Math.ceil((new Date(dl) - new Date(t)) / 86400000);
+    return { text: `${+m}/${+d}`, cls: diff < 0 ? 'overdue' : diff <= 14 ? 'soon' : 'ok' };
+  }
+
+  const pendingChanges     = new Map(); // "cardId__idx" → { newStatus, originalStatus }
+  const pendingMetaChanges = new Map(); // "cardId__idx" → { dateNew, dateOld, assigneeNew, assigneeOld }
+
+  let _priOutside = null;
+  function setupPriOutside() {
+    if (_priOutside) return;
+    _priOutside = function(e) {
+      if (pendingChanges.size === 0 && pendingMetaChanges.size === 0) { teardownPriOutside(); return; }
+      const footer = document.getElementById('priFooter');
+      if (footer && footer.contains(e.target)) return;
+      const allKeys = new Set([...pendingChanges.keys(), ...pendingMetaChanges.keys()]);
+      const inside = [...allKeys].some(key => {
+        const [c, i] = key.split('__');
+        const el = document.querySelector(`#priList .pri-item[data-card="${c}"][data-idx="${i}"]`);
+        return el && el.contains(e.target);
+      });
+      if (inside) return;
+      e.stopPropagation();
+      teardownPriOutside();
+      setTimeout(() => {
+        const ok = confirm('변경사항을 반영할까요?');
+        if (ok) document.getElementById('priApplyBtn')?.click();
+        else    document.getElementById('priCancelBtn')?.click();
+      }, 0);
+    };
+    document.addEventListener('mousedown', _priOutside, true);
+  }
+  function teardownPriOutside() {
+    if (_priOutside) { document.removeEventListener('mousedown', _priOutside, true); _priOutside = null; }
+  }
+
+  function updatePriFooter() {
+    const footer = document.getElementById('priFooter');
+    if (footer) footer.classList.toggle('visible', pendingChanges.size > 0 || pendingMetaChanges.size > 0);
+  }
+
   function buildPriority() {
-    const list = document.getElementById('priList');
+    const list  = document.getElementById('priList');
     const badge = document.getElementById('priBadge');
     if (!list) return;
 
-    /* 미완료 항목 수집 — 카드가 여러 구간에 있어도 첫 구간 기준으로 1번만 */
     const seen = new Set();
     const items = [];
     SEGS.forEach(seg => {
       seg.cards.forEach(cardId => {
         clItems(cardId).forEach((it, idx) => {
           const key = `${cardId}__${idx}`;
-          if (!it.querySelector('input').checked && !seen.has(key)) {
+          const status = it.querySelector('.status-btn')?.dataset.status ?? '';
+          if (status !== '완료' && !seen.has(key)) {
             seen.add(key);
-            const info = CINFO[cardId] || { name: cardId, color: '#c4a47c' };
+            const info = CINFO[cardId] || { name: cardId, color: '#94A7E8' };
             const assignee = localStorage.getItem(`assignee-${cardId}-${idx}`) || '';
             const deadline = localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || '';
-            items.push({ cardId, idx, period: seg.label, cardName: info.name, color: info.color,
-              itemLabel: it.querySelector('.check-label').textContent, assignee, deadline });
+            const memo     = localStorage.getItem(`detail-${cardId}-${idx}-memo`) || '';
+            items.push({ cardId, idx, period: seg.label, cardName: info.shortName || info.name, color: info.color,
+              itemLabel: it.querySelector('.check-label').textContent, assignee, deadline, memo, status });
           }
         });
       });
     });
 
-    /* 마감일 임박 순 정렬 (마감일 있는 것 → 없는 것) */
     items.sort((a, b) => {
       if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
-      if (a.deadline) return -1;
-      if (b.deadline) return 1;
-      return 0;
+      if (a.deadline) return -1; if (b.deadline) return 1; return 0;
     });
 
     if (badge) badge.textContent = items.length;
@@ -1311,159 +2686,693 @@ function updateOverall() {
     const today = new Date().toISOString().slice(0, 10);
     function deadlineBadge(dl) {
       if (!dl) return '';
-      const [y, m, d] = dl.split('-');
+      const [, m, d] = dl.split('-');
       const label = `${+m}/${+d}`;
       const diff = Math.ceil((new Date(dl) - new Date(today)) / 86400000);
-      const cls = diff < 0 ? '' : diff <= 7 ? 'soon' : 'ok';
-      const prefix = diff < 0 ? '⚠️ ' : diff === 0 ? '🔴 오늘 ' : diff <= 7 ? '🟡 ' : '📅 ';
+      const cls = diff < 0 ? '' : diff <= 14 ? 'soon' : 'ok';
+      const prefix = diff < 0 ? '⚠️ ' : diff === 0 ? '🔴 오늘 ' : diff <= 14 ? '🟡 ' : '📅 ';
       return `<span class="pri-deadline-tip ${cls}">${prefix}${label}</span>`;
     }
 
-    list.innerHTML = items.map(it => `
+    list.innerHTML = items.map(it => {
+      const aOpts = AOPTS.map(n => `<option value="${n}"${it.assignee===n?' selected':''}>${n}</option>`).join('');
+      const dl = priDateDisplay(it.deadline);
+      const aEmpty = !it.assignee || it.assignee === '미정';
+      const aText  = it.assignee || '미정';
+      return `
       <div class="pri-item" data-card="${it.cardId}" data-idx="${it.idx}">
-        <label>
-          <input type="checkbox"/>
-          <span class="pri-chk"><svg viewBox="0 0 12 12"><polyline points="1.5,6 5,9.5 10.5,2.5"/></svg></span>
-          <span class="pri-text">
-            ${it.deadline ? deadlineBadge(it.deadline) : ''}
+        <button class="status-btn" type="button" data-card="${it.cardId}" data-idx="${it.idx}" data-status="${it.status||''}">${it.status||''}</button>
+        <div class="pri-body">
+          <div class="pri-top-row">
             <div class="pri-card-name">${it.cardName}</div>
-            <div class="pri-item-name">${it.itemLabel}${it.assignee ? `<span class="pri-assignee-tip">👤 ${it.assignee}</span>` : ''}</div>
-          </span>
-        </label>
-      </div>`).join('');
+            <div class="pri-controls" data-date-cls="date-${dl.cls}">
+              <div class="pri-ctrl-wrap" data-ctrl="date">
+                <span class="pri-meta-tag date-${dl.cls}" title="더블클릭으로 수정">📅 ${dl.text}</span>
+                <input type="date" class="pri-edit-input pri-deadline-input"
+                  data-card="${it.cardId}" data-idx="${it.idx}" value="${it.deadline || ''}"/>
+              </div>
+              <div class="pri-ctrl-wrap" data-ctrl="assignee">
+                <span class="pri-meta-tag date-${dl.cls}" title="더블클릭으로 수정">${aEmpty ? '👤' : '👤 ' + aText}</span>
+                <select class="pri-edit-input pri-assignee-select"
+                  data-card="${it.cardId}" data-idx="${it.idx}">${aOpts}</select>
+              </div>
+            </div>
+          </div>
+          <div class="pri-name-row">
+            <div class="pri-item-name">${it.itemLabel}</div>
+            ${it.memo ? `<span class="pri-memo-dot" data-memo="${it.memo.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}"></span>` : ''}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
 
-    /* 체크박스 이벤트 — 메인 대시보드와 연동 */
-    list.querySelectorAll('.pri-item').forEach(priEl => {
-      const { card: cardId, idx } = priEl.dataset;
-      const cb = priEl.querySelector('input');
-      cb.addEventListener('change', () => {
-        const mainCb = clItems(cardId)[+idx]?.querySelector('input');
-        if (mainCb && !mainCb.checked) {
-          mainCb.checked = true;
-          mainCb.dispatchEvent(new Event('change', { bubbles: true }));
+    /* 상태배지 클릭 → 스테이징만 (메인 미반영) */
+    list.querySelectorAll('.pri-item .status-btn').forEach(btn => {
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        const cardId = btn.dataset.card;
+        const idx    = +btn.dataset.idx;
+        const key    = `${cardId}__${idx}`;
+        const cur    = btn.dataset.status || '';
+        const next   = STATUS_CYCLE[(STATUS_CYCLE.indexOf(cur) + 1) % STATUS_CYCLE.length];
+        if (!pendingChanges.has(key)) {
+          pendingChanges.set(key, { newStatus: next, originalStatus: cur });
+        } else {
+          const orig = pendingChanges.get(key).originalStatus;
+          if (next === orig) pendingChanges.delete(key);
+          else               pendingChanges.get(key).newStatus = next;
         }
+        btn.dataset.status = next;
+        btn.textContent    = next;
+        btn.closest('.pri-item')?.classList.toggle('pri-pending', pendingChanges.has(key));
+        updatePriFooter();
+        if (pendingChanges.has(key)) setupPriOutside();
       });
     });
+
+    /* pending 상태 복원 (외부 rebuild 후에도 유지) */
+    pendingChanges.forEach(({ newStatus }, key) => {
+      const [cardId, idx] = key.split('__');
+      const priItem = list.querySelector(`.pri-item[data-card="${cardId}"][data-idx="${idx}"]`);
+      if (!priItem) { pendingChanges.delete(key); return; }
+      const btn = priItem.querySelector('.status-btn');
+      if (btn) { btn.dataset.status = newStatus; btn.textContent = newStatus; }
+      priItem.classList.add('pri-pending');
+    });
+
+    updatePriFooter();
+
+    /* 더블클릭 → 편집 모드 전환 */
+    list.querySelectorAll('.pri-ctrl-wrap').forEach(wrap => {
+      const badge  = wrap.querySelector('.pri-meta-tag');
+      const editEl = wrap.querySelector('.pri-edit-input');
+      badge.addEventListener('dblclick', () => {
+        editEl.dataset.priOriginal = editEl.value;
+        wrap.classList.add('editing');
+        if (editEl.type === 'date') {
+          editEl.focus();
+          try { editEl.showPicker(); } catch(e) {}
+        } else {
+          editEl.setAttribute('size', AOPTS.length);
+          editEl.focus();
+        }
+      });
+      editEl.addEventListener('blur', () => {
+        editEl.removeAttribute('size');
+        wrap.classList.remove('editing');
+      });
+    });
+
+    /* 마감기한 변경 — 즉시 UI 반영, 하단 버튼으로 확정 */
+    list.querySelectorAll('.pri-deadline-input').forEach(inp => {
+      inp.addEventListener('change', () => {
+        const val = inp.value;
+        const key = `${inp.dataset.card}__${inp.dataset.idx}`;
+        const dl  = priDateDisplay(val);
+        const controls = inp.closest('.pri-controls');
+        const badge = inp.closest('.pri-ctrl-wrap').querySelector('.pri-meta-tag');
+        if (badge) { badge.textContent = `📅 ${dl.text}`; badge.className = `pri-meta-tag date-${dl.cls}`; }
+        if (controls) {
+          controls.dataset.dateCls = `date-${dl.cls}`;
+          const aBadge = controls.querySelector('[data-ctrl="assignee"] .pri-meta-tag');
+          if (aBadge) aBadge.className = `pri-meta-tag date-${dl.cls}`;
+        }
+        inp.closest('.pri-ctrl-wrap').classList.remove('editing');
+        const entry = pendingMetaChanges.get(key) || {};
+        if (!('dateOld' in entry)) entry.dateOld = inp.dataset.priOriginal ?? '';
+        entry.dateNew = val;
+        pendingMetaChanges.set(key, entry);
+        inp.closest('.pri-item')?.classList.add('pri-pending');
+        updatePriFooter();
+        setupPriOutside();
+      });
+    });
+
+    /* 담당자 변경 — 즉시 UI 반영, 하단 버튼으로 확정 */
+    list.querySelectorAll('.pri-assignee-select').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const val = sel.value;
+        const key = `${sel.dataset.card}__${sel.dataset.idx}`;
+        const badge = sel.closest('.pri-ctrl-wrap').querySelector('.pri-meta-tag');
+        if (badge) {
+          const dateCls = sel.closest('.pri-controls')?.dataset.dateCls || 'date-empty';
+          badge.textContent = (!val || val === '미정') ? '👤' : `👤 ${val}`;
+          badge.className = `pri-meta-tag ${dateCls}`;
+        }
+        sel.removeAttribute('size');
+        sel.closest('.pri-ctrl-wrap').classList.remove('editing');
+        const entry = pendingMetaChanges.get(key) || {};
+        if (!('assigneeOld' in entry)) entry.assigneeOld = sel.dataset.priOriginal ?? '';
+        entry.assigneeNew = val;
+        pendingMetaChanges.set(key, entry);
+        sel.closest('.pri-item')?.classList.add('pri-pending');
+        updatePriFooter();
+        setupPriOutside();
+      });
+    });
+
   }
 
+  /* 반영 버튼 */
+  document.getElementById('priApplyBtn')?.addEventListener('click', () => {
+    pendingChanges.forEach(({ newStatus }, key) => {
+      const [cardId, idx] = key.split('__');
+      const idxNum = +idx;
+      if (newStatus) localStorage.setItem(`detail-${cardId}-${idxNum}-status`, newStatus);
+      else           localStorage.removeItem(`detail-${cardId}-${idxNum}-status`);
+      const mainItem = clItems(cardId)[idxNum];
+      if (mainItem) {
+        mainItem.querySelector('input').checked = (newStatus === '완료');
+        const mainBtn = mainItem.querySelector('.status-btn');
+        if (mainBtn) { mainBtn.dataset.status = newStatus; mainBtn.textContent = newStatus; }
+        const info = getCardObject(cardId);
+        if (info) updateCard(cardId, info.grade.id);
+      }
+      saveItemToSupabase(cardId, idxNum);
+    });
+    pendingChanges.clear();
+
+    pendingMetaChanges.forEach(({ dateNew, assigneeNew }, key) => {
+      const [cardId, idx] = key.split('__');
+      const idxNum = +idx;
+      if (dateNew !== undefined) {
+        if (dateNew) localStorage.setItem(`detail-${cardId}-${idxNum}-deadline`, dateNew);
+        else         localStorage.removeItem(`detail-${cardId}-${idxNum}-deadline`);
+        const mainInp = document.querySelector(`.deadline-input[data-card="${cardId}"][data-idx="${idxNum}"]`);
+        if (mainInp) { mainInp.value = dateNew; mainInp.closest('.checklist-item')?.classList.toggle('has-deadline', !!dateNew); }
+        saveItemToSupabase(cardId, idxNum);
+        document.dispatchEvent(new CustomEvent('deadline-updated'));
+      }
+      if (assigneeNew !== undefined) {
+        if (assigneeNew) localStorage.setItem(`assignee-${cardId}-${idxNum}`, assigneeNew);
+        else             localStorage.removeItem(`assignee-${cardId}-${idxNum}`);
+        const mainSel = document.querySelector(`.assignee-select[data-card="${cardId}"][data-idx="${idxNum}"]`);
+        if (mainSel) { mainSel.value = assigneeNew; mainSel.closest('.checklist-item')?.classList.toggle('has-assignee', assigneeNew !== '' && assigneeNew !== '미정'); }
+        saveItemToSupabase(cardId, idxNum);
+        document.dispatchEvent(new CustomEvent('assignee-updated'));
+      }
+    });
+    teardownPriOutside();
+    pendingMetaChanges.clear();
+
+    buildPriority();
+  });
+
+  /* 취소 버튼 */
+  document.getElementById('priCancelBtn')?.addEventListener('click', () => {
+    document.querySelectorAll('#priList .pri-item').forEach(priEl => {
+      const key = `${priEl.dataset.card}__${priEl.dataset.idx}`;
+      if (pendingChanges.has(key)) {
+        const original = pendingChanges.get(key).originalStatus;
+        const btn = priEl.querySelector('.status-btn');
+        if (btn) { btn.dataset.status = original; btn.textContent = original; }
+      }
+      if (pendingMetaChanges.has(key)) {
+        const { dateOld, assigneeOld } = pendingMetaChanges.get(key);
+        if (dateOld !== undefined) {
+          const dl = priDateDisplay(dateOld);
+          const controls = priEl.querySelector('.pri-controls');
+          const badge = priEl.querySelector('[data-ctrl="date"] .pri-meta-tag');
+          if (badge) { badge.textContent = `📅 ${dl.text}`; badge.className = `pri-meta-tag date-${dl.cls}`; }
+          if (controls) {
+            controls.dataset.dateCls = `date-${dl.cls}`;
+            const aBadge = controls.querySelector('[data-ctrl="assignee"] .pri-meta-tag');
+            if (aBadge) aBadge.className = `pri-meta-tag date-${dl.cls}`;
+          }
+          const inp = priEl.querySelector('.pri-deadline-input');
+          if (inp) inp.value = dateOld;
+        }
+        if (assigneeOld !== undefined) {
+          const dateCls = priEl.querySelector('.pri-controls')?.dataset.dateCls || 'date-empty';
+          const badge = priEl.querySelector('[data-ctrl="assignee"] .pri-meta-tag');
+          if (badge) {
+            badge.textContent = (!assigneeOld || assigneeOld === '미정') ? '👤' : `👤 ${assigneeOld}`;
+            badge.className = `pri-meta-tag ${dateCls}`;
+          }
+          const sel = priEl.querySelector('.pri-assignee-select');
+          if (sel) sel.value = assigneeOld;
+        }
+      }
+      if (pendingChanges.has(key) || pendingMetaChanges.has(key)) {
+        priEl.classList.remove('pri-pending');
+      }
+    });
+    pendingChanges.clear();
+    teardownPriOutside();
+    pendingMetaChanges.clear();
+    updatePriFooter();
+  });
+
   /* ── 전체 갱신 ── */
-  function refresh() { buildBand(); buildPriority(); }
+  function refresh() {
+    buildBand();
+    buildPriority();
+    /* 모든 구간 100% 완료 시 로드맵 섹션 숨김 */
+    let total = 0, done = 0;
+    SEGS.forEach(seg => { const st = segStat(seg); total += st.total; done += st.done; });
+    const band = document.querySelector('.roadmap-left');
+    if (band) band.style.display = (total > 0 && done === total) ? 'none' : '';
+  }
 
   refresh();
 
-  /* 메인 대시보드 체크 변경 시 갱신 (priority 내부 이벤트는 제외) */
   document.addEventListener('change', e => {
     if (e.target.type === 'checkbox' && !e.target.closest('#priList'))
       requestAnimationFrame(refresh);
   });
 
-  /* priority 체크 후 메인이 갱신되면 priority도 재구성 */
-  document.getElementById('priList')?.addEventListener('change', () =>
-    requestAnimationFrame(refresh)
-  );
-
-  /* 담당자·마감일 변경 시 우선작업 갱신 */
   document.addEventListener('assignee-updated', () => requestAnimationFrame(buildPriority));
   document.addEventListener('deadline-updated',  () => requestAnimationFrame(buildPriority));
-
-  /* 카드 DOM 완성 후 최초 렌더링 */
   document.addEventListener('dashboard-ready', refresh);
 })();
 
+/* ─── 담당자 상태배지 스테이징 ─── */
+const pendingAssigneeChanges = new Map(); // "cardId__idx" → { newStatus, originalStatus }
+
+function updateAtFooter() {
+  const hasPending = pendingAssigneeChanges.size > 0;
+  document.getElementById('atFooter')?.classList.toggle('visible', hasPending);
+  document.querySelector('#mobileAssigneePanel .at-footer')?.classList.toggle('visible', hasPending);
+}
+
+function applyAtChanges() {
+  const affected = new Set();
+  pendingAssigneeChanges.forEach(({ newStatus }, key) => {
+    const [cardId, idx] = key.split('__');
+    const idxNum = +idx;
+    if (newStatus) localStorage.setItem(`detail-${cardId}-${idxNum}-status`, newStatus);
+    else           localStorage.removeItem(`detail-${cardId}-${idxNum}-status`);
+    const mainItem = document.querySelectorAll(`#cl-${cardId} .checklist-item`)[idxNum];
+    if (mainItem) {
+      mainItem.querySelector('input').checked = (newStatus === '완료');
+      const mainBtn = mainItem.querySelector('.status-btn');
+      if (mainBtn) { mainBtn.dataset.status = newStatus; mainBtn.textContent = newStatus; }
+    }
+    affected.add(cardId);
+    saveItemToSupabase(cardId, idxNum);
+  });
+  affected.forEach(cardId => {
+    const info = getCardObject(cardId);
+    if (info) updateCard(cardId, info.grade.id);
+  });
+  pendingAssigneeChanges.clear();
+  document.dispatchEvent(new CustomEvent('status-updated'));
+}
+
+function cancelAtChanges() {
+  document.querySelectorAll('.at-item').forEach(itemEl => {
+    const key = `${itemEl.dataset.card}__${itemEl.dataset.idx}`;
+    if (pendingAssigneeChanges.has(key)) {
+      const original = pendingAssigneeChanges.get(key).originalStatus;
+      const btn = itemEl.querySelector('.status-btn');
+      if (btn) { btn.dataset.status = original; btn.textContent = original; }
+      itemEl.classList.remove('at-pending');
+    }
+  });
+  pendingAssigneeChanges.clear();
+  updateAtFooter();
+}
+
+/* ─── 담당자별 공통 유틸 ─── */
+function collectAssigneeTasks(name) {
+  const tasks = [];
+  GRADES.forEach(grade => {
+    grade.semesters.forEach(sem => {
+      sem.cards.forEach(card => {
+        const isMig = localStorage.getItem('card-migrated-' + card.id) === '1';
+        const baseItems  = isMig ? [] : card.items;
+        const extraLabels = JSON.parse(localStorage.getItem('extra-items-' + card.id) || '[]');
+        const baseCount  = baseItems.length;
+        baseItems.forEach((item, i) => {
+          if ((localStorage.getItem(`assignee-${card.id}-${i}`) || '미정').trim() !== name) return;
+          const clItem = document.querySelectorAll(`#cl-${card.id} .checklist-item`)[i];
+          if (clItem?.querySelector('input').checked) return;
+          tasks.push({ cardId: card.id, idx: i,
+            cardName: `${grade.name} ${sem.name} ${card.title}`, label: item.label,
+            status: localStorage.getItem(`detail-${card.id}-${i}-status`) || '',
+            memo:   localStorage.getItem(`detail-${card.id}-${i}-memo`)   || '' });
+        });
+        extraLabels.forEach((label, ei) => {
+          const i = baseCount + ei;
+          if ((localStorage.getItem(`assignee-${card.id}-${i}`) || '미정').trim() !== name) return;
+          const clItem = document.querySelectorAll(`#cl-${card.id} .checklist-item`)[i];
+          if (clItem?.querySelector('input').checked) return;
+          tasks.push({ cardId: card.id, idx: i,
+            cardName: `${grade.name} ${sem.name} ${card.title}`, label,
+            status: localStorage.getItem(`detail-${card.id}-${i}-status`) || '',
+            memo:   localStorage.getItem(`detail-${card.id}-${i}-memo`)   || '' });
+        });
+      });
+    });
+  });
+  return tasks;
+}
+
+function renderAssigneeTasksHTML(tasks, color) {
+  if (tasks.length === 0) return '<div class="assignee-empty">배정된 업무가 없습니다</div>';
+  return tasks.map(t => `
+    <div class="at-item" data-card="${t.cardId}" data-idx="${t.idx}">
+      <div class="assignee-task">
+        <button class="status-btn" type="button" data-card="${t.cardId}" data-idx="${t.idx}" data-status="${t.status||''}">${t.status||''}</button>
+        <div class="assignee-task-info">
+          <div class="assignee-task-card">${t.cardName}</div>
+          <div class="assignee-task-label">${t.label}</div>
+        </div>
+        <button class="at-expand-btn${t.memo ? ' has-memo' : ''}" type="button" title="메모">···</button>
+      </div>
+      <div class="at-memo-row">
+        <textarea class="at-memo" placeholder="메모를 입력하세요...">${t.memo.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
+      </div>
+    </div>`).join('');
+}
+
+function bindAssigneeTasks(container) {
+  container.querySelectorAll('.at-item').forEach(itemEl => {
+    const cardId = itemEl.dataset.card;
+    const idx    = +itemEl.dataset.idx;
+    const statusBtn  = itemEl.querySelector('.status-btn');
+    const expandBtn  = itemEl.querySelector('.at-expand-btn');
+    const memoRow    = itemEl.querySelector('.at-memo-row');
+    const memoTA     = itemEl.querySelector('.at-memo');
+
+    if (statusBtn) {
+      statusBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        const key          = `${cardId}__${idx}`;
+        const currentShown = statusBtn.dataset.status || '';
+        const next         = STATUS_CYCLE[(STATUS_CYCLE.indexOf(currentShown) + 1) % STATUS_CYCLE.length];
+        const originalStatus = pendingAssigneeChanges.has(key)
+          ? pendingAssigneeChanges.get(key).originalStatus
+          : (localStorage.getItem(`detail-${cardId}-${idx}-status`) || '');
+        statusBtn.dataset.status = next;
+        statusBtn.textContent    = next;
+        if (next !== originalStatus) {
+          pendingAssigneeChanges.set(key, { newStatus: next, originalStatus });
+          itemEl.classList.add('at-pending');
+        } else {
+          pendingAssigneeChanges.delete(key);
+          itemEl.classList.remove('at-pending');
+        }
+        updateAtFooter();
+      });
+    }
+
+    if (expandBtn && memoRow && memoTA) {
+      expandBtn.addEventListener('click', e => {
+        e.stopPropagation();
+        memoRow.classList.toggle('open');
+        if (memoRow.classList.contains('open')) memoTA.focus();
+      });
+      memoTA.addEventListener('blur', () => {
+        setTimeout(() => {
+          if (!itemEl.contains(document.activeElement)) memoRow.classList.remove('open');
+        }, 150);
+      });
+      memoTA.addEventListener('input', () => {
+        const v = memoTA.value;
+        if (v) localStorage.setItem(`detail-${cardId}-${idx}-memo`, v);
+        else   localStorage.removeItem(`detail-${cardId}-${idx}-memo`);
+        expandBtn.classList.toggle('has-memo', !!v);
+        const mainItem = document.querySelectorAll(`#cl-${cardId} .checklist-item`)[idx];
+        if (mainItem) {
+          const mainMemoTA = mainItem.closest('.item-wrap')?.querySelector('.item-memo');
+          if (mainMemoTA) { mainMemoTA.value = v; mainMemoTA.dispatchEvent(new Event('input')); }
+        }
+        saveItemToSupabase(cardId, idx);
+      });
+    }
+  });
+
+  // 페이지 재빌드 후 pending 상태 복원
+  pendingAssigneeChanges.forEach(({ newStatus }, key) => {
+    const [cId, i] = key.split('__');
+    const el = container.querySelector(`.at-item[data-card="${cId}"][data-idx="${i}"]`);
+    if (el) {
+      const btn = el.querySelector('.status-btn');
+      if (btn) { btn.dataset.status = newStatus; btn.textContent = newStatus; }
+      el.classList.add('at-pending');
+    }
+  });
+
+  // 모바일 패널 내부 footer 버튼 바인딩
+  container.querySelector('.at-apply-btn')?.addEventListener('click', applyAtChanges);
+  container.querySelector('.at-cancel-btn')?.addEventListener('click', cancelAtChanges);
+
+  updateAtFooter();
+}
+
 /* ─── 담당자별 담당업무 ─── */
 (function () {
-  const ASSIGNEES = [
-    { name: '민주',   color: '#f59e0b' },
-    { name: '찬희',   color: '#ea580c' },
-    { name: '대표님', color: '#92400e' },
-    { name: '미정',   color: '#c4a47c' },
-  ];
-
-  const collapsedCards = new Set(ASSIGNEES.map(a => a.name));
+  const collapsedCards = new Set(AOPTS);
   const toggleSVG = `<svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,5 8,11 13,5"/></svg>`;
+
 
   function buildAssigneeSection() {
     const grid = document.getElementById('assigneeGrid');
     if (!grid) return;
 
-    const tasksByPerson = {};
-    ASSIGNEES.forEach(a => { tasksByPerson[a.name] = []; });
+    const currentAssignees = AOPTS.map(n => ({ name: n, color: ASSIGNEE_COLOR_MAP[n] || '#94A7E8' }));
 
-    GRADES.forEach(grade => {
-      grade.semesters.forEach(sem => {
-        sem.cards.forEach(card => {
-          card.items.forEach((item, idx) => {
-            const stored = (localStorage.getItem(`assignee-${card.id}-${idx}`) || '미정').trim();
-            const matched = ASSIGNEES.find(a => a.name === stored);
-            if (!matched) return;
-            const clItem = document.querySelectorAll(`#cl-${card.id} .checklist-item`)[idx];
-            const isDone = clItem ? clItem.querySelector('input').checked : false;
-            if (isDone) return;
-            tasksByPerson[matched.name].push({
-              cardName: `${grade.name} ${sem.name} ${card.title}`,
-              label: item.label,
-            });
-          });
-        });
-      });
-    });
+    currentAssignees.forEach(a => {
+      const tasks = collectAssigneeTasks(a.name);
+      let   card  = grid.querySelector(`.assignee-card[data-assignee="${a.name}"]`);
 
-    grid.innerHTML = ASSIGNEES.map(a => {
-      const tasks = tasksByPerson[a.name];
-      const itemsHTML = tasks.length === 0
-        ? '<div class="assignee-empty">배정된 업무가 없습니다</div>'
-        : tasks.map(t => `
-            <div class="assignee-task">
-              <div class="assignee-task-dot" style="background:${a.color}"></div>
-              <div class="assignee-task-info">
-                <div class="assignee-task-card">${t.cardName}</div>
-                <div class="assignee-task-label">${t.label}</div>
-              </div>
-            </div>`).join('');
-
-      const countText = tasks.length === 0 ? '0건' : `${tasks.length}건`;
-
-      return `
-        <div class="assignee-card" data-assignee="${a.name}">
+      if (!card) {
+        card = document.createElement('div');
+        card.className = 'assignee-card';
+        card.dataset.assignee = a.name;
+        if (collapsedCards.has(a.name)) card.classList.add('collapsed');
+        card.innerHTML = `
           <div class="assignee-card-header">
             <div class="assignee-avatar" style="background:${a.color}">${a.name[0]}</div>
             ${a.name}
-            <span class="assignee-count">${countText}</span>
+            <span class="assignee-count">${tasks.length}건</span>
+            ${a.name !== '미정' ? `<button class="ac-delete" type="button" title="담당자 삭제">×</button>` : ''}
             <button class="ac-toggle" type="button">${toggleSVG}</button>
           </div>
-          <div class="assignee-items">${itemsHTML}</div>
-        </div>`;
-    }).join('');
-
-    ASSIGNEES.forEach(a => {
-      const card = grid.querySelector(`.assignee-card[data-assignee="${a.name}"]`);
-      if (!card) return;
-      if (collapsedCards.has(a.name)) card.classList.add('collapsed');
-      card.querySelector('.ac-toggle').addEventListener('click', () => {
-        card.classList.toggle('collapsed');
-        if (card.classList.contains('collapsed')) collapsedCards.add(a.name);
-        else collapsedCards.delete(a.name);
-      });
+          <div class="assignee-items">${renderAssigneeTasksHTML(tasks, a.color)}</div>`;
+        card.querySelector('.ac-toggle').addEventListener('click', () => {
+          card.classList.toggle('collapsed');
+          if (card.classList.contains('collapsed')) collapsedCards.add(a.name);
+          else collapsedCards.delete(a.name);
+        });
+        card.querySelector('.ac-delete')?.addEventListener('click', e => {
+          e.stopPropagation();
+          if (!confirm(`'${a.name}' 담당자를 삭제할까요?\n해당 담당자의 업무는 모두 미정으로 변경됩니다.`)) return;
+          collapsedCards.delete(a.name);
+          removeAssignee(a.name);
+          document.dispatchEvent(new CustomEvent('assignee-updated'));
+        });
+        bindAssigneeTasks(card.querySelector('.assignee-items'));
+        grid.appendChild(card);
+      } else {
+        const itemsDiv = card.querySelector('.assignee-items');
+        const countEl  = card.querySelector('.assignee-count');
+        if (itemsDiv) { itemsDiv.innerHTML = renderAssigneeTasksHTML(tasks, a.color); bindAssigneeTasks(itemsDiv); }
+        if (countEl)  countEl.textContent = tasks.length + '건';
+      }
     });
+
+    /* AOPTS에 없는 카드 제거 (삭제 이후 rebuild 시) */
+    grid.querySelectorAll('.assignee-card').forEach(c => {
+      if (!AOPTS.includes(c.dataset.assignee)) c.remove();
+    });
+
+    /* '미정' 카드를 항상 맨 끝으로 이동 */
+    const mijeongCard = grid.querySelector('.assignee-card[data-assignee="미정"]');
+    if (mijeongCard) grid.appendChild(mijeongCard);
   }
+
+  /* 담당자 추가 — 더블클릭으로 열기 */
+  const addRow     = document.getElementById('assigneeAddRow');
+  const addTrigger = document.getElementById('assigneeAddTrigger');
+  const newInput   = document.getElementById('assigneeNewInput');
+  const newConfirm = document.getElementById('assigneeNewConfirm');
+  const newCancel  = document.getElementById('assigneeNewCancel');
+
+  function openAddRow()  { addRow.classList.add('open'); newInput.value = ''; newInput.focus(); }
+  function closeAddRow() { addRow.classList.remove('open'); }
+
+  addTrigger?.addEventListener('dblclick', openAddRow);
+
+  function doAddAssignee() {
+    const name = newInput.value.trim();
+    if (!name) { newInput.focus(); return; }
+    if (addAssignee(name)) {
+      collapsedCards.add(name);
+      buildAssigneeSection();
+      document.dispatchEvent(new CustomEvent('assignee-added', { detail: { name } }));
+    }
+    closeAddRow();
+  }
+
+  newConfirm?.addEventListener('click', doAddAssignee);
+  newCancel?.addEventListener('click', closeAddRow);
+  newInput?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doAddAssignee();
+    if (e.key === 'Escape') closeAddRow();
+  });
 
   buildAssigneeSection();
 
+  document.getElementById('atFooter')?.querySelector('.at-apply-btn')
+    ?.addEventListener('click', applyAtChanges);
+  document.getElementById('atFooter')?.querySelector('.at-cancel-btn')
+    ?.addEventListener('click', cancelAtChanges);
+
   document.addEventListener('assignee-updated', buildAssigneeSection);
-  document.addEventListener('change', e => {
-    if (e.target.type === 'checkbox')
-      requestAnimationFrame(buildAssigneeSection);
+  document.addEventListener('status-updated',   () => requestAnimationFrame(buildAssigneeSection));
+  document.addEventListener('dashboard-ready',  buildAssigneeSection);
+
+  document.addEventListener('expand-assignee', e => {
+    const name = e.detail?.name;
+    const isMobile = window.innerWidth <= 640;
+    document.querySelectorAll('.assignee-card').forEach(c => {
+      if (c.dataset.assignee === name) {
+        c.classList.remove('collapsed');
+        c.style.display = '';
+        collapsedCards.delete(name);
+      } else {
+        if (isMobile) {
+          c.style.display = 'none';
+        } else {
+          c.classList.add('collapsed');
+          collapsedCards.add(c.dataset.assignee);
+        }
+      }
+    });
   });
-  document.addEventListener('dashboard-ready', buildAssigneeSection);
 })();
+
+/* ─── 모바일 탭 뷰 ─── */
+const MOB_SECTIONS = ['roadmap-section', 'assignee-section', 'type-section', 'main', 'add-task-section', 'schedule-section'];
+
+function isMobView() { return window.innerWidth <= 640; }
+
+function mobActivate(sectionId, activeEl) {
+  if (!isMobView()) return;
+  if (sectionId === 'type-section') {
+    _embedCardsInTypeView();
+    document.querySelectorAll('.grade-section').forEach(gs => gs.classList.add('collapsed'));
+  } else {
+    _restoreCardsFromTypeView();
+  }
+  MOB_SECTIONS.forEach(id => document.getElementById(id)?.classList.remove('mob-visible'));
+  document.getElementById(sectionId)?.classList.add('mob-visible');
+  document.querySelectorAll('.nav-item, .nav-sub-item').forEach(el => el.classList.remove('mob-active'));
+  activeEl?.classList.add('mob-active');
+  const titleEl = document.getElementById('mob-page-title');
+  if (titleEl) titleEl.textContent = activeEl?.textContent || '';
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+let _typeCardsEmbedded = false;
+
+function _embedCardsInTypeView() {
+  if (_typeCardsEmbedded) return;
+  _typeCardsEmbedded = true;
+  ['study', 'unit', 'vod'].forEach(typeId => {
+    const typeCard  = document.querySelector(`.type-card[data-type="${typeId}"]`);
+    const container = typeCard?.querySelector('.type-expandable');
+    if (!container) return;
+    GRADES.forEach(grade => grade.semesters.forEach(sem => sem.cards.forEach(card => {
+      if (card.type !== typeId) return;
+      const el = document.getElementById('card-' + card.id);
+      if (el) container.appendChild(el);
+    })));
+    // 모바일: 기본 닫힘 상태 유지 (사용자가 직접 토글)
+  });
+}
+
+function _restoreCardsFromTypeView() {
+  if (!_typeCardsEmbedded) return;
+  _typeCardsEmbedded = false;
+  document.querySelectorAll('.type-card').forEach(tc => tc.classList.remove('type-open'));
+  /* GRADES 데이터 기준으로 각 학기 컨테이너에 직접 재삽입 (next 참조 방식보다 안정적) */
+  GRADES.forEach(grade => {
+    grade.semesters.forEach(sem => {
+      const semKey = grade.id + 's' + sem.name.charAt(0);
+      const semContainer = document.querySelector(`.semester-cards[data-sem-key="${semKey}"]`);
+      if (!semContainer) return;
+      sem.cards.forEach(card => {
+        const el = document.getElementById('card-' + card.id);
+        if (el) semContainer.appendChild(el);
+      });
+    });
+  });
+}
+
+function initMobTabs() {
+  if (!isMobView()) return;
+  loadCalendar();
+  mobActivate('schedule-section', document.getElementById('nav-schedule'));
+}
+
+function closeAllSectionCards() {
+  document.querySelectorAll('.card.show-detail').forEach(c => {
+    c.classList.remove('show-detail');
+    const btn = c.querySelector('.detail-toggle-btn');
+    if (btn) btn.textContent = '세부내용 보기';
+  });
+  if (document.querySelector('.type-card.type-open')) {
+    _restoreCardsFromTypeView();
+    document.querySelectorAll('.type-card').forEach(tc => tc.classList.remove('type-open'));
+  }
+  document.querySelectorAll('.grade-section:not(.collapsed)').forEach(gs => gs.classList.add('collapsed'));
+  document.querySelectorAll('.assignee-card:not(.collapsed)').forEach(ac => ac.classList.add('collapsed'));
+}
+
+['nav-priority','nav-assignee','nav-type','nav-grade','nav-add','nav-schedule'].forEach(id => {
+  const sectionMap = { 'nav-priority': 'roadmap-section', 'nav-assignee': 'assignee-section',
+    'nav-type': 'type-section', 'nav-grade': 'main', 'nav-add': 'add-task-section',
+    'nav-schedule': 'schedule-section' };
+  document.getElementById(id)?.addEventListener('click', e => {
+    closeAllSectionCards();
+    if (id === 'nav-schedule') { loadCalendar(); }
+    if (!isMobView()) return;
+    e.preventDefault();
+    if (id === 'nav-assignee') document.querySelectorAll('.assignee-card').forEach(c => { c.style.display = ''; });
+    mobActivate(sectionMap[id], e.currentTarget);
+  });
+});
+
+function buildAssigneeSubMenu() {
+  const sub = document.getElementById('assigneeSubMenu');
+  if (!sub) return;
+  sub.innerHTML = '';
+  AOPTS.filter(n => n !== '미정').forEach(name => {
+    const el = document.createElement('a');
+    el.className = 'nav-sub-item';
+    el.textContent = name;
+    el.addEventListener('click', e => {
+      e.preventDefault();
+      closeAllSectionCards();
+      if (isMobView()) {
+        mobActivate('assignee-section', el);
+        const titleEl = document.getElementById('mob-page-title');
+        if (titleEl) titleEl.textContent = '담당자별';
+      } else {
+        document.getElementById('assignee-section')?.scrollIntoView({ behavior: 'smooth' });
+      }
+      document.dispatchEvent(new CustomEvent('expand-assignee', { detail: { name } }));
+    });
+    sub.appendChild(el);
+  });
+}
+document.addEventListener('dashboard-ready', buildAssigneeSubMenu);
+document.addEventListener('dashboard-ready', initMobTabs);
+document.addEventListener('assignee-updated', buildAssigneeSubMenu);
+document.addEventListener('assignee-added',   buildAssigneeSubMenu);
 
 /* ─── 자료유형별 완료율 ─── */
 (function () {
   const TYPES = [
-    { id: 'study', name: '달크업 세트', color: '#f59e0b' },
-    { id: 'unit',  name: '단원평가',    color: '#ea580c' },
-    { id: 'vod',   name: '핵심콕VOD',   color: '#b45309' },
+    { id: 'study', name: '달크업 세트', color: '#F8B84A' },
+    { id: 'unit',  name: '단원평가',    color: '#E86050' },
+    { id: 'vod',   name: '핵심콕VOD',   color: '#5068B5' },
   ];
+
+  const _typeChevron = `<svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3,5 8,11 13,5"/></svg>`;
 
   function buildTypeSection() {
     const grid = document.getElementById('typeGrid');
@@ -1481,15 +3390,52 @@ function updateOverall() {
         });
       });
     });
+
+    /* 카드가 유형별 뷰에 임베드된 상태면 바만 업데이트 */
+    if (_typeCardsEmbedded) {
+      TYPES.forEach(t => {
+        const typeCard = grid.querySelector(`.type-card[data-type="${t.id}"]`);
+        if (!typeCard) return;
+        const st = stats[t.id];
+        const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
+        const fill = typeCard.querySelector('.type-bar-fill');
+        if (fill) fill.style.width = pct + '%';
+        const statsEl = typeCard.querySelector('.type-stats');
+        if (statsEl) statsEl.innerHTML = `<span>${st.done}/${st.total} 완료</span><span class="type-pct" style="color:${t.color}">${pct}%</span>`;
+      });
+      return;
+    }
+
     grid.innerHTML = TYPES.map(t => {
       const st = stats[t.id];
       const pct = st.total ? Math.round(st.done / st.total * 100) : 0;
-      return `<div class="type-card">
-        <div class="type-card-name"><span class="type-dot" style="background:${t.color}"></span>${t.name}</div>
+      return `<div class="type-card" data-type="${t.id}">
+        <div class="type-card-header">
+          <div class="type-card-name"><span class="type-dot" style="background:${t.color}">${t.name[0]}</span>${t.name}</div>
+          <button class="type-expand-btn" type="button" aria-label="펼치기">${_typeChevron}</button>
+        </div>
         <div class="type-bar-track"><div class="type-bar-fill" style="width:${pct}%;background:${t.color}"></div></div>
         <div class="type-stats"><span>${st.done}/${st.total} 완료</span><span class="type-pct" style="color:${t.color}">${pct}%</span></div>
+        <div class="type-expandable"></div>
       </div>`;
     }).join('');
+
+    grid.querySelectorAll('.type-expand-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const card = btn.closest('.type-card');
+        const wasOpen = card.classList.contains('type-open');
+        if (!wasOpen) {
+          _embedCardsInTypeView();
+          card.classList.add('type-open');
+          if (!isMobView()) {
+            document.querySelectorAll('.grade-section').forEach(gs => gs.classList.add('collapsed'));
+          }
+        } else {
+          card.classList.remove('type-open');
+          if (!grid.querySelector('.type-card.type-open') && !isMobView()) _restoreCardsFromTypeView();
+        }
+      });
+    });
   }
 
   buildTypeSection();
@@ -1497,6 +3443,74 @@ function updateOverall() {
     if (e.target.type === 'checkbox') requestAnimationFrame(buildTypeSection);
   });
   document.addEventListener('dashboard-ready', buildTypeSection);
+})();
+
+/* ─── 모바일 탭 ─── */
+(function () {
+  const tabBar    = document.getElementById('mobileTabs');
+  const apPanel   = document.getElementById('mobileAssigneePanel');
+  const priPanel  = document.getElementById('priority-panel');
+  if (!tabBar) return;
+
+  function buildAssigneeTabs() {
+    /* 기존 담당자 탭만 제거 후 재생성 */
+    [...tabBar.querySelectorAll('.mobile-tab')].filter(b => b.dataset.tab !== 'priority').forEach(b => b.remove());
+    AOPTS.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = 'mobile-tab';
+      btn.dataset.tab = name;
+      btn.textContent = name;
+      tabBar.appendChild(btn);
+    });
+  }
+
+  function showAssigneePanel(name) {
+    const color = ASSIGNEE_COLOR_MAP[name] || '#94A7E8';
+    const tasks = collectAssigneeTasks(name);
+    apPanel.innerHTML = `
+      <div class="mobile-ap-header">
+        <div class="assignee-avatar" style="background:${color}">${name[0]}</div>
+        <span style="font-weight:700;color:#1e293b">${name}</span>
+        <span class="assignee-count" style="margin-left:auto">${tasks.length}건</span>
+        <div class="at-footer" id="atFooterMob">
+          <button class="at-cancel-btn" type="button">취소</button>
+          <button class="at-apply-btn" type="button">✓ 반영</button>
+        </div>
+      </div>
+      <div>${renderAssigneeTasksHTML(tasks, color)}</div>`;
+    bindAssigneeTasks(apPanel);
+    apPanel.style.display = 'block';
+    priPanel.style.display = 'none';
+  }
+
+  function activate(tab) {
+    [...tabBar.querySelectorAll('.mobile-tab')].forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    if (tab === 'priority') {
+      priPanel.style.display = '';
+      apPanel.style.display  = 'none';
+    } else {
+      showAssigneePanel(tab);
+    }
+  }
+
+  tabBar.addEventListener('click', e => {
+    const btn = e.target.closest('.mobile-tab');
+    if (btn) activate(btn.dataset.tab);
+  });
+
+  /* 담당자 추가 시 탭 재생성 */
+  document.addEventListener('assignee-added', () => buildAssigneeTabs());
+
+  /* 체크/담당자 변경 시 현재 탭 내용 갱신 */
+  function refreshCurrent() {
+    const active = tabBar.querySelector('.mobile-tab.active');
+    if (active && active.dataset.tab !== 'priority') showAssigneePanel(active.dataset.tab);
+  }
+  document.addEventListener('assignee-updated', () => requestAnimationFrame(refreshCurrent));
+  document.addEventListener('status-updated',   () => requestAnimationFrame(refreshCurrent));
+
+  document.addEventListener('dashboard-ready', buildAssigneeTabs);
+  buildAssigneeTabs();
 })();
 
 /* ─── 항목 상세 모달 ─── */
@@ -1559,6 +3573,746 @@ function updateOverall() {
   document.getElementById('modal-save-btn').addEventListener('click', saveModal);
   overlay.addEventListener('click', e => { if (e.target === overlay) closeModal(); });
 })();
+
+/* ─── 항목 삭제 헬퍼 ─── */
+function getCardObject(cardId) {
+  for (const grade of GRADES) {
+    for (const sem of grade.semesters) {
+      const card = sem.cards.find(c => c.id === cardId);
+      if (card) return { card, grade, sem };
+    }
+  }
+  const customCards = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+  const cc = customCards.find(c => c.id === cardId);
+  if (cc) {
+    if (cc.semKey === 'etc' || cc.gradeId === 'etc') {
+      const fakeGrade = { id: 'etc', name: '기타', color: '#64748b', unitColor: '#64748b', vodColor: '#64748b', semesters: [] };
+      const fakeSem   = { name: '' };
+      return { card: { id: cc.id, type: 'custom', title: cc.title, items: [] }, grade: fakeGrade, sem: fakeSem };
+    }
+    const grade = GRADES.find(g => g.id === cc.gradeId);
+    const sem   = grade?.semesters.find(s => s.name.charAt(0) === cc.semKey.slice(3));
+    if (grade && sem) return { card: { id: cc.id, type: 'custom', title: cc.title, items: [] }, grade, sem };
+  }
+  return null;
+}
+
+/* 카드의 모든 항목을 extra-items로 통합 (최초 삭제 시 한 번만 실행) */
+function migrateCardToExtra(cardId, card) {
+  const states     = JSON.parse(localStorage.getItem('card-' + cardId) || '[]');
+  const extraLabels = JSON.parse(localStorage.getItem('extra-items-' + cardId) || '[]');
+  const baseLabels  = card.items.map(it => it.label);
+  const allLabels   = [...baseLabels, ...extraLabels];
+  const snap = allLabels.map((_, i) => ({
+    done:     !!states[i],
+    assignee: localStorage.getItem(`assignee-${cardId}-${i}`),
+    deadline: localStorage.getItem(`detail-${cardId}-${i}-deadline`),
+    memo:     localStorage.getItem(`detail-${cardId}-${i}-memo`),
+    status:   localStorage.getItem(`detail-${cardId}-${i}-status`),
+  }));
+  /* 기존 키 전체 삭제 */
+  for (let i = 0; i < allLabels.length; i++) {
+    localStorage.removeItem(`assignee-${cardId}-${i}`);
+    localStorage.removeItem(`detail-${cardId}-${i}-deadline`);
+    localStorage.removeItem(`detail-${cardId}-${i}-memo`);
+    localStorage.removeItem(`detail-${cardId}-${i}-status`);
+  }
+  /* extra-items로 통합 저장 */
+  localStorage.setItem('extra-items-' + cardId, JSON.stringify(allLabels));
+  localStorage.setItem('card-' + cardId, JSON.stringify(snap.map(s => s.done)));
+  snap.forEach((s, i) => {
+    if (s.assignee) localStorage.setItem(`assignee-${cardId}-${i}`, s.assignee);
+    if (s.deadline) localStorage.setItem(`detail-${cardId}-${i}-deadline`, s.deadline);
+    if (s.memo)     localStorage.setItem(`detail-${cardId}-${i}-memo`, s.memo);
+    if (s.status)   localStorage.setItem(`detail-${cardId}-${i}-status`, s.status);
+  });
+  localStorage.setItem('card-migrated-' + cardId, '1');
+}
+
+function deleteItem(cardId, itemIdx, baseCount) {
+  const info = getCardObject(cardId);
+  if (!info) return;
+  const { card, grade, sem } = info;
+
+  /* 아직 마이그레이션 전이면 먼저 통합 */
+  if (localStorage.getItem('card-migrated-' + cardId) !== '1' && card.items.length > 0) {
+    migrateCardToExtra(cardId, card);
+    /* 마이그레이션 후 effectiveBaseCount = 0, itemIdx는 그대로 유지 */
+  }
+
+  /* 이제 모든 항목이 extra-items에 있음 */
+  const extras = JSON.parse(localStorage.getItem('extra-items-' + cardId) || '[]');
+  extras.splice(itemIdx, 1);
+  localStorage.setItem('extra-items-' + cardId, JSON.stringify(extras));
+
+  /* 이후 항목 키 한 칸 앞당기기 */
+  for (let j = itemIdx; j < extras.length; j++) {
+    const o = j + 1, n = j;
+    const av = localStorage.getItem(`assignee-${cardId}-${o}`);
+    const dv = localStorage.getItem(`detail-${cardId}-${o}-deadline`);
+    const mv = localStorage.getItem(`detail-${cardId}-${o}-memo`);
+    const sv = localStorage.getItem(`detail-${cardId}-${o}-status`);
+    if (av !== null) localStorage.setItem(`assignee-${cardId}-${n}`, av); else localStorage.removeItem(`assignee-${cardId}-${n}`);
+    if (dv !== null) localStorage.setItem(`detail-${cardId}-${n}-deadline`, dv); else localStorage.removeItem(`detail-${cardId}-${n}-deadline`);
+    if (mv !== null) localStorage.setItem(`detail-${cardId}-${n}-memo`, mv); else localStorage.removeItem(`detail-${cardId}-${n}-memo`);
+    if (sv !== null) localStorage.setItem(`detail-${cardId}-${n}-status`, sv); else localStorage.removeItem(`detail-${cardId}-${n}-status`);
+    localStorage.removeItem(`assignee-${cardId}-${o}`);
+    localStorage.removeItem(`detail-${cardId}-${o}-deadline`);
+    localStorage.removeItem(`detail-${cardId}-${o}-memo`);
+    localStorage.removeItem(`detail-${cardId}-${o}-status`);
+  }
+  const last = extras.length;
+  localStorage.removeItem(`assignee-${cardId}-${last}`);
+  localStorage.removeItem(`detail-${cardId}-${last}-deadline`);
+  localStorage.removeItem(`detail-${cardId}-${last}-memo`);
+  localStorage.removeItem(`detail-${cardId}-${last}-status`);
+
+  /* states 배열 업데이트 */
+  const states = JSON.parse(localStorage.getItem('card-' + cardId) || '[]');
+  states.splice(itemIdx, 1);
+  localStorage.setItem('card-' + cardId, JSON.stringify(states));
+
+  /* 카드 DOM 재빌드 */
+  const cardEl = document.getElementById('card-' + cardId);
+  if (!cardEl) return;
+
+  /* 남은 항목이 0개면 카드 자체를 제거 */
+  const remainingExtras = JSON.parse(localStorage.getItem('extra-items-' + cardId) || '[]');
+  if (remainingExtras.length === 0) {
+    cardEl.remove();
+    ['extra-items-', 'card-', 'card-migrated-'].forEach(p => localStorage.removeItem(p + cardId));
+    if (cardId.startsWith('custom-')) {
+      const cc = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+      localStorage.setItem('custom-cards', JSON.stringify(cc.filter(c => c.id !== cardId)));
+    }
+    updateGrade(grade.id);
+    updateOverall();
+    document.dispatchEvent(new CustomEvent('assignee-updated'));
+    return;
+  }
+
+  const newEl = buildCard(card, grade.color, grade.unitColor, grade.vodColor || grade.unitColor, grade.id, grade.name, sem.name);
+  cardEl.replaceWith(newEl);
+  if (!newEl.querySelector('.checklist-item')) {
+    newEl.remove();
+    ['extra-items-', 'card-', 'card-migrated-'].forEach(p => localStorage.removeItem(p + cardId));
+    if (cardId.startsWith('custom-')) {
+      const cc = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+      localStorage.setItem('custom-cards', JSON.stringify(cc.filter(c => c.id !== cardId)));
+    }
+    updateGrade(grade.id);
+    updateOverall();
+    document.dispatchEvent(new CustomEvent('assignee-updated'));
+    return;
+  }
+  updateCard(cardId, grade.id);
+  document.dispatchEvent(new CustomEvent('assignee-updated'));
+}
+
+/* ─── 항목 순서 이동 ─── */
+/* newOrder: 새 DOM 위치[i]에 들어갈 원래 data-idx 값들의 배열 */
+function applyReorder(cardId, newOrder) {
+  const info = getCardObject(cardId);
+  if (!info) return;
+  const { card, grade, sem } = info;
+
+  if (localStorage.getItem('card-migrated-' + cardId) !== '1' && card.items.length > 0)
+    migrateCardToExtra(cardId, card);
+
+  const extras = JSON.parse(localStorage.getItem('extra-items-' + cardId) || '[]');
+  const states = JSON.parse(localStorage.getItem('card-' + cardId) || '[]');
+
+  const snapshot = newOrder.map(oldIdx => ({
+    label:    extras[oldIdx] ?? '',
+    state:    !!states[oldIdx],
+    assignee: localStorage.getItem(`assignee-${cardId}-${oldIdx}`),
+    deadline: localStorage.getItem(`detail-${cardId}-${oldIdx}-deadline`),
+    memo:     localStorage.getItem(`detail-${cardId}-${oldIdx}-memo`),
+    status:   localStorage.getItem(`detail-${cardId}-${oldIdx}-status`),
+  }));
+
+  localStorage.setItem('extra-items-' + cardId, JSON.stringify(snapshot.map(s => s.label)));
+  localStorage.setItem('card-' + cardId, JSON.stringify(snapshot.map(s => s.state)));
+  snapshot.forEach((s, i) => {
+    if (s.assignee !== null) localStorage.setItem(`assignee-${cardId}-${i}`, s.assignee);
+    else localStorage.removeItem(`assignee-${cardId}-${i}`);
+    if (s.deadline !== null) localStorage.setItem(`detail-${cardId}-${i}-deadline`, s.deadline);
+    else localStorage.removeItem(`detail-${cardId}-${i}-deadline`);
+    if (s.memo !== null) localStorage.setItem(`detail-${cardId}-${i}-memo`, s.memo);
+    else localStorage.removeItem(`detail-${cardId}-${i}-memo`);
+    if (s.status !== null) localStorage.setItem(`detail-${cardId}-${i}-status`, s.status);
+    else localStorage.removeItem(`detail-${cardId}-${i}-status`);
+  });
+  for (let i = snapshot.length; i < extras.length; i++) {
+    localStorage.removeItem(`assignee-${cardId}-${i}`);
+    localStorage.removeItem(`detail-${cardId}-${i}-deadline`);
+    localStorage.removeItem(`detail-${cardId}-${i}-memo`);
+    localStorage.removeItem(`detail-${cardId}-${i}-status`);
+  }
+
+  const cardEl = document.getElementById('card-' + cardId);
+  if (!cardEl) return;
+  const newEl = buildCard(card, grade.color, grade.unitColor, grade.vodColor || grade.unitColor, grade.id, grade.name, sem.name);
+  cardEl.replaceWith(newEl);
+  updateCard(cardId, grade.id);
+}
+
+/* ─── 커스텀 카드 생성/재렌더링 ─── */
+function getOrCreateCustomCard(semKey, customType) {
+  const safeType = customType.replace(/\s+/g, '_');
+  const cardId   = 'custom-' + semKey + '-' + safeType;
+
+  /* 이미 DOM에 있으면 바로 반환 */
+  if (document.getElementById('card-' + cardId)) return cardId;
+
+  /* 기타 섹션 처리 */
+  if (semKey === 'etc') {
+    const stack = document.querySelector('.semester-cards[data-sem-key="etc"]');
+    if (!stack) return null;
+    const customCards = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+    if (!customCards.find(c => c.id === cardId)) {
+      customCards.push({ id: cardId, semKey: 'etc', gradeId: 'etc', title: customType });
+      localStorage.setItem('custom-cards', JSON.stringify(customCards));
+    }
+    const card = { id: cardId, type: 'custom', title: customType, items: [] };
+    const el = buildCard(card, '#64748b', '#64748b', '#64748b', 'etc', '기타', '');
+    stack.appendChild(el);
+    document.getElementById('grade-section-etc')?.classList.remove('collapsed');
+    return cardId;
+  }
+
+  /* localStorage에 저장 */
+  const gradeId = semKey.slice(0, 2);
+  const grade   = GRADES.find(g => g.id === gradeId);
+  if (!grade) return null;
+  const semNum  = semKey.slice(3);
+  const sem     = grade.semesters.find(s => s.name.charAt(0) === semNum);
+  if (!sem) return null;
+
+  const customCards = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+  if (!customCards.find(c => c.id === cardId)) {
+    customCards.push({ id: cardId, semKey, gradeId, title: customType });
+    localStorage.setItem('custom-cards', JSON.stringify(customCards));
+  }
+
+  /* 카드 렌더링 */
+  const card  = { id: cardId, type: 'custom', title: customType, items: [] };
+  const el    = buildCard(card, grade.color, grade.unitColor, grade.vodColor || grade.unitColor, grade.id, grade.name, sem.name);
+  const stack = document.querySelector('.semester-cards[data-sem-key="' + semKey + '"]');
+  if (!stack) return null;
+  stack.appendChild(el);
+
+  /* 해당 학년 섹션 펼치기 */
+  stack.closest('.grade-section')?.classList.remove('collapsed');
+  return cardId;
+}
+
+function renderCustomCards() {
+  const customCards = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+  customCards.forEach(cc => {
+    if (document.getElementById('card-' + cc.id)) return;
+    if (cc.semKey === 'etc' || cc.gradeId === 'etc') {
+      const stack = document.querySelector('.semester-cards[data-sem-key="etc"]');
+      if (!stack) return;
+      const card = { id: cc.id, type: 'custom', title: cc.title, items: [] };
+      const el = buildCard(card, '#64748b', '#64748b', '#64748b', 'etc', '기타', '');
+      stack.appendChild(el);
+      updateCard(cc.id, 'etc');
+      return;
+    }
+    const grade = GRADES.find(g => g.id === cc.gradeId);
+    if (!grade) return;
+    const sem = grade.semesters.find(s => s.name.charAt(0) === cc.semKey.slice(3));
+    if (!sem) return;
+    const card = { id: cc.id, type: 'custom', title: cc.title, items: [] };
+    const el   = buildCard(card, grade.color, grade.unitColor, grade.vodColor || grade.unitColor, grade.id, grade.name, sem.name);
+    const stack = document.querySelector('.semester-cards[data-sem-key="' + cc.semKey + '"]');
+    if (stack) { stack.appendChild(el); updateCard(cc.id, cc.gradeId); }
+  });
+}
+
+/* ─── 신규 업무 추가 — 전역 함수 ─── */
+function toggleAtTypeField(semVal) {
+  var typeField = document.getElementById('atType')?.closest('.at-field');
+  if (!typeField) return;
+  if (semVal === 'etc') {
+    typeField.style.display = 'none';
+    document.getElementById('atType').value = '';
+    var ci = document.getElementById('atTypeCustom');
+    if (ci) { ci.value = ''; ci.style.display = 'none'; }
+  } else {
+    typeField.style.display = '';
+  }
+}
+
+function atRebuildAssignee() {
+  var sel = document.getElementById('atAssignee');
+  if (!sel) return;
+  var cur = sel.value;
+  sel.innerHTML = '';
+  var ph = document.createElement('option');
+  ph.value = ''; ph.textContent = '선택'; ph.disabled = true;
+  ph.selected = (!cur || !AOPTS.includes(cur));
+  sel.appendChild(ph);
+  AOPTS.forEach(function(n) {
+    var opt = document.createElement('option');
+    opt.value = n; opt.textContent = n;
+    if (n === cur) opt.selected = true;
+    sel.appendChild(opt);
+  });
+}
+
+
+function doAtSubmit() {
+  var sem   = (document.getElementById('atSem')?.value   || '');
+  var type  = (document.getElementById('atType')?.value  || '');
+  var label = (document.getElementById('atLabel')?.value || '').trim();
+  if (!sem)   { document.getElementById('atSem')?.focus();   return; }
+  if (sem !== 'etc' && !type) { document.getElementById('atType')?.focus(); return; }
+  if (!label) { document.getElementById('atLabel')?.focus(); return; }
+
+  var cardId;
+  if (sem === 'etc') {
+    cardId = getOrCreateCustomCard('etc', '기타');
+    if (!cardId) { alert('카드 생성에 실패했습니다.'); return; }
+  } else if (type === 'custom') {
+    var ct = (document.getElementById('atTypeCustom')?.value || '').trim();
+    if (!ct) { document.getElementById('atTypeCustom')?.focus(); return; }
+    cardId = getOrCreateCustomCard(sem, ct);
+    if (!cardId) { alert('카드 생성에 실패했습니다.'); return; }
+  } else {
+    cardId = sem + '-' + type;
+  }
+
+  var inp = document.querySelector('#add-row-' + cardId + ' .add-item-input');
+  var btn = document.querySelector('#add-row-' + cardId + ' .add-item-confirm');
+  if (!inp || !btn) { alert('해당 카드를 찾을 수 없습니다.'); return; }
+  inp.value = label;
+  btn.click();
+
+  /* 담당자·마감기한 적용 */
+  requestAnimationFrame(function() {
+    var items   = document.querySelectorAll('#cl-' + cardId + ' .checklist-item');
+    var newItem = items[items.length - 1];
+    if (!newItem) return;
+    var assignee = document.getElementById('atAssignee')?.value;
+    if (assignee) {
+      var s = newItem.parentElement?.querySelector('.assignee-select');
+      if (s) { s.value = assignee; s.dispatchEvent(new Event('change')); }
+    }
+    var dl = document.getElementById('atDeadline')?.value;
+    if (dl) {
+      var d = newItem.querySelector('.deadline-input');
+      if (d) { d.value = dl; d.dispatchEvent(new Event('change')); }
+    }
+    /* 해당 학년 섹션 펼치기 */
+    document.getElementById('card-' + cardId)?.closest('.grade-section')?.classList.remove('collapsed');
+  });
+
+  /* 입력 초기화 */
+  document.getElementById('atLabel').value    = '';
+  document.getElementById('atDeadline').value = '';
+  document.getElementById('atAssignee').value = '';
+  var ci = document.getElementById('atTypeCustom');
+  if (ci) { ci.value = ''; ci.style.display = 'none'; }
+  document.getElementById('atType').value = '';
+  document.getElementById('atLabel')?.focus();
+}
+
+atRebuildAssignee();
+document.addEventListener('dashboard-ready', atRebuildAssignee);
+document.addEventListener('dashboard-ready', renderCustomCards);
+document.addEventListener('assignee-added',  atRebuildAssignee);
+document.getElementById('atHeader')?.addEventListener('click', function() {
+  document.getElementById('add-task-section')?.classList.toggle('collapsed');
+});
+
+/* ─── Google Calendar ICS 연동 ─── */
+/* ▼▼▼ 캘린더 공개 iCal URL 입력
+   Google Calendar → 캘린더 설정 → "캘린더 통합" → "공개 주소(iCal 형식)" 복사 ▼▼▼ */
+const CAL_ICS_GRADE3 = 'https://calendar.google.com/calendar/ical/c_ad7471308f6d124f05af0dde41a7d6c23e2a5d3f58d61d3309a18415ad57704c%40group.calendar.google.com/private-286ee87b43404a7210a698022972d640/basic.ics';
+const CAL_ICS_GRADE4 = 'https://calendar.google.com/calendar/ical/c_a3e0a4f50ccb76d9a1aa39c15251f58793629bd8da63ade05068d9b4177ca64d%40group.calendar.google.com/private-eb15422a678a65d852f3c12abdec388b/basic.ics';
+/* ▲▲▲ 설정 끝 ▲▲▲ */
+
+const CORS_PROXIES = [
+  'https://corsproxy.io/?',
+  'https://api.allorigins.win/raw?url=',
+];
+
+const CAL_COLORS = {
+  grade3: { bg: '#FDE8F1', text: '#9D174D', dot: '#F9A8D4', name: '3학년 일정' },
+  grade4: { bg: '#FEF3C7', text: '#92400E', dot: '#FCD34D', name: '4학년 일정' }
+};
+
+let calYear       = new Date().getFullYear();
+let calMonth      = new Date().getMonth();
+let calAllEvents  = null; // 전체 이벤트 캐시 (ICS 파싱 결과)
+
+/* ICS 텍스트 파싱 */
+function parseICS(text, grade) {
+  // 줄 이어붙이기 (line folding 해제)
+  text = text.replace(/\r\n /g, '').replace(/\r\n\t/g, '').replace(/\r/g, '');
+  var lines  = text.split('\n');
+  var events = [];
+  var inEv   = false;
+  var ev     = null;
+
+  lines.forEach(function(raw) {
+    var line = raw.trim();
+    if (line === 'BEGIN:VEVENT') { inEv = true; ev = { _grade: grade }; return; }
+    if (line === 'END:VEVENT')   { if (ev) events.push(ev); inEv = false; ev = null; return; }
+    if (!inEv || !ev) return;
+
+    var ci = line.indexOf(':');
+    if (ci < 0) return;
+    var propRaw  = line.slice(0, ci);
+    var val      = line.slice(ci + 1);
+    var propName = propRaw.split(';')[0].toUpperCase();
+
+    if      (propName === 'SUMMARY')     ev.summary     = icsText(val);
+    else if (propName === 'DESCRIPTION') ev.description = icsText(val);
+    else if (propName === 'LOCATION')    ev.location    = icsText(val);
+    else if (propName === 'DTSTART')     ev.start       = icsDate(propRaw, val);
+    else if (propName === 'DTEND')       ev.end         = icsDate(propRaw, val);
+    else if (propName === 'UID')         ev.id          = val;
+  });
+  return events;
+}
+
+function icsText(v) {
+  return v.replace(/\\n/g, '\n').replace(/\\,/g, ',').replace(/\\;/g, ';').replace(/\\\\/g, '\\');
+}
+
+function icsDate(propRaw, val) {
+  var isAllDay = propRaw.toUpperCase().indexOf('VALUE=DATE') >= 0 ||
+                 (val.indexOf('T') < 0 && val.length === 8);
+  if (isAllDay) {
+    return { date: val.slice(0,4) + '-' + val.slice(4,6) + '-' + val.slice(6,8) };
+  }
+  var y   = val.slice(0,4), mo = val.slice(4,6), d  = val.slice(6,8);
+  var h   = val.slice(9,11), mi = val.slice(11,13), s = val.slice(13,15);
+  var utc = val.endsWith('Z');
+  return { dateTime: y+'-'+mo+'-'+d+'T'+h+':'+mi+':'+s+(utc?'Z':'') };
+}
+
+/* 타임아웃 fetch */
+function fetchWithTimeout(url, ms) {
+  var ctrl = new AbortController();
+  var tid  = setTimeout(function() { ctrl.abort(); }, ms || 8000);
+  return fetch(url, { signal: ctrl.signal }).finally(function() { clearTimeout(tid); });
+}
+
+/* 프록시 순서대로 시도 */
+async function fetchViaProxy(icsUrl) {
+  var encoded = encodeURIComponent(icsUrl);
+  for (var i = 0; i < CORS_PROXIES.length; i++) {
+    try {
+      var res = await fetchWithTimeout(CORS_PROXIES[i] + encoded, 8000);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      return await res.text();
+    } catch(e) {
+      console.warn('프록시 실패 [' + CORS_PROXIES[i] + ']:', e.message);
+      if (i === CORS_PROXIES.length - 1) throw e;
+    }
+  }
+}
+
+/* ICS 파일 fetch → 파싱 */
+async function fetchICS(url, grade) {
+  var text = await fetchViaProxy(url);
+  return parseICS(text, grade);
+}
+
+/* 전체 이벤트 로드 (캐시 활용) */
+async function loadAllEvents() {
+  if (calAllEvents !== null) return calAllEvents;
+
+  var results = [];
+  var errors  = [];
+  var sources = [
+    { url: CAL_ICS_GRADE3, grade: 'grade3' },
+    { url: CAL_ICS_GRADE4, grade: 'grade4' }
+  ];
+  await Promise.all(sources.map(async function(src) {
+    try {
+      var evs = await fetchICS(src.url, src.grade);
+      evs.forEach(function(e) { results.push(e); });
+    } catch(e) {
+      errors.push(src.grade + ': ' + e.message);
+      console.warn('ICS 로드 실패 (' + src.grade + '):', e);
+    }
+  }));
+
+  if (errors.length === 2) throw new Error(errors.join(' / '));
+
+  results.sort(function(a, b) {
+    var aD = (a.start && (a.start.dateTime || a.start.date)) || '';
+    var bD = (b.start && (b.start.dateTime || b.start.date)) || '';
+    return aD.localeCompare(bD);
+  });
+  calAllEvents = results;
+  return results;
+}
+
+/* 해당 월 이벤트 필터링 */
+function getMonthKey(ev) {
+  var s = (ev.start && (ev.start.dateTime || ev.start.date)) || '';
+  return s.slice(0, 7); // YYYY-MM
+}
+
+function filterByMonth(events, y, m) {
+  var mk = y + '-' + String(m + 1).padStart(2, '0');
+  return events.filter(function(ev) { return getMonthKey(ev) === mk; });
+}
+
+function getEventDateKey(ev) {
+  var s = (ev.start && (ev.start.dateTime || ev.start.date)) || '';
+  return s.slice(0, 10); // YYYY-MM-DD
+}
+
+function renderCalendar(events) {
+  var grid = document.getElementById('calGrid');
+  if (!grid) return;
+
+  var label = document.getElementById('calMonthLabel');
+  if (label) label.textContent = calYear + '년 ' + (calMonth + 1) + '월';
+
+  var today    = new Date();
+  var todayKey = today.getFullYear() + '-' +
+    String(today.getMonth() + 1).padStart(2, '0') + '-' +
+    String(today.getDate()).padStart(2, '0');
+
+  var byDate = {};
+  events.forEach(function(ev) {
+    var k = getEventDateKey(ev);
+    if (!byDate[k]) byDate[k] = [];
+    byDate[k].push(ev);
+  });
+
+  var firstDow      = new Date(calYear, calMonth, 1).getDay();
+  var daysInMonth   = new Date(calYear, calMonth + 1, 0).getDate();
+  var daysInPrevM   = new Date(calYear, calMonth, 0).getDate();
+
+  var cells = [];
+  for (var i = 0; i < firstDow; i++) {
+    var d  = daysInPrevM - firstDow + 1 + i;
+    var y2 = calMonth === 0 ? calYear - 1 : calYear;
+    var m2 = calMonth === 0 ? 11 : calMonth - 1;
+    cells.push({ day: d, other: true, dow: i,
+      dateKey: y2 + '-' + String(m2 + 1).padStart(2, '0') + '-' + String(d).padStart(2, '0') });
+  }
+  for (var d2 = 1; d2 <= daysInMonth; d2++) {
+    var dow2 = (firstDow + d2 - 1) % 7;
+    cells.push({ day: d2, other: false, dow: dow2,
+      dateKey: calYear + '-' + String(calMonth + 1).padStart(2, '0') + '-' + String(d2).padStart(2, '0') });
+  }
+  var rem = cells.length % 7;
+  if (rem !== 0) {
+    var fill = 7 - rem;
+    for (var d3 = 1; d3 <= fill; d3++) {
+      var y3 = calMonth === 11 ? calYear + 1 : calYear;
+      var m3 = calMonth === 11 ? 0 : calMonth + 1;
+      var dow3 = cells.length % 7;
+      cells.push({ day: d3, other: true, dow: dow3,
+        dateKey: y3 + '-' + String(m3 + 1).padStart(2, '0') + '-' + String(d3).padStart(2, '0') });
+    }
+  }
+
+  grid.innerHTML = '';
+  cells.forEach(function(cell) {
+    var el   = document.createElement('div');
+    var cls  = ['cal-day'];
+    if (cell.other)              cls.push('other-month');
+    if (cell.dateKey === todayKey) cls.push('today');
+    if (cell.dow === 0)          cls.push('sunday');
+    if (cell.dow === 6)          cls.push('saturday');
+    el.className = cls.join(' ');
+
+    var numEl = document.createElement('div');
+    numEl.className = 'cal-day-num';
+    numEl.textContent = cell.day;
+    el.appendChild(numEl);
+
+    var dayEvs = byDate[cell.dateKey] || [];
+    if (dayEvs.length) {
+      var wrap   = document.createElement('div');
+      wrap.className = 'cal-events';
+      var MAX    = 3;
+      var shown  = dayEvs.slice(0, MAX);
+      var hidden = dayEvs.slice(MAX);
+
+      shown.forEach(function(ev) {
+        wrap.appendChild(makeEventEl(ev));
+      });
+
+      if (hidden.length) {
+        var more = document.createElement('div');
+        more.className = 'cal-event more';
+        more.textContent = '+' + hidden.length + '개 더';
+        more.addEventListener('click', function(e) {
+          e.stopPropagation();
+          more.remove();
+          hidden.forEach(function(ev) { wrap.appendChild(makeEventEl(ev)); });
+        });
+        wrap.appendChild(more);
+      }
+      el.appendChild(wrap);
+    }
+    grid.appendChild(el);
+  });
+
+  if (CAL_ICS_GRADE3 === 'YOUR_GRADE3_ICS_URL') {
+    var notice = document.createElement('div');
+    notice.className = 'cal-config-notice';
+    notice.innerHTML = '📌 Google Calendar를 연결하려면 JS 상단의 <b>CAL_ICS_GRADE3 / CAL_ICS_GRADE4</b>에 iCal URL을 입력하세요';
+    grid.appendChild(notice);
+  }
+}
+
+function makeEventEl(ev) {
+  var grade = ev._grade;
+  var col   = CAL_COLORS[grade];
+  var el    = document.createElement('div');
+  el.className = 'cal-event ' + grade;
+  el.style.background = col.bg;
+  el.style.color      = col.text;
+  el.textContent = ev.summary || '(제목 없음)';
+  el.addEventListener('click', function(e) { e.stopPropagation(); openCalEventModal(ev); });
+  return el;
+}
+
+async function loadCalendar() {
+  var grid  = document.getElementById('calGrid');
+  var label = document.getElementById('calMonthLabel');
+  if (!grid) return;
+  if (label) label.textContent = calYear + '년 ' + (calMonth + 1) + '월';
+
+  if (!calAllEvents) {
+    grid.innerHTML = '<div class="cal-loading">캘린더를 불러오는 중...</div>';
+  }
+
+  try {
+    var all    = await loadAllEvents();
+    var events = filterByMonth(all, calYear, calMonth);
+    renderCalendar(events);
+  } catch(e) {
+    grid.innerHTML = '<div class="cal-error">일정을 불러오지 못했습니다: ' + e.message + '</div>';
+  }
+}
+
+function openCalEventModal(ev) {
+  var grade   = ev._grade;
+  var col     = CAL_COLORS[grade];
+  var dot     = document.getElementById('calModalDot');
+  var title   = document.getElementById('calModalTitle');
+  var calLbl  = document.getElementById('calModalCal');
+  var dateLbl = document.getElementById('calModalDate');
+  var timeLbl = document.getElementById('calModalTime');
+  var timeRow = document.getElementById('calModalTimeRow');
+  var descLbl = document.getElementById('calModalDesc');
+  var descRow = document.getElementById('calModalDescRow');
+  var locLbl  = document.getElementById('calModalLoc');
+  var locRow  = document.getElementById('calModalLocRow');
+
+  if (dot)    dot.style.background = col.dot;
+  if (title)  title.textContent    = ev.summary || '(제목 없음)';
+  if (calLbl) calLbl.textContent   = col.name;
+
+  var isAllDay = ev.start && ev.start.date && !ev.start.dateTime;
+  if (isAllDay) {
+    var d   = new Date(ev.start.date + 'T00:00:00');
+    var end = ev.end && ev.end.date ? new Date(ev.end.date + 'T00:00:00') : null;
+    var fmt = function(dt) { return dt.getFullYear() + '년 ' + (dt.getMonth()+1) + '월 ' + dt.getDate() + '일'; };
+    if (end && end.getTime() !== d.getTime() + 86400000) {
+      var endD = new Date(end.getTime() - 86400000);
+      if (dateLbl) dateLbl.textContent = fmt(d) + ' ~ ' + fmt(endD);
+    } else {
+      if (dateLbl) dateLbl.textContent = fmt(d);
+    }
+    if (timeRow) timeRow.style.display = 'none';
+  } else {
+    var start = new Date(ev.start.dateTime);
+    var end2  = ev.end && ev.end.dateTime ? new Date(ev.end.dateTime) : null;
+    var fmt2  = function(dt) { return dt.getFullYear() + '년 ' + (dt.getMonth()+1) + '월 ' + dt.getDate() + '일'; };
+    if (dateLbl) dateLbl.textContent = fmt2(start);
+    if (timeRow) timeRow.style.display = 'flex';
+    var pad   = function(n) { return String(n).padStart(2, '0'); };
+    var ts    = pad(start.getHours()) + ':' + pad(start.getMinutes());
+    var te    = end2 ? ' ~ ' + pad(end2.getHours()) + ':' + pad(end2.getMinutes()) : '';
+    if (timeLbl) timeLbl.textContent = ts + te;
+  }
+
+  if (ev.description) {
+    if (descRow) descRow.style.display = 'flex';
+    if (descLbl) descLbl.textContent = ev.description.replace(/<[^>]*>/g, '');
+  } else {
+    if (descRow) descRow.style.display = 'none';
+  }
+  if (ev.location) {
+    if (locRow) locRow.style.display = 'flex';
+    if (locLbl) locLbl.textContent   = ev.location;
+  } else {
+    if (locRow) locRow.style.display = 'none';
+  }
+
+  var overlay = document.getElementById('cal-event-modal');
+  if (overlay) overlay.classList.add('open');
+}
+
+document.getElementById('calModalClose')?.addEventListener('click', function() {
+  document.getElementById('cal-event-modal')?.classList.remove('open');
+});
+document.getElementById('cal-event-modal')?.addEventListener('click', function(e) {
+  if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+});
+
+document.getElementById('calPrevBtn')?.addEventListener('click', function() {
+  calMonth--;
+  if (calMonth < 0) { calMonth = 11; calYear--; }
+  loadCalendar();
+});
+document.getElementById('calNextBtn')?.addEventListener('click', function() {
+  calMonth++;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  loadCalendar();
+});
+document.getElementById('calTodayBtn')?.addEventListener('click', function() {
+  var now = new Date();
+  calYear  = now.getFullYear();
+  calMonth = now.getMonth();
+  loadCalendar();
+});
+
+document.addEventListener('dashboard-ready', function() {
+  loadCalendar();
+});
+window.addEventListener('load', function() {
+  setTimeout(function() {
+    if (calAllEvents === null) loadCalendar();
+  }, 500);
+});
+
+/* ─── 메모 툴팁 ─── */
+(function() {
+  var tip = document.createElement('div');
+  tip.id = 'memo-tooltip';
+  document.body.appendChild(tip);
+  document.addEventListener('mouseover', function(e) {
+    var target = e.target.closest('.item-expand-btn.has-memo, .pri-memo-dot');
+    if (!target || !target.dataset.memo) { tip.style.display = 'none'; return; }
+    tip.textContent = target.dataset.memo;
+    tip.style.left = (e.clientX + 14) + 'px';
+    tip.style.top  = (e.clientY - 10) + 'px';
+    tip.style.display = 'block';
+  });
+  document.addEventListener('mousemove', function(e) {
+    if (tip.style.display === 'block') {
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY - 10) + 'px';
+    }
+  });
+})();
+
 </script>
 <div id="detail-modal" class="modal-overlay">
   <div class="modal-box">
@@ -1599,6 +4353,37 @@ function updateOverall() {
     <div class="modal-footer">
       <button class="modal-btn modal-btn-cancel" id="modal-cancel-btn">취소</button>
       <button class="modal-btn modal-btn-save" id="modal-save-btn">저장</button>
+    </div>
+  </div>
+</div>
+<div id="cal-event-modal" class="cal-modal-overlay">
+  <div class="cal-modal-box">
+    <div class="cal-modal-header">
+      <div class="cal-modal-grade-dot" id="calModalDot"></div>
+      <div class="cal-modal-title-text" id="calModalTitle">일정 상세</div>
+      <button class="cal-modal-close" id="calModalClose">✕</button>
+    </div>
+    <div class="cal-modal-body">
+      <div class="cal-modal-row">
+        <div class="cal-modal-label">캘린더</div>
+        <div class="cal-modal-value" id="calModalCal">-</div>
+      </div>
+      <div class="cal-modal-row">
+        <div class="cal-modal-label">날짜</div>
+        <div class="cal-modal-value" id="calModalDate">-</div>
+      </div>
+      <div class="cal-modal-row" id="calModalTimeRow">
+        <div class="cal-modal-label">시간</div>
+        <div class="cal-modal-value" id="calModalTime">-</div>
+      </div>
+      <div class="cal-modal-row" id="calModalDescRow" style="display:none">
+        <div class="cal-modal-label">메모</div>
+        <div class="cal-modal-value" id="calModalDesc">-</div>
+      </div>
+      <div class="cal-modal-row" id="calModalLocRow" style="display:none">
+        <div class="cal-modal-label">장소</div>
+        <div class="cal-modal-value" id="calModalLoc">-</div>
+      </div>
     </div>
   </div>
 </div>
