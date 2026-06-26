@@ -4178,10 +4178,13 @@ const CAL_ICS_GRADE3 = 'https://calendar.google.com/calendar/ical/c_ad7471308f6d
 const CAL_ICS_GRADE4 = 'https://calendar.google.com/calendar/ical/c_a3e0a4f50ccb76d9a1aa39c15251f58793629bd8da63ade05068d9b4177ca64d%40group.calendar.google.com/private-eb15422a678a65d852f3c12abdec388b/basic.ics';
 /* ▲▲▲ 설정 끝 ▲▲▲ */
 
+/* { u: proxy URL prefix, json: true이면 응답을 JSON으로 파싱해 .contents 추출 } */
 const CORS_PROXIES = [
-  'https://corsproxy.io/?',
-  'https://api.allorigins.win/raw?url=',
-  'https://api.codetabs.com/v1/proxy?quest=',
+  { u: 'https://corsproxy.io/?',                          json: false },
+  { u: 'https://api.allorigins.win/raw?url=',             json: false },
+  { u: 'https://api.allorigins.win/get?url=',             json: true  },
+  { u: 'https://api.codetabs.com/v1/proxy?quest=',        json: false },
+  { u: 'https://thingproxy.freeboard.io/fetch/',          json: false },
 ];
 
 const CAL_COLORS = {
@@ -4250,19 +4253,34 @@ function fetchWithTimeout(url, ms, opts) {
     .finally(function() { clearTimeout(tid); });
 }
 
-/* 모든 프록시 동시 요청 → 제일 빠른 응답 하나 사용 (Promise.any) */
+/* Promise.any 폴리필 (구형 브라우저 대응) */
+if (typeof Promise.any !== 'function') {
+  Promise.any = function(promises) {
+    return new Promise(function(resolve, reject) {
+      var errors = [], left = promises.length;
+      if (!left) { reject(new Error('No promises')); return; }
+      promises.forEach(function(p, i) {
+        Promise.resolve(p).then(resolve, function(e) {
+          errors[i] = e; if (--left === 0) reject(new Error('All failed'));
+        });
+      });
+    });
+  };
+}
+
+/* 모든 프록시 동시 요청 → 제일 빠른 성공 하나 사용 */
 async function fetchViaProxy(icsUrl, bustCache) {
   var encoded  = encodeURIComponent(icsUrl);
   var cacheSfx = bustCache ? ('&_cb=' + Date.now()) : '';
 
-  var proxyAttempts = CORS_PROXIES.map(function(p) {
-    var url = p + encoded + cacheSfx;
+  var proxyAttempts = CORS_PROXIES.map(function(proxy) {
+    var url = proxy.u + encoded + cacheSfx;
     return (async function() {
-      var res = await fetchWithTimeout(url, 8000, { cache: 'default' });
+      var res = await fetchWithTimeout(url, 10000, { cache: 'default' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      var text = await res.text();
-      if (!text.includes('BEGIN:VCALENDAR')) throw new Error('ICS 형식 아님');
-      console.log('[캘린더] 프록시 성공:', p);
+      var text = proxy.json ? (await res.json()).contents : await res.text();
+      if (!text || !text.includes('BEGIN:VCALENDAR')) throw new Error('ICS 형식 아님');
+      console.log('[캘린더] 성공:', proxy.u);
       return text;
     })();
   });
