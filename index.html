@@ -524,9 +524,12 @@
     .at-item { border-bottom: 1px solid #EEF2FF; }
     .at-item:last-child { border-bottom: none; }
     .at-dl-label { position: relative; display: inline-flex; flex-shrink: 0; cursor: pointer; }
-    .at-dl-text { display: inline-flex; align-items: center; justify-content: center;
-      height: 18px; padding: 0 5px; border: 1px solid #DDE5FF; border-radius: 4px;
-      background: #F0F4FF; font-size: .6rem; color: #5068B5; white-space: nowrap; }
+    .at-dl-text { display: inline-flex; align-items: center; gap: 2px;
+      font-size: .6rem; font-weight: 600; padding: 1px 6px; border-radius: 4px;
+      white-space: nowrap; background: #F0F4FF; color: #5068B5; border: 1px solid #DDE5FF; }
+    .at-dl-text.overdue { background: #fff1f2; color: #dc2626; border-color: #fecdd3; }
+    .at-dl-text.soon    { background: #fef9c3; color: #a16207; border-color: #fde68a; }
+    .at-dl-text.ok      { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
     .at-dl-input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%;
       cursor: pointer; border: none; padding: 0; background: transparent; }
     .assignee-task {
@@ -3326,9 +3329,23 @@ function collectAssigneeTasks(name) {
   return tasks;
 }
 
+function _atDlInfo(dl) {
+  if (!dl) return { cls: '', text: '📅 기한입력' };
+  const today = new Date().toISOString().slice(0, 10);
+  const diff  = Math.ceil((new Date(dl) - new Date(today)) / 86400000);
+  const [, m, d] = dl.split('-');
+  const label = `${+m}/${+d}`;
+  if (diff < 0)  return { cls: 'overdue', text: `⚠️ ${label}` };
+  if (diff === 0) return { cls: 'soon',   text: `🔴 오늘` };
+  if (diff <= 14) return { cls: 'soon',   text: `🟡 ${label}` };
+  return              { cls: 'ok',     text: `📅 ${label}` };
+}
+
 function renderAssigneeTasksHTML(tasks, color) {
   if (tasks.length === 0) return '<div class="assignee-empty">배정된 업무가 없습니다</div>';
-  return tasks.map(t => `
+  return tasks.map(t => {
+    const dl = _atDlInfo(t.deadline);
+    return `
     <div class="at-item" data-card="${t.cardId}" data-idx="${t.idx}">
       <div class="assignee-task">
         <button class="status-btn" type="button" data-card="${t.cardId}" data-idx="${t.idx}" data-status="${t.status||''}">${t.status||''}</button>
@@ -3337,7 +3354,7 @@ function renderAssigneeTasksHTML(tasks, color) {
           <div class="assignee-task-label">${t.label}</div>
         </div>
         <label class="at-dl-label">
-          <span class="at-dl-text">${t.deadline ? fmtMD(t.deadline) : '기한입력'}</span>
+          <span class="at-dl-text ${dl.cls}">${dl.text}</span>
           <input type="date" class="at-dl-input" value="${t.deadline||''}" />
         </label>
         <button class="at-expand-btn${t.memo ? ' has-memo' : ''}" type="button" title="메모">···</button>
@@ -3345,7 +3362,8 @@ function renderAssigneeTasksHTML(tasks, color) {
       <div class="at-memo-row">
         <textarea class="at-memo" placeholder="메모를 입력하세요...">${t.memo.replace(/&/g,'&amp;').replace(/</g,'&lt;')}</textarea>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function bindAssigneeTasks(container) {
@@ -3387,7 +3405,9 @@ function bindAssigneeTasks(container) {
         const val = dlInput.value;
         if (val) localStorage.setItem(`detail-${cardId}-${idx}-deadline`, val);
         else     localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
-        dlText.textContent = val ? fmtMD(val) : '기한입력';
+        const info = _atDlInfo(val);
+        dlText.textContent = info.text;
+        dlText.className   = `at-dl-text ${info.cls}`;
         saveItemToSupabase(cardId, idx);
         document.dispatchEvent(new CustomEvent('deadline-updated'));
         document.dispatchEvent(new CustomEvent('assignee-updated'));
