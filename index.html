@@ -6,6 +6,7 @@
   <title>스터디 자료 준비 현황 대시보드</title>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1213,6 +1214,79 @@
       grid-column: 1/-1; padding: 16px; text-align: center;
       color: #94A7E8; font-size: .8rem; border-top: 1px dashed #DDE5FF;
     }
+    /* 캘린더 편집 모드 */
+    .cal-edit-btn {
+      font-size: .74rem; font-weight: 600; padding: 4px 12px;
+      border-radius: 99px; border: 1.5px solid #DDE5FF;
+      background: #fff; color: #64748b; cursor: pointer;
+      transition: all .15s; display: flex; align-items: center; gap: 5px;
+    }
+    .cal-edit-btn:hover { border-color: #5068B5; color: #5068B5; background: #EEF2FF; }
+    .cal-edit-btn.logged-in { background: #5068B5; color: #fff; border-color: #5068B5; }
+    .cal-edit-btn.logged-in:hover { background: #3a52a3; }
+    .cal-day.edit-mode { cursor: pointer; }
+    .cal-day.edit-mode:hover { background: #EEF2FF; }
+    .cal-event-del {
+      display: none; margin-left: 3px; color: inherit; opacity: .6;
+      font-size: .65rem; cursor: pointer; flex-shrink: 0;
+    }
+    .edit-mode-active .cal-event { display: flex; align-items: center; justify-content: space-between; }
+    .edit-mode-active .cal-event-del { display: inline; }
+    /* 일정 추가/수정 모달 */
+    .cal-form-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,.45); z-index: 700;
+      align-items: center; justify-content: center;
+    }
+    .cal-form-overlay.open { display: flex; }
+    .cal-form-box {
+      background: #fff; border-radius: 16px;
+      width: 100%; max-width: 400px; margin: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.25); overflow: hidden;
+    }
+    .cal-form-header {
+      padding: 14px 16px; background: #F0F4FF;
+      border-bottom: 1px solid #DDE5FF;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .cal-form-title { font-size: .9rem; font-weight: 700; color: #1e293b; }
+    .cal-form-close {
+      width: 28px; height: 28px; border: none; background: transparent;
+      cursor: pointer; border-radius: 50%; font-size: 1rem; color: #64748b;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .cal-form-close:hover { background: #EEF2FF; }
+    .cal-form-body { padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+    .cal-form-field { display: flex; flex-direction: column; gap: 5px; }
+    .cal-form-field label { font-size: .75rem; font-weight: 600; color: #64748b; }
+    .cal-form-field input, .cal-form-field select, .cal-form-field textarea {
+      border: 1.5px solid #DDE5FF; border-radius: 8px;
+      padding: 8px 10px; font-size: .82rem; font-family: inherit;
+      color: #1e293b; outline: none; transition: border-color .15s;
+    }
+    .cal-form-field input:focus, .cal-form-field select:focus { border-color: #5068B5; }
+    .cal-form-row { display: flex; gap: 8px; }
+    .cal-form-row .cal-form-field { flex: 1; }
+    .cal-form-footer {
+      padding: 12px 16px; border-top: 1px solid #DDE5FF;
+      display: flex; justify-content: flex-end; gap: 8px;
+    }
+    .cal-form-cancel {
+      padding: 7px 16px; border-radius: 8px; border: 1.5px solid #DDE5FF;
+      background: #fff; color: #64748b; font-size: .8rem; cursor: pointer;
+    }
+    .cal-form-save {
+      padding: 7px 16px; border-radius: 8px; border: none;
+      background: #5068B5; color: #fff; font-size: .8rem; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+    }
+    .cal-form-save:hover { background: #3a52a3; }
+    .cal-form-delete {
+      padding: 7px 16px; border-radius: 8px; border: 1.5px solid #fca5a5;
+      background: #fff; color: #dc2626; font-size: .8rem; cursor: pointer; margin-right: auto;
+    }
+    .cal-form-delete:hover { background: #fee2e2; }
     /* 일정 상세 모달 */
     .cal-modal-overlay {
       display: none; position: fixed; inset: 0;
@@ -1291,6 +1365,7 @@
         <button class="cal-nav-btn" id="calNextBtn">&#8250;</button>
         <button class="cal-today-btn" id="calTodayBtn">오늘</button>
       </div>
+      <button class="cal-edit-btn" id="calEditBtn">✏️ 편집 모드</button>
       <div class="cal-grade-filter">
         <button class="cal-filter-btn active" data-grade="all">전체</button>
         <button class="cal-filter-btn" data-grade="grade3">3학년</button>
@@ -1436,6 +1511,59 @@
   </div>
 </section>
 
+<div id="cal-form-modal" class="cal-form-overlay">
+  <div class="cal-form-box">
+    <div class="cal-form-header">
+      <div class="cal-form-title" id="calFormTitle">일정 추가</div>
+      <button class="cal-form-close" id="calFormClose">✕</button>
+    </div>
+    <div class="cal-form-body">
+      <div class="cal-form-field">
+        <label>제목</label>
+        <input type="text" id="calFormSummary" placeholder="일정 제목"/>
+      </div>
+      <div class="cal-form-field">
+        <label>캘린더</label>
+        <select id="calFormGrade">
+          <option value="grade3">3학년 일정</option>
+          <option value="grade4">4학년 일정</option>
+        </select>
+      </div>
+      <div class="cal-form-row">
+        <div class="cal-form-field">
+          <label>시작일</label>
+          <input type="date" id="calFormStartDate"/>
+        </div>
+        <div class="cal-form-field">
+          <label>종료일</label>
+          <input type="date" id="calFormEndDate"/>
+        </div>
+      </div>
+      <div class="cal-form-row" id="calFormTimeRow">
+        <div class="cal-form-field">
+          <label>시작 시간</label>
+          <input type="time" id="calFormStartTime"/>
+        </div>
+        <div class="cal-form-field">
+          <label>종료 시간</label>
+          <input type="time" id="calFormEndTime"/>
+        </div>
+      </div>
+      <div class="cal-form-field">
+        <label><input type="checkbox" id="calFormAllDay" checked style="margin-right:5px">종일</label>
+      </div>
+      <div class="cal-form-field">
+        <label>메모 (선택)</label>
+        <input type="text" id="calFormDesc" placeholder="메모"/>
+      </div>
+    </div>
+    <div class="cal-form-footer">
+      <button class="cal-form-delete" id="calFormDelete" style="display:none">삭제</button>
+      <button class="cal-form-cancel" id="calFormCancel">취소</button>
+      <button class="cal-form-save" id="calFormSaveBtn">저장</button>
+    </div>
+  </div>
+</div>
 <div id="detail-modal" class="modal-overlay">
   <div class="modal-box">
     <div class="modal-header">
@@ -4224,6 +4352,7 @@ function renderCalendar(events) {
     if (cell.other)                cls.push('other-month');
     if (cell.dateKey === todayKey) cls.push('today');
     el.className = cls.join(' ');
+    el.dataset.dateKey = cell.dateKey;
 
     var numEl = document.createElement('div');
     numEl.className = 'cal-day-num';
@@ -4273,8 +4402,17 @@ function makeEventEl(ev) {
   el.className = 'cal-event ' + grade;
   el.style.background = col.bg;
   el.style.color      = col.text;
-  el.textContent = ev.summary || '(제목 없음)';
-  el.addEventListener('click', function(e) { e.stopPropagation(); openCalEventModal(ev); });
+
+  var txt = document.createElement('span');
+  txt.textContent = ev.summary || '(제목 없음)';
+  txt.style.overflow = 'hidden'; txt.style.textOverflow = 'ellipsis'; txt.style.whiteSpace = 'nowrap';
+  el.appendChild(txt);
+
+  el.addEventListener('click', function(e) {
+    e.stopPropagation();
+    if (calEditMode) { openCalForm(null, ev.id, ev._grade); }
+    else             { openCalEventModal(ev); }
+  });
   return el;
 }
 
@@ -4363,6 +4501,170 @@ document.getElementById('calModalClose')?.addEventListener('click', function() {
 });
 document.getElementById('cal-event-modal')?.addEventListener('click', function(e) {
   if (e.target === e.currentTarget) e.currentTarget.classList.remove('open');
+});
+
+/* ─── Google OAuth + 캘린더 편집 ─── */
+const OAUTH_CLIENT_ID = '321659511981-3h9id6qu1p9hqj95f01k6hjkskeife82.apps.googleusercontent.com';
+const CAL_SCOPE       = 'https://www.googleapis.com/auth/calendar';
+const CAL_API_BASE    = 'https://www.googleapis.com/calendar/v3/calendars';
+
+const CAL_WRITE_IDS = {
+  grade3: 'c_ad7471308f6d124f05af0dde41a7d6c23e2a5d3f58d61d3309a18415ad57704c@group.calendar.google.com',
+  grade4: 'c_a3e0a4f50ccb76d9a1aa39c15251f58793629bd8da63ade05068d9b4177ca64d@group.calendar.google.com'
+};
+
+let calAccessToken  = null;
+let calEditMode     = false;
+let calEditEventId  = null;
+let calEditGrade    = null;
+
+/* 토큰 클라이언트 초기화 */
+let tokenClient = null;
+function initTokenClient() {
+  if (!window.google) return;
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: OAUTH_CLIENT_ID,
+    scope: CAL_SCOPE,
+    callback: function(resp) {
+      if (resp.error) { alert('로그인 실패: ' + resp.error); return; }
+      calAccessToken = resp.access_token;
+      document.getElementById('calEditBtn').textContent = '✏️ 편집 중 (로그아웃)';
+      document.getElementById('calEditBtn').classList.add('logged-in');
+      calEditMode = true;
+      document.getElementById('calGrid').classList.add('edit-mode-active');
+      enableDayCellClick();
+      if (calAllEvents !== null) renderCalendar(filterByMonth(calAllEvents, calYear, calMonth));
+    }
+  });
+}
+window.addEventListener('load', function() { setTimeout(initTokenClient, 1000); });
+
+/* 편집 버튼 */
+document.getElementById('calEditBtn')?.addEventListener('click', function() {
+  if (calEditMode) {
+    calAccessToken = null; calEditMode = false;
+    this.textContent = '✏️ 편집 모드';
+    this.classList.remove('logged-in');
+    document.getElementById('calGrid').classList.remove('edit-mode-active');
+    if (calAllEvents !== null) renderCalendar(filterByMonth(calAllEvents, calYear, calMonth));
+  } else {
+    if (!tokenClient) { alert('잠시 후 다시 시도해주세요.'); return; }
+    tokenClient.requestAccessToken();
+  }
+});
+
+/* 날짜 셀 클릭 → 일정 추가 */
+function enableDayCellClick() {
+  document.querySelectorAll('.cal-day').forEach(function(cell) {
+    cell.classList.add('edit-mode');
+    cell.addEventListener('click', function(e) {
+      if (!calEditMode) return;
+      if (e.target.closest('.cal-event')) return;
+      openCalForm(cell.dataset.dateKey, null, null);
+    });
+  });
+}
+
+/* 폼 열기 */
+function openCalForm(dateKey, eventId, grade) {
+  calEditEventId = eventId;
+  calEditGrade   = grade;
+  document.getElementById('calFormTitle').textContent = eventId ? '일정 수정' : '일정 추가';
+  document.getElementById('calFormDelete').style.display = eventId ? 'block' : 'none';
+  document.getElementById('calFormSummary').value = '';
+  document.getElementById('calFormDesc').value    = '';
+  document.getElementById('calFormAllDay').checked = true;
+  document.getElementById('calFormTimeRow').style.display = 'none';
+  document.getElementById('calFormStartDate').value = dateKey || '';
+  document.getElementById('calFormEndDate').value   = dateKey || '';
+
+  if (eventId && calAllEvents) {
+    var ev = calAllEvents.find(function(e) { return e.id === eventId; });
+    if (ev) {
+      document.getElementById('calFormSummary').value = ev.summary || '';
+      document.getElementById('calFormDesc').value    = ev.description || '';
+      document.getElementById('calFormGrade').value   = ev._grade;
+      calEditGrade = ev._grade;
+      var isAllDay = ev.start && ev.start.date;
+      document.getElementById('calFormAllDay').checked = !!isAllDay;
+      document.getElementById('calFormTimeRow').style.display = isAllDay ? 'none' : 'flex';
+      if (isAllDay) {
+        document.getElementById('calFormStartDate').value = ev.start.date;
+        var endD = new Date(ev.end.date + 'T00:00:00');
+        endD.setDate(endD.getDate() - 1);
+        document.getElementById('calFormEndDate').value = endD.toISOString().slice(0,10);
+      } else {
+        document.getElementById('calFormStartDate').value = ev.start.dateTime.slice(0,10);
+        document.getElementById('calFormEndDate').value   = ev.end.dateTime.slice(0,10);
+        document.getElementById('calFormStartTime').value = ev.start.dateTime.slice(11,16);
+        document.getElementById('calFormEndTime').value   = ev.end.dateTime.slice(11,16);
+      }
+    }
+  }
+  document.getElementById('cal-form-modal').classList.add('open');
+}
+
+document.getElementById('calFormAllDay')?.addEventListener('change', function() {
+  document.getElementById('calFormTimeRow').style.display = this.checked ? 'none' : 'flex';
+});
+
+function closeCalForm() { document.getElementById('cal-form-modal').classList.remove('open'); }
+document.getElementById('calFormClose')?.addEventListener('click', closeCalForm);
+document.getElementById('calFormCancel')?.addEventListener('click', closeCalForm);
+document.getElementById('cal-form-modal')?.addEventListener('click', function(e) {
+  if (e.target === e.currentTarget) closeCalForm();
+});
+
+/* 저장 */
+document.getElementById('calFormSaveBtn')?.addEventListener('click', async function() {
+  var summary   = document.getElementById('calFormSummary').value.trim();
+  if (!summary) { alert('제목을 입력하세요.'); return; }
+  var grade     = document.getElementById('calFormGrade').value;
+  var calId     = CAL_WRITE_IDS[grade];
+  var isAllDay  = document.getElementById('calFormAllDay').checked;
+  var startDate = document.getElementById('calFormStartDate').value;
+  var endDate   = document.getElementById('calFormEndDate').value || startDate;
+  var desc      = document.getElementById('calFormDesc').value.trim();
+
+  var body;
+  if (isAllDay) {
+    var endD = new Date(endDate + 'T00:00:00');
+    endD.setDate(endD.getDate() + 1);
+    body = { summary: summary, description: desc,
+      start: { date: startDate }, end: { date: endD.toISOString().slice(0,10) } };
+  } else {
+    var st = document.getElementById('calFormStartTime').value || '09:00';
+    var et = document.getElementById('calFormEndTime').value   || '10:00';
+    body = { summary: summary, description: desc,
+      start: { dateTime: startDate + 'T' + st + ':00', timeZone: 'Asia/Seoul' },
+      end:   { dateTime: endDate   + 'T' + et + ':00', timeZone: 'Asia/Seoul' } };
+  }
+
+  var url    = CAL_API_BASE + '/' + encodeURIComponent(calId) + '/events' + (calEditEventId ? '/' + calEditEventId : '');
+  var method = calEditEventId ? 'PUT' : 'POST';
+  try {
+    var res = await fetch(url, { method: method,
+      headers: { 'Authorization': 'Bearer ' + calAccessToken, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body) });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    calAllEvents = null;
+    closeCalForm();
+    await loadCalendar();
+  } catch(e) { alert('저장 실패: ' + e.message); }
+});
+
+/* 삭제 */
+document.getElementById('calFormDelete')?.addEventListener('click', async function() {
+  if (!confirm('이 일정을 삭제하시겠습니까?')) return;
+  var calId = CAL_WRITE_IDS[calEditGrade];
+  try {
+    var res = await fetch(CAL_API_BASE + '/' + encodeURIComponent(calId) + '/events/' + calEditEventId, {
+      method: 'DELETE', headers: { 'Authorization': 'Bearer ' + calAccessToken } });
+    if (!res.ok && res.status !== 204) throw new Error('HTTP ' + res.status);
+    calAllEvents = null;
+    closeCalForm();
+    await loadCalendar();
+  } catch(e) { alert('삭제 실패: ' + e.message); }
 });
 
 document.querySelectorAll('.cal-filter-btn').forEach(function(btn) {
