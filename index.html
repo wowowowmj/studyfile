@@ -436,19 +436,14 @@
     .dl-ok-btn     { background: #5068B5; color: #fff; border: none; border-radius: 3px; padding: 1px 6px; font-size: .6rem; cursor: pointer; font-weight: 700; }
     .dl-cancel-btn { background: #EEF2FF; color: #5068B5; border: none; border-radius: 3px; padding: 1px 6px; font-size: .6rem; cursor: pointer; font-weight: 700; }
     .checklist-item.checked .deadline-display { color: #94A7E8; border-color: #ece7e0; background: #fafafa; }
-    .deadline-input {
-      position: fixed; left: -9999px; top: -9999px;
-      width: 0; height: 0; opacity: 0; pointer-events: none;
-      border: none; outline: none; background: transparent; font-family: inherit;
-      font-size: .6rem; color: #5068B5; padding: 0; cursor: pointer;
-      border-bottom: 1px dashed #C0CFFF; max-width: 92px;
+    .deadline-input { display: none; }
+    .item-main.dl-editing .deadline-display { display: none; }
+    .item-main.dl-editing .deadline-input {
+      display: inline-block; font-family: inherit; font-size: .6rem;
+      border: 1.5px solid #5068B5; border-radius: 4px;
+      padding: 2px 5px; outline: none; color: #1e293b; background: #fff;
+      width: 100px;
     }
-    .deadline-input::-webkit-calendar-picker-indicator {
-      width: 8px; height: 8px; opacity: .45; cursor: pointer; padding: 0; margin-left: 2px;
-    }
-    .deadline-input:focus { outline: none; border-bottom-color: #F8B84A; }
-    .deadline-input:focus::-webkit-calendar-picker-indicator { opacity: .8; }
-    .checklist-item.checked .deadline-input { color: #94A7E8; border-bottom-color: #DDE5FF; }
     .assignee-colon { font-size: .75rem; color: #94A7E8; flex-shrink: 0; }
     .assignee-input {
       width: 40px; flex-shrink: 0; user-select: text;
@@ -538,8 +533,14 @@
     .at-dl-text.overdue { background: #fff1f2; color: #dc2626; border-color: #fecdd3; }
     .at-dl-text.soon    { background: #fef9c3; color: #a16207; border-color: #fde68a; }
     .at-dl-text.ok      { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
-    .at-dl-input { position: absolute; inset: 0; opacity: 0; pointer-events: none;
-      width: 100%; height: 100%; cursor: pointer; border: none; padding: 0; background: transparent; }
+    .at-dl-input { display: none; }
+    .at-dl-wrap.editing .at-dl-text { display: none; }
+    .at-dl-wrap.editing .at-dl-input {
+      display: inline-block; font-family: inherit; font-size: .6rem;
+      border: 1.5px solid #5068B5; border-radius: 4px;
+      padding: 2px 4px; outline: none; color: #1e293b; background: #fff;
+      width: 90px;
+    }
     .at-dl-actions { display: none; gap: 3px; }
     .at-dl-wrap.pending .at-dl-actions { display: flex; }
     .at-dl-ok     { background: #5068B5; color: #fff; border: none; border-radius: 3px; padding: 1px 6px; font-size: .65rem; cursor: pointer; font-weight: 700; }
@@ -2218,10 +2219,10 @@ function buildItemHTML(cardId, i, label, status, assignee, deadline, canDelete) 
       <div class="item-col">
         <span class="check-label">${label}</span>
         <span class="deadline-display ${deadline ? _dlClass(deadline) : ''}">${deadline ? _dlText(deadline) : '📅 기한입력'}</span>
-        <input type="date" class="deadline-input" data-card="${cardId}" data-idx="${i}" value="${deadline}" title="마감기한 설정" style="position:absolute;opacity:0;pointer-events:none;width:1px;height:1px;"/>
-        <span class="dl-confirm"><button class="dl-ok-btn" type="button">✓</button><button class="dl-cancel-btn" type="button">✕</button></span>
       </div>
     </label>
+    <input type="date" class="deadline-input" data-card="${cardId}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
+    <span class="dl-confirm"><button class="dl-ok-btn" type="button">✓</button><button class="dl-cancel-btn" type="button">✕</button></span>
     <select class="assignee-select" data-card="${cardId}" data-idx="${i}">${opts}</select>
     <button class="item-expand-btn" type="button" title="메모">···</button>
     ${canDelete ? `<button class="item-delete-btn" type="button" title="삭제">×</button>` : ''}
@@ -2288,7 +2289,7 @@ function cancelCardChanges(cardId) {
     }
     if (pendingCardChanges.has(dlKey)) {
       const orig = pendingCardChanges.get(dlKey).originalValue;
-      const inp  = itemEl.querySelector('.deadline-input');
+      const inp  = itemEl.closest('.item-wrap')?.querySelector('.deadline-input');
       const disp = itemEl.querySelector('.deadline-display');
       if (inp)  inp.value = orig || '';
       if (disp) { disp.textContent = orig ? _dlText(orig) : '📅 기한입력'; disp.className = `deadline-display ${orig ? _dlClass(orig) : ''}`; }
@@ -2437,18 +2438,24 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       }
       updateCardFooter(card.id);
     });
-    const inp  = itemEl.querySelector('.deadline-input');
-    const disp = itemEl.querySelector('.deadline-display');
-    const dlConfirm = itemEl.querySelector('.dl-confirm');
-    const dlOkBtn   = itemEl.querySelector('.dl-ok-btn');
-    const dlCancelBtn = itemEl.querySelector('.dl-cancel-btn');
+    const itemWrap    = itemEl.closest('.item-wrap');
+    const inp         = itemWrap?.querySelector('.deadline-input');
+    const disp        = itemEl.querySelector('.deadline-display');
+    const dlConfirm   = itemWrap?.querySelector('.dl-confirm');
+    const dlOkBtn     = itemWrap?.querySelector('.dl-ok-btn');
+    const dlCancelBtn = itemWrap?.querySelector('.dl-cancel-btn');
     if (inp && disp && dlConfirm) {
       let dlOrigVal = inp.value;
       let dlPendVal = null;
       let dlOutside = null;
 
+      function _dlEditClose() {
+        inp.closest('.item-main')?.classList.remove('dl-editing');
+      }
+
       function dlApply() {
         const val = dlPendVal !== null ? dlPendVal : inp.value;
+        _dlEditClose();
         if (val) localStorage.setItem(`detail-${card.id}-${idx}-deadline`, val);
         else     localStorage.removeItem(`detail-${card.id}-${idx}-deadline`);
         disp.textContent = val ? _dlText(val) : '📅 기한입력';
@@ -2464,6 +2471,7 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
 
       function dlCancel() {
         inp.value = dlOrigVal;
+        _dlEditClose();
         disp.textContent = dlOrigVal ? _dlText(dlOrigVal) : '📅 기한입력';
         disp.className   = `deadline-display ${dlOrigVal ? _dlClass(dlOrigVal) : ''}`;
         dlConfirm.classList.remove('show');
@@ -2471,13 +2479,19 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
         if (dlOutside) { document.removeEventListener('click', dlOutside, true); dlOutside = null; }
       }
 
+      disp.addEventListener('click', e => { e.preventDefault(); e.stopPropagation(); });
       disp.addEventListener('dblclick', e => {
-        e.stopPropagation();
+        e.preventDefault(); e.stopPropagation();
         dlOrigVal = inp.value; dlPendVal = null;
-        try { inp.showPicker(); } catch(x) { inp.click(); }
+        inp.closest('.item-main').classList.add('dl-editing');
+        inp.focus();
+        try { inp.showPicker(); } catch(x) {}
       });
 
+      inp.addEventListener('blur', () => { _dlEditClose(); });
+
       inp.addEventListener('change', () => {
+        _dlEditClose();
         dlPendVal = inp.value;
         disp.textContent = dlPendVal ? _dlText(dlPendVal) : '📅 기한입력';
         disp.className   = `deadline-display ${dlPendVal ? _dlClass(dlPendVal) : ''}`;
@@ -2485,9 +2499,9 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
         dlConfirm.classList.add('show');
         if (dlOutside) { document.removeEventListener('click', dlOutside, true); dlOutside = null; }
         setTimeout(() => {
-          const cardEl = itemEl.closest('.card');
+          const cardEl = itemEl.closest('.card') || itemWrap;
           dlOutside = ev => {
-            if (!(cardEl || itemEl).contains(ev.target)) {
+            if (!cardEl.contains(ev.target)) {
               if (confirm('변경사항을 저장할까요?')) dlApply(); else dlCancel();
             }
           };
@@ -2495,8 +2509,8 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
         }, 300);
       });
 
-      dlOkBtn?.addEventListener('click', e => { e.stopPropagation(); dlApply(); });
-      dlCancelBtn?.addEventListener('click', e => { e.stopPropagation(); dlCancel(); });
+      dlOkBtn?.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); dlApply(); });
+      dlCancelBtn?.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); dlCancel(); });
     }
     /* 메모 토글 */
     const memoRow   = itemEl.closest('.item-wrap').querySelector('.item-memo-row');
@@ -3213,9 +3227,9 @@ function updateOverall() {
         const mainInp = document.querySelector(`.deadline-input[data-card="${cardId}"][data-idx="${idxNum}"]`);
         if (mainInp) {
           mainInp.value = dateNew;
-          const mainDisp = mainInp.closest('.checklist-item')?.querySelector('.deadline-display');
+          const mainDisp = mainInp.closest('.item-main')?.querySelector('.deadline-display');
           if (mainDisp) { mainDisp.textContent = dateNew ? _dlText(dateNew) : '📅 기한입력'; mainDisp.className = `deadline-display ${dateNew ? _dlClass(dateNew) : ''}`; }
-          mainInp.closest('.checklist-item')?.classList.toggle('has-deadline', !!dateNew);
+          mainInp.closest('.item-main')?.querySelector('.checklist-item')?.classList.toggle('has-deadline', !!dateNew);
         }
         saveItemToSupabase(cardId, idxNum);
         document.dispatchEvent(new CustomEvent('deadline-updated'));
@@ -3471,12 +3485,12 @@ function bindAssigneeTasks(container) {
 
       function applyDl() {
         const val = pendVal !== null ? pendVal : dlInput.value;
+        dlWrap.classList.remove('editing', 'pending');
         if (val) localStorage.setItem(`detail-${cardId}-${idx}-deadline`, val);
         else     localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
         const info = _atDlInfo(val);
         dlText.textContent = info.text;
         dlText.className   = `at-dl-text ${info.cls}`;
-        dlWrap.classList.remove('editing', 'pending');
         pendVal = null; origVal = val;
         saveItemToSupabase(cardId, idx);
         document.dispatchEvent(new CustomEvent('deadline-updated'));
@@ -3485,10 +3499,10 @@ function bindAssigneeTasks(container) {
 
       function cancelDl() {
         dlInput.value = origVal;
+        dlWrap.classList.remove('editing', 'pending');
         const info = _atDlInfo(origVal);
         dlText.textContent = info.text;
         dlText.className   = `at-dl-text ${info.cls}`;
-        dlWrap.classList.remove('editing', 'pending');
         pendVal = null;
         if (outsideHandler) { document.removeEventListener('click', outsideHandler, true); outsideHandler = null; }
       }
@@ -3496,11 +3510,15 @@ function bindAssigneeTasks(container) {
       dlText.addEventListener('dblclick', e => {
         e.stopPropagation();
         origVal = dlInput.value; pendVal = null;
-        dlWrap.classList.remove('pending');
-        try { dlInput.showPicker(); } catch(x) { dlInput.click(); }
+        dlWrap.classList.add('editing');
+        dlInput.focus();
+        try { dlInput.showPicker(); } catch(x) {}
       });
 
+      dlInput.addEventListener('blur', () => { dlWrap.classList.remove('editing'); });
+
       dlInput.addEventListener('change', () => {
+        dlWrap.classList.remove('editing');
         pendVal = dlInput.value;
         const info = _atDlInfo(pendVal);
         dlText.textContent = info.text;
@@ -3517,8 +3535,8 @@ function bindAssigneeTasks(container) {
         }, 300);
       });
 
-      dlOk.addEventListener('click', e => { e.stopPropagation(); applyDl(); });
-      dlCancel.addEventListener('click', e => { e.stopPropagation(); cancelDl(); });
+      dlOk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); applyDl(); });
+      dlCancel.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); cancelDl(); });
     }
 
     if (expandBtn && memoRow && memoTA) {
@@ -4346,7 +4364,7 @@ function doAtSubmit() {
     }
     var dl = document.getElementById('atDeadline')?.value;
     if (dl) {
-      var d = newItem.querySelector('.deadline-input');
+      var d = newItem.closest('.item-wrap')?.querySelector('.deadline-input') || newItem.querySelector('.deadline-input');
       if (d) { d.value = dl; d.dispatchEvent(new Event('change')); }
     }
     /* 해당 학년 섹션 펼치기 */
