@@ -531,7 +531,8 @@
     .at-dl-text.soon    { background: #fef9c3; color: #a16207; border-color: #fde68a; }
     .at-dl-text.ok      { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
     .at-dl-input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%;
-      cursor: pointer; border: none; padding: 0; background: transparent; }
+      cursor: pointer; border: none; padding: 0; background: transparent; pointer-events: none; }
+    .at-dl-label { cursor: pointer; }
     .assignee-task {
       padding: 6px 14px; display: flex; align-items: flex-start; gap: 8px;
     }
@@ -3353,10 +3354,10 @@ function renderAssigneeTasksHTML(tasks, color) {
           <div class="assignee-task-card">${t.cardName}</div>
           <div class="assignee-task-label">${t.label}</div>
         </div>
-        <label class="at-dl-label">
+        <div class="at-dl-label">
           <span class="at-dl-text ${dl.cls}">${dl.text}</span>
           <input type="date" class="at-dl-input" value="${t.deadline||''}" />
-        </label>
+        </div>
         <button class="at-expand-btn${t.memo ? ' has-memo' : ''}" type="button" title="메모">···</button>
       </div>
       <div class="at-memo-row">
@@ -3397,10 +3398,14 @@ function bindAssigneeTasks(container) {
       });
     }
 
+    const dlLabel = itemEl.querySelector('.at-dl-label');
     const dlInput = itemEl.querySelector('.at-dl-input');
     const dlText  = itemEl.querySelector('.at-dl-text');
-    if (dlInput && dlText) {
-      dlInput.addEventListener('click', e => e.stopPropagation());
+    if (dlLabel && dlInput && dlText) {
+      dlLabel.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        try { dlInput.showPicker(); } catch(x) { dlInput.click(); }
+      });
       dlInput.addEventListener('change', () => {
         const val = dlInput.value;
         if (val) localStorage.setItem(`detail-${cardId}-${idx}-deadline`, val);
