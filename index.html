@@ -3299,8 +3299,9 @@ function collectAssigneeTasks(name) {
           if (clItem?.querySelector('input').checked) return;
           tasks.push({ cardId: card.id, idx: i,
             cardName: `${grade.name} ${sem.name} ${card.title}`, label: item.label,
-            status: localStorage.getItem(`detail-${card.id}-${i}-status`) || '',
-            memo:   localStorage.getItem(`detail-${card.id}-${i}-memo`)   || '' });
+            status:   localStorage.getItem(`detail-${card.id}-${i}-status`)   || '',
+            memo:     localStorage.getItem(`detail-${card.id}-${i}-memo`)     || '',
+            deadline: localStorage.getItem(`detail-${card.id}-${i}-deadline`) || '' });
         });
         extraLabels.forEach((label, ei) => {
           const i = baseCount + ei;
@@ -3309,13 +3310,24 @@ function collectAssigneeTasks(name) {
           if (clItem?.querySelector('input').checked) return;
           tasks.push({ cardId: card.id, idx: i,
             cardName: `${grade.name} ${sem.name} ${card.title}`, label,
-            status: localStorage.getItem(`detail-${card.id}-${i}-status`) || '',
-            memo:   localStorage.getItem(`detail-${card.id}-${i}-memo`)   || '' });
+            status:   localStorage.getItem(`detail-${card.id}-${i}-status`)   || '',
+            memo:     localStorage.getItem(`detail-${card.id}-${i}-memo`)     || '',
+            deadline: localStorage.getItem(`detail-${card.id}-${i}-deadline`) || '' });
         });
       });
     });
   });
   return tasks;
+}
+
+function _atDeadlineBadge(dl) {
+  if (!dl) return '';
+  const today = new Date().toISOString().slice(0, 10);
+  const [, m, d] = dl.split('-');
+  const diff = Math.ceil((new Date(dl) - new Date(today)) / 86400000);
+  const cls    = diff < 0 ? '' : diff <= 14 ? 'soon' : 'ok';
+  const prefix = diff < 0 ? '⚠️ ' : diff === 0 ? '🔴 오늘 ' : diff <= 14 ? '🟡 ' : '📅 ';
+  return `<span class="pri-deadline-tip ${cls}">${prefix}${+m}/${+d}</span>`;
 }
 
 function renderAssigneeTasksHTML(tasks, color) {
@@ -3328,6 +3340,7 @@ function renderAssigneeTasksHTML(tasks, color) {
           <div class="assignee-task-card">${t.cardName}</div>
           <div class="assignee-task-label">${t.label}</div>
         </div>
+        ${_atDeadlineBadge(t.deadline)}
         <button class="at-expand-btn${t.memo ? ' has-memo' : ''}" type="button" title="메모">···</button>
       </div>
       <div class="at-memo-row">
