@@ -1351,6 +1351,19 @@
       .schedule-wrapper { padding: 16px 16px 24px; }
     }
     @media (max-width: 640px) {
+      /* 날짜 목록 모달 → 하단 시트 */
+      #cal-day-modal { align-items: flex-end; }
+      #cal-day-modal .cal-modal-box { max-width: 100%; width: 100%; margin: 0; border-radius: 20px 20px 0 0; max-height: 80vh; display: flex; flex-direction: column; }
+      .cal-day-list-body { max-height: calc(80vh - 110px); }
+      .cal-day-list-item { padding: 11px 14px; gap: 13px; }
+      .cal-day-list-check { width: 24px; height: 24px; min-width: 24px; min-height: 44px; }
+      .cal-day-list-check::before { content: ''; position: absolute; inset: -10px; }
+      .cal-day-list-check { position: relative; }
+      .cal-day-list-title { font-size: .9rem; }
+      .cal-day-list-meta { font-size: .75rem; }
+    }
+
+    @media (max-width: 640px) {
       .schedule-wrapper { padding: 10px 10px 16px; }
       .schedule-header { gap: 8px; margin-bottom: 10px; }
       .schedule-title { font-size: .82rem; }
