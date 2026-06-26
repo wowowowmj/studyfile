@@ -523,16 +523,25 @@
     }
     .at-item { border-bottom: 1px solid #EEF2FF; }
     .at-item:last-child { border-bottom: none; }
-    .at-dl-label { position: relative; display: inline-flex; flex-shrink: 0; cursor: pointer; }
+    .at-dl-wrap { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
     .at-dl-text { display: inline-flex; align-items: center; gap: 2px;
       font-size: .6rem; font-weight: 600; padding: 1px 6px; border-radius: 4px;
-      white-space: nowrap; background: #F0F4FF; color: #5068B5; border: 1px solid #DDE5FF; }
+      white-space: nowrap; background: #F0F4FF; color: #5068B5; border: 1px solid #DDE5FF;
+      cursor: pointer; user-select: none; }
     .at-dl-text.overdue { background: #fff1f2; color: #dc2626; border-color: #fecdd3; }
     .at-dl-text.soon    { background: #fef9c3; color: #a16207; border-color: #fde68a; }
     .at-dl-text.ok      { background: #f0fdf4; color: #16a34a; border-color: #bbf7d0; }
-    .at-dl-input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%;
-      cursor: pointer; border: none; padding: 0; background: transparent; pointer-events: none; }
-    .at-dl-label { cursor: pointer; }
+    .at-dl-input { display: none; font-size: .6rem; font-weight: 600; padding: 2px 5px;
+      border-radius: 4px; border: 1px solid #5068B5; color: #5068B5; background: #fff;
+      cursor: pointer; min-width: 110px; }
+    .at-dl-wrap.editing .at-dl-text { display: none; }
+    .at-dl-wrap.editing .at-dl-input { display: inline-flex; }
+    .at-dl-actions { display: none; gap: 3px; }
+    .at-dl-wrap.pending .at-dl-actions { display: flex; }
+    .at-dl-wrap.pending .at-dl-text { display: inline-flex; }
+    .at-dl-wrap.pending .at-dl-input { display: none; }
+    .at-dl-ok     { background: #5068B5; color: #fff; border: none; border-radius: 3px; padding: 1px 6px; font-size: .65rem; cursor: pointer; font-weight: 700; }
+    .at-dl-cancel { background: #EEF2FF; color: #5068B5; border: none; border-radius: 3px; padding: 1px 6px; font-size: .65rem; cursor: pointer; font-weight: 700; }
     .assignee-task {
       padding: 6px 14px; display: flex; align-items: flex-start; gap: 8px;
     }
@@ -3354,9 +3363,13 @@ function renderAssigneeTasksHTML(tasks, color) {
           <div class="assignee-task-card">${t.cardName}</div>
           <div class="assignee-task-label">${t.label}</div>
         </div>
-        <div class="at-dl-label">
+        <div class="at-dl-wrap">
           <span class="at-dl-text ${dl.cls}">${dl.text}</span>
           <input type="date" class="at-dl-input" value="${t.deadline||''}" />
+          <div class="at-dl-actions">
+            <button class="at-dl-ok" type="button">✓</button>
+            <button class="at-dl-cancel" type="button">✕</button>
+          </div>
         </div>
         <button class="at-expand-btn${t.memo ? ' has-memo' : ''}" type="button" title="메모">···</button>
       </div>
@@ -3398,25 +3411,72 @@ function bindAssigneeTasks(container) {
       });
     }
 
-    const dlLabel = itemEl.querySelector('.at-dl-label');
-    const dlInput = itemEl.querySelector('.at-dl-input');
-    const dlText  = itemEl.querySelector('.at-dl-text');
-    if (dlLabel && dlInput && dlText) {
-      dlLabel.addEventListener('dblclick', e => {
-        e.stopPropagation();
-        try { dlInput.showPicker(); } catch(x) { dlInput.click(); }
-      });
-      dlInput.addEventListener('change', () => {
-        const val = dlInput.value;
+    const dlWrap   = itemEl.querySelector('.at-dl-wrap');
+    const dlInput  = itemEl.querySelector('.at-dl-input');
+    const dlText   = itemEl.querySelector('.at-dl-text');
+    const dlOk     = itemEl.querySelector('.at-dl-ok');
+    const dlCancel = itemEl.querySelector('.at-dl-cancel');
+    if (dlWrap && dlInput && dlText) {
+      let origVal = dlInput.value;
+      let pendVal = null;
+      let outsideHandler = null;
+
+      function applyDl() {
+        const val = pendVal !== null ? pendVal : dlInput.value;
         if (val) localStorage.setItem(`detail-${cardId}-${idx}-deadline`, val);
         else     localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
         const info = _atDlInfo(val);
         dlText.textContent = info.text;
         dlText.className   = `at-dl-text ${info.cls}`;
+        dlWrap.classList.remove('editing', 'pending');
+        pendVal = null; origVal = val;
         saveItemToSupabase(cardId, idx);
         document.dispatchEvent(new CustomEvent('deadline-updated'));
-        document.dispatchEvent(new CustomEvent('assignee-updated'));
+        if (outsideHandler) { document.removeEventListener('click', outsideHandler, true); outsideHandler = null; }
+      }
+
+      function cancelDl() {
+        dlInput.value = origVal;
+        const info = _atDlInfo(origVal);
+        dlText.textContent = info.text;
+        dlText.className   = `at-dl-text ${info.cls}`;
+        dlWrap.classList.remove('editing', 'pending');
+        pendVal = null;
+        if (outsideHandler) { document.removeEventListener('click', outsideHandler, true); outsideHandler = null; }
+      }
+
+      dlText.addEventListener('dblclick', e => {
+        e.stopPropagation();
+        origVal = dlInput.value; pendVal = null;
+        dlWrap.classList.add('editing');
+        dlWrap.classList.remove('pending');
+        dlInput.focus();
+        setTimeout(() => {
+          outsideHandler = function(ev) {
+            if (!itemEl.contains(ev.target)) {
+              if (pendVal !== null) {
+                if (confirm('변경사항을 저장할까요?')) applyDl(); else cancelDl();
+              } else {
+                cancelDl();
+              }
+            }
+          };
+          document.addEventListener('click', outsideHandler, true);
+        }, 0);
       });
+
+      dlInput.addEventListener('click', e => e.stopPropagation());
+      dlInput.addEventListener('change', () => {
+        pendVal = dlInput.value;
+        const info = _atDlInfo(pendVal);
+        dlText.textContent = info.text;
+        dlText.className   = `at-dl-text ${info.cls}`;
+        dlWrap.classList.remove('editing');
+        dlWrap.classList.add('pending');
+      });
+
+      dlOk.addEventListener('click', e => { e.stopPropagation(); applyDl(); });
+      dlCancel.addEventListener('click', e => { e.stopPropagation(); cancelDl(); });
     }
 
     if (expandBtn && memoRow && memoTA) {
