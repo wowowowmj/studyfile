@@ -434,10 +434,11 @@
     .dl-confirm.show { display: inline-flex; }
     .dl-ok-btn     { background: #5068B5; color: #fff; border: none; border-radius: 3px; padding: 1px 6px; font-size: .6rem; cursor: pointer; font-weight: 700; }
     .dl-cancel-btn { background: #EEF2FF; color: #5068B5; border: none; border-radius: 3px; padding: 1px 6px; font-size: .6rem; cursor: pointer; font-weight: 700; }
-    .checklist-item.checked + .deadline-display { color: #94A7E8; border-color: #ece7e0; background: #fafafa; }
+    .checklist-item.checked + .dl-badge-wrap .deadline-display { color: #94A7E8; border-color: #ece7e0; background: #fafafa; }
+    .dl-badge-wrap { position: relative; display: inline-flex; align-items: center; flex-shrink: 0; }
     .deadline-input { display: none; }
-    .item-main.dl-editing .deadline-display { display: none; }
-    .item-main.dl-editing .deadline-input {
+    .dl-badge-wrap.editing .deadline-display { display: none; }
+    .dl-badge-wrap.editing .deadline-input {
       display: inline-block; font-family: inherit; font-size: .6rem;
       border: 1.5px solid #5068B5; border-radius: 4px;
       padding: 2px 5px; outline: none; color: #1e293b; background: #fff;
@@ -989,7 +990,7 @@
         font-size: .6rem; color: #5068B5; cursor: pointer;
         font-family: inherit; box-sizing: border-box;
       }
-      .checklist-item.checked + .deadline-display {
+      .checklist-item.checked + .dl-badge-wrap .deadline-display {
         color: #94A7E8; border-color: #ece7e0; background: #fafafa;
       }
       .assignee-select {
@@ -2216,8 +2217,10 @@ function buildItemHTML(cardId, i, label, status, assignee, deadline, canDelete) 
       <button class="status-btn" type="button" data-card="${cardId}" data-idx="${i}" data-status="${status||''}">${status||''}</button>
       <span class="check-label">${label}</span>
     </label>
-    <span class="deadline-display ${deadline ? _dlClass(deadline) : ''}">${deadline ? _dlText(deadline) : '📅 기한입력'}</span>
-    <input type="date" class="deadline-input" data-card="${cardId}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
+    <div class="dl-badge-wrap">
+      <span class="deadline-display ${deadline ? _dlClass(deadline) : ''}">${deadline ? _dlText(deadline) : '📅 기한입력'}</span>
+      <input type="date" class="deadline-input" data-card="${cardId}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
+    </div>
     <span class="dl-confirm"><button class="dl-ok-btn" type="button">✓</button><button class="dl-cancel-btn" type="button">✕</button></span>
     <select class="assignee-select" data-card="${cardId}" data-idx="${i}">${opts}</select>
     <button class="item-expand-btn" type="button" title="메모">···</button>
@@ -2285,8 +2288,8 @@ function cancelCardChanges(cardId) {
     }
     if (pendingCardChanges.has(dlKey)) {
       const orig = pendingCardChanges.get(dlKey).originalValue;
-      const inp  = itemEl.closest('.item-wrap')?.querySelector('.deadline-input');
-      const disp = itemEl.closest('.item-wrap')?.querySelector('.deadline-display');
+      const inp  = itemEl.closest('.item-wrap')?.querySelector('.dl-badge-wrap .deadline-input');
+      const disp = itemEl.closest('.item-wrap')?.querySelector('.dl-badge-wrap .deadline-display');
       if (inp)  inp.value = orig || '';
       if (disp) { disp.textContent = orig ? _dlText(orig) : '📅 기한입력'; disp.className = `deadline-display ${orig ? _dlClass(orig) : ''}`; }
       itemEl.classList.toggle('has-deadline', !!orig);
@@ -2435,8 +2438,9 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       updateCardFooter(card.id);
     });
     const itemWrap    = itemEl.closest('.item-wrap');
-    const inp         = itemWrap?.querySelector('.deadline-input');
-    const disp        = itemWrap?.querySelector('.deadline-display');
+    const dlBadgeWrap = itemWrap?.querySelector('.dl-badge-wrap');
+    const inp         = dlBadgeWrap?.querySelector('.deadline-input');
+    const disp        = dlBadgeWrap?.querySelector('.deadline-display');
     const dlConfirm   = itemWrap?.querySelector('.dl-confirm');
     const dlOkBtn     = itemWrap?.querySelector('.dl-ok-btn');
     const dlCancelBtn = itemWrap?.querySelector('.dl-cancel-btn');
@@ -2446,7 +2450,7 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       let dlOutside = null;
 
       function _dlEditClose() {
-        inp.closest('.item-main')?.classList.remove('dl-editing');
+        dlBadgeWrap.classList.remove('editing');
       }
 
       function dlApply() {
@@ -2478,7 +2482,7 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       disp.addEventListener('dblclick', e => {
         e.stopPropagation();
         dlOrigVal = inp.value; dlPendVal = null;
-        inp.closest('.item-main').classList.add('dl-editing');
+        dlBadgeWrap.classList.add('editing');
         inp.focus();
         try { inp.showPicker(); } catch(x) {}
       });
@@ -3222,7 +3226,7 @@ function updateOverall() {
         const mainInp = document.querySelector(`.deadline-input[data-card="${cardId}"][data-idx="${idxNum}"]`);
         if (mainInp) {
           mainInp.value = dateNew;
-          const mainDisp = mainInp.closest('.item-main')?.querySelector('.deadline-display');
+          const mainDisp = mainInp.closest('.dl-badge-wrap')?.querySelector('.deadline-display');
           if (mainDisp) { mainDisp.textContent = dateNew ? _dlText(dateNew) : '📅 기한입력'; mainDisp.className = `deadline-display ${dateNew ? _dlClass(dateNew) : ''}`; }
           mainInp.closest('.item-main')?.querySelector('.checklist-item')?.classList.toggle('has-deadline', !!dateNew);
         }
