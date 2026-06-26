@@ -1396,7 +1396,7 @@
         <button class="cal-today-btn" id="calTodayBtn">오늘</button>
       </div>
       <button class="cal-edit-btn" id="calEditBtn">✏️ 편집 모드</button>
-      <button class="cal-edit-btn" id="calRefreshBtn">↺ 새로고침</button>
+      <button class="cal-edit-btn" id="calRefreshBtn" style="display:none">↺ 새로고침</button>
       <div class="cal-grade-filter">
         <button class="cal-filter-btn active" data-grade="all">전체</button>
         <button class="cal-filter-btn" data-grade="grade3">3학년</button>
@@ -4634,6 +4634,7 @@ function initTokenClient() {
       calAccessToken = resp.access_token;
       document.getElementById('calEditBtn').textContent = '✏️ 편집 중 (로그아웃)';
       document.getElementById('calEditBtn').classList.add('logged-in');
+      document.getElementById('calRefreshBtn').style.display = '';
       calEditMode = true;
       document.getElementById('calGrid').classList.add('edit-mode-active');
       enableDayCellClick();
@@ -4659,6 +4660,7 @@ document.getElementById('calEditBtn')?.addEventListener('click', function() {
     calAccessToken = null; calEditMode = false;
     this.textContent = '✏️ 편집 모드';
     this.classList.remove('logged-in');
+    document.getElementById('calRefreshBtn').style.display = 'none';
     document.getElementById('calGrid').classList.remove('edit-mode-active');
     if (calAllEvents !== null) renderCalendar(filterByMonth(calAllEvents, calYear, calMonth));
   } else {
