@@ -523,6 +523,12 @@
     }
     .at-item { border-bottom: 1px solid #EEF2FF; }
     .at-item:last-child { border-bottom: none; }
+    .at-dl-label { position: relative; display: inline-flex; flex-shrink: 0; cursor: pointer; }
+    .at-dl-text { display: inline-flex; align-items: center; justify-content: center;
+      height: 18px; padding: 0 5px; border: 1px solid #DDE5FF; border-radius: 4px;
+      background: #F0F4FF; font-size: .6rem; color: #5068B5; white-space: nowrap; }
+    .at-dl-input { position: absolute; inset: 0; opacity: 0; width: 100%; height: 100%;
+      cursor: pointer; border: none; padding: 0; background: transparent; }
     .assignee-task {
       padding: 6px 14px; display: flex; align-items: flex-start; gap: 8px;
     }
@@ -3330,8 +3336,10 @@ function renderAssigneeTasksHTML(tasks, color) {
           <div class="assignee-task-card">${t.cardName}</div>
           <div class="assignee-task-label">${t.label}</div>
         </div>
-        <span class="deadline-display at-deadline-display">${t.deadline ? fmtMD(t.deadline) : '기한입력'}</span>
-        <input type="date" class="deadline-input at-deadline-input" value="${t.deadline||''}" />
+        <label class="at-dl-label">
+          <span class="at-dl-text">${t.deadline ? fmtMD(t.deadline) : '기한입력'}</span>
+          <input type="date" class="at-dl-input" value="${t.deadline||''}" />
+        </label>
         <button class="at-expand-btn${t.memo ? ' has-memo' : ''}" type="button" title="메모">···</button>
       </div>
       <div class="at-memo-row">
@@ -3371,19 +3379,15 @@ function bindAssigneeTasks(container) {
       });
     }
 
-    const dlDisp  = itemEl.querySelector('.at-deadline-display');
-    const dlInput = itemEl.querySelector('.at-deadline-input');
-    if (dlDisp && dlInput) {
-      dlDisp.addEventListener('click', e => {
-        e.stopPropagation();
-        try { dlInput.showPicker(); } catch(x) { dlInput.click(); }
-      });
+    const dlInput = itemEl.querySelector('.at-dl-input');
+    const dlText  = itemEl.querySelector('.at-dl-text');
+    if (dlInput && dlText) {
       dlInput.addEventListener('click', e => e.stopPropagation());
       dlInput.addEventListener('change', () => {
         const val = dlInput.value;
         if (val) localStorage.setItem(`detail-${cardId}-${idx}-deadline`, val);
         else     localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
-        dlDisp.textContent = val ? fmtMD(val) : '기한입력';
+        dlText.textContent = val ? fmtMD(val) : '기한입력';
         saveItemToSupabase(cardId, idx);
         document.dispatchEvent(new CustomEvent('deadline-updated'));
         document.dispatchEvent(new CustomEvent('assignee-updated'));
