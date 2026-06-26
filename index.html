@@ -1365,6 +1365,7 @@
         <button class="cal-nav-btn" id="calNextBtn">&#8250;</button>
         <button class="cal-today-btn" id="calTodayBtn">오늘</button>
       </div>
+      <button class="cal-edit-btn" id="calRefreshBtn">↺ 새로고침</button>
       <button class="cal-edit-btn" id="calEditBtn">✏️ 편집 모드</button>
       <div class="cal-grade-filter">
         <button class="cal-filter-btn active" data-grade="all">전체</button>
@@ -4538,6 +4539,16 @@ function initTokenClient() {
   });
 }
 window.addEventListener('load', function() { setTimeout(initTokenClient, 1000); });
+
+/* 새로고침 버튼 */
+document.getElementById('calRefreshBtn')?.addEventListener('click', async function() {
+  calAllEvents = null;
+  this.textContent = '↺ 불러오는 중...';
+  this.disabled = true;
+  await loadCalendar();
+  this.textContent = '↺ 새로고침';
+  this.disabled = false;
+});
 
 /* 편집 버튼 */
 document.getElementById('calEditBtn')?.addEventListener('click', function() {
