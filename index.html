@@ -1116,8 +1116,9 @@
       background: #fff;
       border-bottom: 1px solid #DDE5FF;
       box-shadow: 0 2px 6px rgba(0,0,0,.04);
+      overflow-x: hidden;
     }
-    .schedule-wrapper { max-width: 1200px; margin: 0 auto; padding: 24px 24px 32px; }
+    .schedule-wrapper { max-width: 1200px; margin: 0 auto; padding: 24px 24px 32px; width: 100%; box-sizing: border-box; overflow-x: hidden; }
     .schedule-header {
       display: flex; align-items: center; gap: 14px;
       margin-bottom: 20px; flex-wrap: wrap;
@@ -1151,19 +1152,22 @@
     }
     .cal-grid-wrap {
       border: 1.5px solid #DDE5FF; border-radius: 12px; overflow: hidden;
+      width: 100%; box-sizing: border-box;
     }
     .cal-weekdays {
-      display: grid; grid-template-columns: repeat(5, 1fr);
-      background: #F0F4FF; border-bottom: 1.5px solid #DDE5FF;
+      display: grid; grid-template-columns: repeat(5, minmax(0, 1fr));
+      width: 100%; background: #F0F4FF; border-bottom: 1.5px solid #DDE5FF;
     }
     .cal-weekday {
       text-align: center; padding: 8px 4px;
       font-size: .74rem; font-weight: 700; color: #64748b;
+      min-width: 0; overflow: hidden;
     }
-    .cal-grid { display: grid; grid-template-columns: repeat(5, 1fr); }
+    .cal-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); width: 100%; }
     .cal-day {
       min-height: 90px; border-right: 1px solid #EEF2FF; border-bottom: 1px solid #EEF2FF;
       padding: 6px 6px 4px; background: #fff; transition: background .15s;
+      min-width: 0; overflow: hidden;
     }
     .cal-day:nth-child(5n) { border-right: none; }
     .cal-day.other-month { background: #FAFBFF; }
@@ -1319,6 +1323,32 @@
     .cal-modal-row { display: flex; gap: 8px; align-items: flex-start; }
     .cal-modal-label { font-size: .72rem; font-weight: 600; color: #94A7E8; min-width: 44px; padding-top: 1px; }
     .cal-modal-value { font-size: .82rem; color: #334155; flex: 1; line-height: 1.5; }
+
+    /* ── 캘린더 반응형 ── */
+    /* 셀 높이를 뷰포트 너비에 비례해 부드럽게 조정 */
+    .cal-day { min-height: clamp(52px, 11vw, 90px); }
+
+    @media (max-width: 900px) {
+      .schedule-wrapper { padding: 16px 16px 24px; }
+    }
+    @media (max-width: 640px) {
+      .schedule-wrapper { padding: 10px 10px 16px; }
+      .schedule-header { gap: 8px; margin-bottom: 10px; }
+      .schedule-title { font-size: .82rem; }
+      .cal-nav-btn { width: 24px; height: 24px; font-size: .95rem; }
+      .cal-month-label { font-size: .8rem; min-width: 72px; }
+      .cal-today-btn { font-size: .63rem; padding: 2px 7px; }
+      .cal-filter-btn { font-size: .63rem; padding: 3px 7px; }
+      .cal-edit-btn { font-size: .63rem; padding: 3px 7px; }
+      .cal-legend { gap: 8px; }
+      .cal-legend-item { font-size: .64rem; }
+      .cal-weekday { padding: 5px 2px; font-size: .63rem; }
+      .cal-day { min-height: clamp(48px, 13vw, 64px); padding: 3px 3px 2px; }
+      .cal-day-num { font-size: .68rem; width: 17px; height: 17px; margin-bottom: 2px; }
+      .cal-events { gap: 1px; }
+      .cal-event { font-size: .57rem; padding: 1px 3px; }
+      .cal-event.more { font-size: .54rem; padding: 0 3px; }
+    }
   </style>
 </head>
 <body>
