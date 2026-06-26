@@ -4211,20 +4211,23 @@ function icsDate(propRaw, val) {
 }
 
 /* 타임아웃 fetch */
-function fetchWithTimeout(url, ms) {
+function fetchWithTimeout(url, ms, opts) {
   var ctrl = new AbortController();
   var tid  = setTimeout(function() { ctrl.abort(); }, ms || 8000);
-  return fetch(url, { signal: ctrl.signal }).finally(function() { clearTimeout(tid); });
+  return fetch(url, Object.assign({ signal: ctrl.signal, cache: 'no-store' }, opts || {}))
+    .finally(function() { clearTimeout(tid); });
 }
 
 /* 직접 fetch 후 실패 시 프록시 순서대로 시도 */
-async function fetchViaProxy(icsUrl) {
+async function fetchViaProxy(icsUrl, bustCache) {
+  var ts      = bustCache ? ('&_t=' + Date.now()) : '';
   var encoded = encodeURIComponent(icsUrl);
-  var attempts = [icsUrl].concat(CORS_PROXIES.map(function(p) { return p + encoded; }));
+  var attempts = [icsUrl + (bustCache ? '?_t=' + Date.now() : '')]
+    .concat(CORS_PROXIES.map(function(p) { return p + encoded + ts; }));
   for (var i = 0; i < attempts.length; i++) {
     try {
-      console.log('[캘린더] 시도 ' + (i+1) + ':', attempts[i].slice(0, 60) + '...');
-      var res = await fetchWithTimeout(attempts[i], 10000);
+      console.log('[캘린더] 시도 ' + (i+1) + ':', attempts[i].slice(0, 80) + '...');
+      var res = await fetchWithTimeout(attempts[i], 10000, { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       var text = await res.text();
       if (!text.includes('BEGIN:VCALENDAR')) throw new Error('ICS 형식 아님');
@@ -4238,13 +4241,13 @@ async function fetchViaProxy(icsUrl) {
 }
 
 /* ICS 파일 fetch → 파싱 */
-async function fetchICS(url, grade) {
-  var text = await fetchViaProxy(url);
+async function fetchICS(url, grade, bustCache) {
+  var text = await fetchViaProxy(url, bustCache);
   return parseICS(text, grade);
 }
 
 /* 전체 이벤트 로드 (캐시 활용) */
-async function loadAllEvents() {
+async function loadAllEvents(bustCache) {
   if (calAllEvents !== null) return calAllEvents;
 
   var results = [];
@@ -4255,7 +4258,7 @@ async function loadAllEvents() {
   ];
   await Promise.all(sources.map(async function(src) {
     try {
-      var evs = await fetchICS(src.url, src.grade);
+      var evs = await fetchICS(src.url, src.grade, bustCache);
       evs.forEach(function(e) { results.push(e); });
     } catch(e) {
       errors.push(src.grade + ': ' + e.message);
@@ -4417,7 +4420,7 @@ function makeEventEl(ev) {
   return el;
 }
 
-async function loadCalendar() {
+async function loadCalendar(bustCache) {
   var grid  = document.getElementById('calGrid');
   var label = document.getElementById('calMonthLabel');
   if (!grid) return;
@@ -4428,7 +4431,7 @@ async function loadCalendar() {
   }
 
   try {
-    var all    = await loadAllEvents();
+    var all    = await loadAllEvents(bustCache);
     var events = filterByMonth(all, calYear, calMonth);
     renderCalendar(events);
     console.log('[캘린더] 렌더 완료 — 전체 이벤트:', all.length, '/ 이번 달:', events.length);
@@ -4545,7 +4548,7 @@ document.getElementById('calRefreshBtn')?.addEventListener('click', async functi
   calAllEvents = null;
   this.textContent = '↺ 불러오는 중...';
   this.disabled = true;
-  await loadCalendar();
+  await loadCalendar(true);
   this.textContent = '↺ 새로고침';
   this.disabled = false;
 });
