@@ -4376,20 +4376,56 @@ async function loadAllEvents(bustCache) {
   }
 }
 
-/* 해당 월 이벤트 필터링 */
-function getMonthKey(ev) {
-  var s = (ev.start && (ev.start.dateTime || ev.start.date)) || '';
-  return s.slice(0, 7); // YYYY-MM
+/* 이벤트의 실제 마지막 날 (all-day end는 exclusive이므로 -1일) */
+function getEventEndDateStr(ev) {
+  var isAllDay = ev.start && ev.start.date && !ev.start.dateTime;
+  if (isAllDay) {
+    if (ev.end && ev.end.date) {
+      var d = new Date(ev.end.date + 'T00:00:00');
+      d.setDate(d.getDate() - 1);
+      return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    }
+    return (ev.start.date || '').slice(0, 10);
+  }
+  return ev.end && ev.end.dateTime ? ev.end.dateTime.slice(0, 10)
+       : (ev.start && ev.start.dateTime ? ev.start.dateTime.slice(0, 10) : '');
 }
 
-function filterByMonth(events, y, m) {
-  var mk = y + '-' + String(m + 1).padStart(2, '0');
-  return events.filter(function(ev) { return getMonthKey(ev) === mk; });
+/* 기간형 이벤트 → 해당하는 모든 YYYY-MM-DD 배열 반환 */
+function getEventDateKeys(ev) {
+  var isAllDay = ev.start && ev.start.date && !ev.start.dateTime;
+  var startStr = isAllDay
+    ? (ev.start.date || '').slice(0, 10)
+    : (ev.start && ev.start.dateTime ? ev.start.dateTime.slice(0, 10) : '');
+  if (!startStr) return [];
+  var endStr = getEventEndDateStr(ev);
+  if (endStr < startStr) endStr = startStr;
+
+  var keys = [], cur = new Date(startStr + 'T00:00:00'), end = new Date(endStr + 'T00:00:00');
+  while (cur <= end) {
+    keys.push(cur.getFullYear() + '-' + String(cur.getMonth()+1).padStart(2,'0') + '-' + String(cur.getDate()).padStart(2,'0'));
+    cur = new Date(cur.getTime() + 86400000);
+  }
+  return keys.length ? keys : [startStr];
 }
 
+/* 시작일 단일 키 (정렬·편집용) */
 function getEventDateKey(ev) {
   var s = (ev.start && (ev.start.dateTime || ev.start.date)) || '';
-  return s.slice(0, 10); // YYYY-MM-DD
+  return s.slice(0, 10);
+}
+
+/* 해당 월에 걸치는 이벤트 필터링 (기간형 포함) */
+function filterByMonth(events, y, m) {
+  var lastDate = new Date(y, m + 1, 0);
+  var firstStr = y + '-' + String(m + 1).padStart(2, '0') + '-01';
+  var lastStr  = y + '-' + String(m + 1).padStart(2, '0') + '-' + String(lastDate.getDate()).padStart(2, '0');
+  return events.filter(function(ev) {
+    var startStr = getEventDateKey(ev);
+    if (!startStr) return false;
+    var endStr = getEventEndDateStr(ev) || startStr;
+    return startStr <= lastStr && endStr >= firstStr;
+  });
 }
 
 function buildWeekdayCells(y, m) {
@@ -4441,9 +4477,10 @@ function renderCalendar(events) {
 
   var byDate = {};
   events.forEach(function(ev) {
-    var k = getEventDateKey(ev);
-    if (!byDate[k]) byDate[k] = [];
-    byDate[k].push(ev);
+    getEventDateKeys(ev).forEach(function(k) {
+      if (!byDate[k]) byDate[k] = [];
+      byDate[k].push(ev);
+    });
   });
 
   var cells = buildWeekdayCells(calYear, calMonth);
