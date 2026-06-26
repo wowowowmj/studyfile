@@ -1328,9 +1328,15 @@
     .cal-day { cursor: pointer; }
     .cal-day-list-body { padding: 8px 12px; display: flex; flex-direction: column; gap: 6px; max-height: 55vh; overflow-y: auto; }
     .cal-day-list-empty { color: #94A7E8; font-size: .8rem; text-align: center; padding: 24px 0; }
-    .cal-day-list-item { border-radius: 8px; padding: 9px 12px; cursor: pointer; display: flex; flex-direction: column; gap: 3px; transition: opacity .15s; border: none; text-align: left; width: 100%; box-sizing: border-box; }
+    .cal-day-list-item { border-radius: 8px; padding: 9px 12px; cursor: pointer; display: flex; flex-direction: row; align-items: center; gap: 10px; transition: opacity .15s; border: none; text-align: left; width: 100%; box-sizing: border-box; }
     .cal-day-list-item:hover { opacity: .8; }
-    .cal-day-list-title { font-size: .87rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .cal-day-list-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid currentColor; flex-shrink: 0; display: flex; align-items: center; justify-content: center; opacity: .65; transition: all .15s; }
+    .cal-day-list-check.checked { background: currentColor; opacity: 1; }
+    .cal-day-list-check.checked::after { content: '✓'; color: #fff; font-size: .6rem; font-weight: 900; line-height: 1; }
+    .cal-day-list-content { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+    .cal-day-list-title { font-size: .87rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transition: all .15s; }
+    .cal-day-list-item.completed .cal-day-list-title { text-decoration: line-through; opacity: .55; }
+    .cal-day-list-item.completed { opacity: .75; }
     .cal-day-list-meta { font-size: .72rem; opacity: .8; }
     .cal-day-list-footer { padding: 8px 12px 14px; }
     .cal-day-list-add { width: 100%; padding: 9px; border: 2px dashed #94A7E8; border-radius: 8px; background: transparent; color: #5068B5; font-size: .85rem; font-weight: 600; cursor: pointer; transition: all .15s; }
@@ -4729,6 +4735,14 @@ document.getElementById('calEditBtn')?.addEventListener('click', function() {
 /* enableDayCellClick: renderCalendar 내부에서 처리됨 */
 function enableDayCellClick() {}
 
+/* 일정 완료 상태 (localStorage) */
+var _calCompleted = JSON.parse(localStorage.getItem('calCompleted') || '{}');
+function toggleEventCompleted(evId) {
+  if (_calCompleted[evId]) { delete _calCompleted[evId]; }
+  else                     { _calCompleted[evId] = true; }
+  localStorage.setItem('calCompleted', JSON.stringify(_calCompleted));
+}
+
 /* 날짜 일정 목록 모달 */
 function openCalDayModal(dateKey) {
   var body    = document.getElementById('calDayModalBody');
@@ -4753,16 +4767,33 @@ function openCalDayModal(dateKey) {
     body.appendChild(empty);
   } else {
     evs.forEach(function(ev) {
-      var col  = CAL_COLORS[ev._grade];
-      var item = document.createElement('button');
-      item.className = 'cal-day-list-item';
+      var col      = CAL_COLORS[ev._grade];
+      var done     = !!_calCompleted[ev.id];
+      var item     = document.createElement('button');
+      item.className = 'cal-day-list-item' + (done ? ' completed' : '');
       item.style.background = col.bg;
       item.style.color = col.text;
+
+      /* 체크박스 */
+      var chk = document.createElement('div');
+      chk.className = 'cal-day-list-check' + (done ? ' checked' : '');
+      chk.addEventListener('click', function(e) {
+        e.stopPropagation();
+        toggleEventCompleted(ev.id);
+        var nowDone = !!_calCompleted[ev.id];
+        item.classList.toggle('completed', nowDone);
+        chk.classList.toggle('checked', nowDone);
+      });
+      item.appendChild(chk);
+
+      /* 제목 + 메타 */
+      var content = document.createElement('div');
+      content.className = 'cal-day-list-content';
 
       var t = document.createElement('div');
       t.className = 'cal-day-list-title';
       t.textContent = ev.summary || '(제목 없음)';
-      item.appendChild(t);
+      content.appendChild(t);
 
       var m = document.createElement('div');
       m.className = 'cal-day-list-meta';
@@ -4774,7 +4805,8 @@ function openCalDayModal(dateKey) {
         var st  = new Date(ev.start.dateTime);
         m.textContent = col.name + ' · ' + pad(st.getHours()) + ':' + pad(st.getMinutes());
       }
-      item.appendChild(m);
+      content.appendChild(m);
+      item.appendChild(content);
 
       item.addEventListener('click', function() {
         document.getElementById('cal-day-modal').classList.remove('open');
