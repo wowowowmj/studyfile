@@ -4735,12 +4735,25 @@ document.getElementById('calEditBtn')?.addEventListener('click', function() {
 /* enableDayCellClick: renderCalendar 내부에서 처리됨 */
 function enableDayCellClick() {}
 
-/* 일정 완료 상태 (localStorage) */
-var _calCompleted = JSON.parse(localStorage.getItem('calCompleted') || '{}');
-function toggleEventCompleted(evId) {
-  if (_calCompleted[evId]) { delete _calCompleted[evId]; }
-  else                     { _calCompleted[evId] = true; }
-  localStorage.setItem('calCompleted', JSON.stringify(_calCompleted));
+/* 일정 완료 상태 (Supabase 공유) */
+var _calCompleted = {};
+
+async function loadCalCompleted() {
+  var { data } = await _sb.from('cal_completed').select('event_id');
+  if (data) {
+    _calCompleted = {};
+    data.forEach(function(r) { _calCompleted[r.event_id] = true; });
+  }
+}
+
+async function toggleEventCompleted(evId) {
+  if (_calCompleted[evId]) {
+    delete _calCompleted[evId];
+    _sb.from('cal_completed').delete().eq('event_id', evId);
+  } else {
+    _calCompleted[evId] = true;
+    _sb.from('cal_completed').upsert({ event_id: evId });
+  }
 }
 
 /* 날짜 일정 목록 모달 */
@@ -4968,6 +4981,7 @@ document.getElementById('calTodayBtn')?.addEventListener('click', function() {
 });
 
 document.addEventListener('dashboard-ready', function() {
+  loadCalCompleted();
   loadCalendar();
 });
 window.addEventListener('load', function() {
