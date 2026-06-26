@@ -4002,17 +4002,22 @@ function fetchWithTimeout(url, ms) {
   return fetch(url, { signal: ctrl.signal }).finally(function() { clearTimeout(tid); });
 }
 
-/* 프록시 순서대로 시도 */
+/* 직접 fetch 후 실패 시 프록시 순서대로 시도 */
 async function fetchViaProxy(icsUrl) {
   var encoded = encodeURIComponent(icsUrl);
-  for (var i = 0; i < CORS_PROXIES.length; i++) {
+  var attempts = [icsUrl].concat(CORS_PROXIES.map(function(p) { return p + encoded; }));
+  for (var i = 0; i < attempts.length; i++) {
     try {
-      var res = await fetchWithTimeout(CORS_PROXIES[i] + encoded, 8000);
+      console.log('[캘린더] 시도 ' + (i+1) + ':', attempts[i].slice(0, 60) + '...');
+      var res = await fetchWithTimeout(attempts[i], 10000);
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      return await res.text();
+      var text = await res.text();
+      if (!text.includes('BEGIN:VCALENDAR')) throw new Error('ICS 형식 아님');
+      console.log('[캘린더] 성공 (' + (i+1) + '번째 시도)');
+      return text;
     } catch(e) {
-      console.warn('프록시 실패 [' + CORS_PROXIES[i] + ']:', e.message);
-      if (i === CORS_PROXIES.length - 1) throw e;
+      console.warn('[캘린더] 실패 (' + (i+1) + '번째):', e.message);
+      if (i === attempts.length - 1) throw e;
     }
   }
 }
@@ -4195,8 +4200,10 @@ async function loadCalendar() {
     var all    = await loadAllEvents();
     var events = filterByMonth(all, calYear, calMonth);
     renderCalendar(events);
+    console.log('[캘린더] 렌더 완료 — 전체 이벤트:', all.length, '/ 이번 달:', events.length);
   } catch(e) {
-    grid.innerHTML = '<div class="cal-error">일정을 불러오지 못했습니다: ' + e.message + '</div>';
+    console.error('[캘린더] 최종 오류:', e);
+    grid.innerHTML = '<div class="cal-error">일정을 불러오지 못했습니다.<br><small>' + e.message + '</small></div>';
   }
 }
 
