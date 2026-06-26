@@ -4759,6 +4759,17 @@ async function loadCalCompleted() {
   }
 }
 
+function initCalCompletedRealtime() {
+  _sb.channel('cal-completed-sync')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'cal_completed' },
+      async function() {
+        await loadCalCompleted();
+        if (calAllEvents) renderCalendar(filterByMonth(calAllEvents, calYear, calMonth));
+      }
+    )
+    .subscribe();
+}
+
 async function toggleEventCompleted(evId) {
   if (_calCompleted[evId]) {
     delete _calCompleted[evId];
@@ -5004,6 +5015,7 @@ document.getElementById('calTodayBtn')?.addEventListener('click', function() {
 
 document.addEventListener('dashboard-ready', async function() {
   await loadCalCompleted();
+  initCalCompletedRealtime();
   loadCalendar();
 });
 window.addEventListener('load', function() {
