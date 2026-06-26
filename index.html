@@ -4181,6 +4181,8 @@ const CAL_ICS_GRADE4 = 'https://calendar.google.com/calendar/ical/c_a3e0a4f50ccb
 const CORS_PROXIES = [
   'https://corsproxy.io/?',
   'https://api.allorigins.win/raw?url=',
+  'https://api.codetabs.com/v1/proxy?quest=',
+  'https://corsproxy.io/?url=',
 ];
 
 const CAL_COLORS = {
@@ -4192,6 +4194,7 @@ let calYear        = new Date().getFullYear();
 let calMonth       = new Date().getMonth();
 let calAllEvents   = null;
 let calGradeFilter = 'all'; // 'all' | 'grade3' | 'grade4'
+let _calLoadPromise = null; // 동시 로드 중복 방지
 
 /* ICS 텍스트 파싱 */
 function parseICS(text, grade) {
@@ -4258,7 +4261,9 @@ async function fetchViaProxy(icsUrl, bustCache) {
   for (var i = 0; i < attempts.length; i++) {
     try {
       console.log('[캘린더] 시도 ' + (i+1) + ':', attempts[i].slice(0, 80));
-      var res = await fetchWithTimeout(attempts[i], 10000, { cache: 'no-store' });
+      /* 프록시 요청은 cache 강제 안 함 — 프록시 자체 캐시 활용으로 안정성 향상 */
+      var fetchOpts = i === 0 ? { cache: 'no-store' } : {};
+      var res = await fetchWithTimeout(attempts[i], 15000, fetchOpts);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       var text = await res.text();
       if (!text.includes('BEGIN:VCALENDAR')) throw new Error('ICS 형식 아님');
@@ -4306,45 +4311,54 @@ async function fetchEventsViaAPI() {
   return results;
 }
 
-/* 전체 이벤트 로드 (캐시 활용) */
+/* 전체 이벤트 로드 (캐시 활용 + 중복 요청 방지) */
 async function loadAllEvents(bustCache) {
-  if (calAllEvents !== null) return calAllEvents;
+  if (calAllEvents !== null && !bustCache) return calAllEvents;
+  if (_calLoadPromise && !bustCache) return _calLoadPromise;
 
-  var results = [];
-  var errors  = [];
+  _calLoadPromise = (async function() {
+    var results = [];
+    var errors  = [];
 
-  /* 로그인 상태면 API로, 아니면 ICS로 */
-  if (calAccessToken) {
-    try {
-      results = await fetchEventsViaAPI();
-      console.log('[캘린더] API 로드 성공:', results.length + '개');
-    } catch(e) {
-      errors.push('API: ' + e.message);
-    }
-  } else {
-    var sources = [
-      { url: CAL_ICS_GRADE3, grade: 'grade3' },
-      { url: CAL_ICS_GRADE4, grade: 'grade4' }
-    ];
-    await Promise.all(sources.map(async function(src) {
+    /* 로그인 상태면 API로, 아니면 ICS로 */
+    if (calAccessToken) {
       try {
-        var evs = await fetchICS(src.url, src.grade, bustCache);
-        evs.forEach(function(e) { results.push(e); });
+        results = await fetchEventsViaAPI();
+        console.log('[캘린더] API 로드 성공:', results.length + '개');
       } catch(e) {
-        errors.push(src.grade + ': ' + e.message);
-        console.warn('ICS 로드 실패 (' + src.grade + '):', e);
+        errors.push('API: ' + e.message);
       }
-    }));
-    if (errors.length === 2) throw new Error(errors.join(' / '));
-  }
+    } else {
+      var sources = [
+        { url: CAL_ICS_GRADE3, grade: 'grade3' },
+        { url: CAL_ICS_GRADE4, grade: 'grade4' }
+      ];
+      await Promise.all(sources.map(async function(src) {
+        try {
+          var evs = await fetchICS(src.url, src.grade, bustCache);
+          evs.forEach(function(e) { results.push(e); });
+        } catch(e) {
+          errors.push(src.grade + ': ' + e.message);
+          console.warn('ICS 로드 실패 (' + src.grade + '):', e);
+        }
+      }));
+      if (errors.length === 2) throw new Error(errors.join(' / '));
+    }
 
-  results.sort(function(a, b) {
-    var aD = (a.start && (a.start.dateTime || a.start.date)) || '';
-    var bD = (b.start && (b.start.dateTime || b.start.date)) || '';
-    return aD.localeCompare(bD);
-  });
-  calAllEvents = results;
-  return results;
+    results.sort(function(a, b) {
+      var aD = (a.start && (a.start.dateTime || a.start.date)) || '';
+      var bD = (b.start && (b.start.dateTime || b.start.date)) || '';
+      return aD.localeCompare(bD);
+    });
+    calAllEvents = results;
+    return results;
+  })();
+
+  try {
+    return await _calLoadPromise;
+  } finally {
+    _calLoadPromise = null;
+  }
 }
 
 /* 해당 월 이벤트 필터링 */
