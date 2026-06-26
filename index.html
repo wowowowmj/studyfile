@@ -4763,10 +4763,12 @@ async function loadCalCompleted() {
 async function toggleEventCompleted(evId) {
   if (_calCompleted[evId]) {
     delete _calCompleted[evId];
-    _sb.from('cal_completed').delete().eq('event_id', evId);
+    var { error } = await _sb.from('cal_completed').delete().eq('event_id', evId);
+    if (error) { _calCompleted[evId] = true; console.error('완료 해제 실패:', error); return; }
   } else {
     _calCompleted[evId] = true;
-    _sb.from('cal_completed').upsert({ event_id: evId });
+    var { error } = await _sb.from('cal_completed').upsert({ event_id: evId });
+    if (error) { delete _calCompleted[evId]; console.error('완료 저장 실패:', error); return; }
   }
   if (calAllEvents) renderCalendar(filterByMonth(calAllEvents, calYear, calMonth));
 }
@@ -4995,8 +4997,8 @@ document.getElementById('calTodayBtn')?.addEventListener('click', function() {
   loadCalendar();
 });
 
-document.addEventListener('dashboard-ready', function() {
-  loadCalCompleted();
+document.addEventListener('dashboard-ready', async function() {
+  await loadCalCompleted();
   loadCalendar();
 });
 window.addEventListener('load', function() {
