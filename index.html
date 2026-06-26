@@ -4247,27 +4247,66 @@ async function fetchICS(url, grade, bustCache) {
   return parseICS(text, grade);
 }
 
+/* Google Calendar API로 이벤트 가져오기 (로그인 상태) */
+async function fetchEventsViaAPI() {
+  var results = [];
+  var sources = [
+    { id: CAL_WRITE_IDS.grade3, grade: 'grade3' },
+    { id: CAL_WRITE_IDS.grade4, grade: 'grade4' }
+  ];
+  await Promise.all(sources.map(async function(src) {
+    try {
+      var url = CAL_API_BASE + '/' + encodeURIComponent(src.id) +
+        '/events?singleEvents=true&orderBy=startTime&maxResults=2500';
+      var res = await fetch(url, {
+        headers: { 'Authorization': 'Bearer ' + calAccessToken },
+        cache: 'no-store'
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      (data.items || []).forEach(function(ev) {
+        results.push(Object.assign({}, ev, {
+          _grade: src.grade,
+          start: ev.start,
+          end:   ev.end
+        }));
+      });
+    } catch(e) { console.warn('API 로드 실패 (' + src.grade + '):', e); }
+  }));
+  return results;
+}
+
 /* 전체 이벤트 로드 (캐시 활용) */
 async function loadAllEvents(bustCache) {
   if (calAllEvents !== null) return calAllEvents;
 
   var results = [];
   var errors  = [];
-  var sources = [
-    { url: CAL_ICS_GRADE3, grade: 'grade3' },
-    { url: CAL_ICS_GRADE4, grade: 'grade4' }
-  ];
-  await Promise.all(sources.map(async function(src) {
-    try {
-      var evs = await fetchICS(src.url, src.grade, bustCache);
-      evs.forEach(function(e) { results.push(e); });
-    } catch(e) {
-      errors.push(src.grade + ': ' + e.message);
-      console.warn('ICS 로드 실패 (' + src.grade + '):', e);
-    }
-  }));
 
-  if (errors.length === 2) throw new Error(errors.join(' / '));
+  /* 로그인 상태면 API로, 아니면 ICS로 */
+  if (calAccessToken) {
+    try {
+      results = await fetchEventsViaAPI();
+      console.log('[캘린더] API 로드 성공:', results.length + '개');
+    } catch(e) {
+      errors.push('API: ' + e.message);
+    }
+  } else {
+    var sources = [
+      { url: CAL_ICS_GRADE3, grade: 'grade3' },
+      { url: CAL_ICS_GRADE4, grade: 'grade4' }
+    ];
+    await Promise.all(sources.map(async function(src) {
+      try {
+        var evs = await fetchICS(src.url, src.grade, bustCache);
+        evs.forEach(function(e) { results.push(e); });
+      } catch(e) {
+        errors.push(src.grade + ': ' + e.message);
+        console.warn('ICS 로드 실패 (' + src.grade + '):', e);
+      }
+    }));
+    if (errors.length === 2) throw new Error(errors.join(' / '));
+  }
 
   results.sort(function(a, b) {
     var aD = (a.start && (a.start.dateTime || a.start.date)) || '';
