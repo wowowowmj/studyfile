@@ -2104,7 +2104,10 @@ async function seedSupabase() {
       });
     });
   });
-  const { error } = await _sb.from('item_states').upsert(rows, { onConflict: 'card_id,item_index' });
+  const { error } = await _sb.from('item_states').upsert(
+    _statusColExists === false ? rows.map(r => { const {status, ...rest} = r; return rest; }) : rows,
+    { onConflict: 'card_id,item_index' }
+  );
   if (error) throw error;
   console.log(`[Supabase] ${rows.length}개 항목 시드 완료`);
 }
@@ -2131,28 +2134,52 @@ async function loadAllFromSupabase() {
   }
 }
 
+/* status 컬럼 존재 여부 (null=미확인, true=있음, false=없음) */
+let _statusColExists = null;
+let _statusColAlertShown = false;
+
+function _handleSupabaseError(e, retryFn) {
+  const msg = e?.message || '';
+  const isColMissing = msg.includes('status') && (msg.includes('column') || msg.includes('schema cache') || msg.includes('PGRST204'));
+  if (isColMissing) {
+    _statusColExists = false;
+    if (!_statusColAlertShown) {
+      _statusColAlertShown = true;
+      alert('Supabase에 status 컬럼이 없습니다.\n\nSupabase 대시보드 → SQL Editor에서 아래 SQL을 실행하세요:\n\nALTER TABLE item_states ADD COLUMN IF NOT EXISTS status TEXT;\n\n실행 후 페이지를 새로고침하면 정상 저장됩니다.');
+    }
+    if (retryFn) retryFn();
+  } else {
+    console.warn('[Supabase] 저장 실패:', msg);
+  }
+}
+
 /* ─── Supabase: 카드 전체 일괄 저장 ─── */
 async function saveCardToSupabase(cardId) {
   if (_isInitializing) return;
   const items = [...document.querySelectorAll(`#cl-${cardId} .checklist-item`)];
   if (!items.length) return;
-  const rows = items.map((item, idx) => ({
+  const mkRow = (item, idx, withStatus) => ({
     card_id:    cardId,
     item_index: idx,
     ...getCardMeta(cardId, idx),
     done:       item.querySelector('input').checked,
-    status:     localStorage.getItem(`detail-${cardId}-${idx}-status`)   || null,
+    ...(withStatus ? { status: localStorage.getItem(`detail-${cardId}-${idx}-status`) || null } : {}),
     assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
     deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
     memo:       localStorage.getItem(`detail-${cardId}-${idx}-memo`)     || null,
     link:       localStorage.getItem(`detail-${cardId}-${idx}-link`)     || null,
     updated_at: new Date().toISOString()
-  }));
+  });
   try {
+    const rows = items.map((item, idx) => mkRow(item, idx, _statusColExists !== false));
     const { error } = await _sb.from('item_states').upsert(rows, { onConflict: 'card_id,item_index' });
     if (error) throw error;
+    _statusColExists = true;
   } catch (e) {
-    console.warn('[Supabase] 카드 저장 실패:', e.message);
+    _handleSupabaseError(e, async () => {
+      const rows = items.map((item, idx) => mkRow(item, idx, false));
+      await _sb.from('item_states').upsert(rows, { onConflict: 'card_id,item_index' });
+    });
   }
 }
 
@@ -2161,22 +2188,26 @@ async function saveItemToSupabase(cardId, idx) {
   if (_isInitializing) return;
   const clItem = document.querySelectorAll(`#cl-${cardId} .checklist-item`)[idx];
   if (!clItem) return;
+  const mkRow = (withStatus) => ({
+    card_id:    cardId,
+    item_index: idx,
+    ...getCardMeta(cardId, idx),
+    done:       clItem.querySelector('input').checked,
+    ...(withStatus ? { status: localStorage.getItem(`detail-${cardId}-${idx}-status`) || null } : {}),
+    assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
+    deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
+    memo:       localStorage.getItem(`detail-${cardId}-${idx}-memo`)     || null,
+    link:       localStorage.getItem(`detail-${cardId}-${idx}-link`)     || null,
+    updated_at: new Date().toISOString()
+  });
   try {
-    const { error } = await _sb.from('item_states').upsert({
-      card_id:    cardId,
-      item_index: idx,
-      ...getCardMeta(cardId, idx),
-      done:       clItem.querySelector('input').checked,
-      status:     localStorage.getItem(`detail-${cardId}-${idx}-status`)   || null,
-      assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
-      deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
-      memo:       localStorage.getItem(`detail-${cardId}-${idx}-memo`)     || null,
-      link:       localStorage.getItem(`detail-${cardId}-${idx}-link`)     || null,
-      updated_at: new Date().toISOString()
-    }, { onConflict: 'card_id,item_index' });
+    const { error } = await _sb.from('item_states').upsert(mkRow(_statusColExists !== false), { onConflict: 'card_id,item_index' });
     if (error) throw error;
+    _statusColExists = true;
   } catch (e) {
-    console.warn('[Supabase] 항목 저장 실패:', e.message);
+    _handleSupabaseError(e, async () => {
+      await _sb.from('item_states').upsert(mkRow(false), { onConflict: 'card_id,item_index' });
+    });
   }
 }
 
