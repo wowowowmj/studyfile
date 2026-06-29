@@ -3462,6 +3462,12 @@ function collectAssigneeTasks(name) {
       });
     });
   });
+  tasks.sort((a, b) => {
+    if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
+    if (a.deadline) return -1;
+    if (b.deadline) return 1;
+    return 0;
+  });
   return tasks;
 }
 
