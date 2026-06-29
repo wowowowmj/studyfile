@@ -139,7 +139,7 @@
       cursor: pointer; padding: 5px 8px; border-radius: 8px;
       transition: background .15s; user-select: none;
     }
-    .item-main:hover .checklist-item { background: #F0F4FF; }
+    .checklist-item:hover { background: #F0F4FF; }
     .checklist-item input[type="checkbox"] { display: none; }
     .item-delete-btn {
       background: none; border: none; cursor: pointer; color: #B0C0EC;
@@ -2062,6 +2062,8 @@ function applyToLocalStorage(data) {
     items.forEach((it, idx) => {
       if (!it) return;
       localStorage.setItem(`assignee-${cardId}-${idx}`, it.assignee || '미정');
+      it.status   ? localStorage.setItem(`detail-${cardId}-${idx}-status`, it.status)
+                  : localStorage.removeItem(`detail-${cardId}-${idx}-status`);
       it.deadline ? localStorage.setItem(`detail-${cardId}-${idx}-deadline`, it.deadline)
                   : localStorage.removeItem(`detail-${cardId}-${idx}-deadline`);
       it.memo     ? localStorage.setItem(`detail-${cardId}-${idx}-memo`, it.memo)
@@ -2091,6 +2093,7 @@ async function seedSupabase() {
             card_title: card.title,
             item_label: item.label,
             done:       states[idx] ?? item.done,
+            status:     localStorage.getItem(`detail-${card.id}-${idx}-status`)   || null,
             assignee:   localStorage.getItem(`assignee-${card.id}-${idx}`) || '미정',
             deadline:   localStorage.getItem(`detail-${card.id}-${idx}-deadline`) || null,
             memo:       localStorage.getItem(`detail-${card.id}-${idx}-memo`)     || null,
@@ -2138,6 +2141,7 @@ async function saveCardToSupabase(cardId) {
     item_index: idx,
     ...getCardMeta(cardId, idx),
     done:       item.querySelector('input').checked,
+    status:     localStorage.getItem(`detail-${cardId}-${idx}-status`)   || null,
     assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
     deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
     memo:       localStorage.getItem(`detail-${cardId}-${idx}-memo`)     || null,
@@ -2163,6 +2167,7 @@ async function saveItemToSupabase(cardId, idx) {
       item_index: idx,
       ...getCardMeta(cardId, idx),
       done:       clItem.querySelector('input').checked,
+      status:     localStorage.getItem(`detail-${cardId}-${idx}-status`)   || null,
       assignee:   localStorage.getItem(`assignee-${cardId}-${idx}`) || '미정',
       deadline:   localStorage.getItem(`detail-${cardId}-${idx}-deadline`) || null,
       memo:       localStorage.getItem(`detail-${cardId}-${idx}-memo`)     || null,
@@ -2211,12 +2216,12 @@ function buildItemHTML(cardId, i, label, status, assignee, deadline, canDelete) 
   const opts = AOPTS.map(n => `<option value="${n}"${assignee===n?' selected':''}>${n}</option>`).join('');
   return `<div class="item-wrap">
   <div class="item-main">
-    <label class="checklist-item${done ? ' checked' : ''}${assignee && assignee !== '미정' ? ' has-assignee' : ''}${deadline ? ' has-deadline' : ''}">
+    <div class="checklist-item${done ? ' checked' : ''}${assignee && assignee !== '미정' ? ' has-assignee' : ''}${deadline ? ' has-deadline' : ''}">
       <span class="drag-handle" title="드래그하여 순서 변경">⠿</span>
       <input type="checkbox"${done ? ' checked' : ''}/>
       <button class="status-btn" type="button" data-card="${cardId}" data-idx="${i}" data-status="${status||''}">${status||''}</button>
       <span class="check-label">${label}</span>
-    </label>
+    </div>
     <div class="dl-badge-wrap">
       <span class="deadline-display ${deadline ? _dlClass(deadline) : ''}">${deadline ? _dlText(deadline) : '📅 기한입력'}</span>
       <input type="date" class="deadline-input" data-card="${cardId}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
@@ -2238,7 +2243,9 @@ const pendingCardChanges = new Map(); // "cardId__idx" → { newStatus, original
 
 function updateCardFooter(cardId) {
   const hasPending = [...pendingCardChanges.keys()].some(k => k.startsWith(cardId + '__'));
-  document.getElementById(`cpf-${cardId}`)?.classList.toggle('visible', hasPending);
+  document.querySelectorAll(`[id="cpf-${cardId}"]`).forEach(el =>
+    el.classList.toggle('visible', hasPending)
+  );
 }
 
 function applyCardChanges(cardId) {
@@ -2269,8 +2276,29 @@ function applyCardChanges(cardId) {
   });
   [...pendingCardChanges.keys()].filter(k => k.startsWith(cardId + '__'))
     .forEach(k => pendingCardChanges.delete(k));
+
+  /* item-wrap 하이라이트 제거 */
+  document.querySelectorAll(`#cl-${cardId} .checklist-item`).forEach(itemEl => {
+    itemEl.closest('.item-wrap')?.classList.remove('card-item-pending');
+  });
+
   const info = getCardObject(cardId);
   if (info) updateCard(cardId, info.grade.id);
+
+  /* 푸터 강제 숨김 */
+  document.querySelectorAll(`[id="cpf-${cardId}"]`).forEach(el => el.classList.remove('visible'));
+
+  /* 세부내용 열림 상태 닫기 + 마감기한 confirm 팝업 닫기 */
+  const cardEl = document.getElementById('card-' + cardId);
+  if (cardEl) {
+    cardEl.querySelectorAll('.dl-confirm').forEach(c => c.classList.remove('show'));
+    if (cardEl.classList.contains('show-detail')) {
+      cardEl.classList.remove('show-detail');
+      const toggleBtn = cardEl.querySelector('.detail-toggle-btn');
+      if (toggleBtn) toggleBtn.textContent = '세부내용 보기';
+    }
+  }
+
   document.dispatchEvent(new CustomEvent('status-updated'));
   if (hasDeadline) document.dispatchEvent(new CustomEvent('deadline-updated'));
   if (hasAssignee) document.dispatchEvent(new CustomEvent('assignee-updated'));
@@ -2389,6 +2417,16 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
   function bindItem(itemEl, idx, canDelete) {
     const statusBtn = itemEl.querySelector('.status-btn');
     const cbInput   = itemEl.querySelector('input[type="checkbox"]');
+    const checkLabel = itemEl.querySelector('.check-label');
+    if (checkLabel && cbInput) {
+      checkLabel.addEventListener('click', e => {
+        e.stopPropagation();
+        cbInput.checked = !cbInput.checked;
+        itemEl.classList.toggle('checked', cbInput.checked);
+        cbInput.dispatchEvent(new Event('change', { bubbles: true }));
+        updateCard(card.id, gradeId);
+      });
+    }
     if (statusBtn) {
       statusBtn.addEventListener('click', e => {
         e.preventDefault(); e.stopPropagation();
@@ -2437,80 +2475,6 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
       }
       updateCardFooter(card.id);
     });
-    const itemWrap    = itemEl.closest('.item-wrap');
-    const dlBadgeWrap = itemWrap?.querySelector('.dl-badge-wrap');
-    const inp         = dlBadgeWrap?.querySelector('.deadline-input');
-    const disp        = dlBadgeWrap?.querySelector('.deadline-display');
-    const dlConfirm   = itemWrap?.querySelector('.dl-confirm');
-    const dlOkBtn     = itemWrap?.querySelector('.dl-ok-btn');
-    const dlCancelBtn = itemWrap?.querySelector('.dl-cancel-btn');
-    if (inp && disp && dlConfirm) {
-      let dlOrigVal = inp.value;
-      let dlPendVal = null;
-      let dlOutside = null;
-
-      function _dlEditClose() {
-        dlBadgeWrap.classList.remove('editing');
-      }
-
-      function dlApply() {
-        const val = dlPendVal !== null ? dlPendVal : inp.value;
-        _dlEditClose();
-        if (val) localStorage.setItem(`detail-${card.id}-${idx}-deadline`, val);
-        else     localStorage.removeItem(`detail-${card.id}-${idx}-deadline`);
-        disp.textContent = val ? _dlText(val) : '📅 기한입력';
-        disp.className   = `deadline-display ${val ? _dlClass(val) : ''}`;
-        itemEl.classList.toggle('has-deadline', !!val);
-        dlConfirm.classList.remove('show');
-        dlPendVal = null; dlOrigVal = val;
-        saveItemToSupabase(card.id, idx);
-        document.dispatchEvent(new CustomEvent('deadline-updated'));
-        document.dispatchEvent(new CustomEvent('assignee-updated'));
-        if (dlOutside) { document.removeEventListener('click', dlOutside, true); dlOutside = null; }
-      }
-
-      function dlCancel() {
-        inp.value = dlOrigVal;
-        _dlEditClose();
-        disp.textContent = dlOrigVal ? _dlText(dlOrigVal) : '📅 기한입력';
-        disp.className   = `deadline-display ${dlOrigVal ? _dlClass(dlOrigVal) : ''}`;
-        dlConfirm.classList.remove('show');
-        dlPendVal = null;
-        if (dlOutside) { document.removeEventListener('click', dlOutside, true); dlOutside = null; }
-      }
-
-      disp.addEventListener('dblclick', e => {
-        e.stopPropagation();
-        dlOrigVal = inp.value; dlPendVal = null;
-        dlBadgeWrap.classList.add('editing');
-        inp.focus();
-        try { inp.showPicker(); } catch(x) {}
-      });
-
-      inp.addEventListener('blur', () => { _dlEditClose(); });
-
-      inp.addEventListener('change', () => {
-        _dlEditClose();
-        dlPendVal = inp.value;
-        disp.textContent = dlPendVal ? _dlText(dlPendVal) : '📅 기한입력';
-        disp.className   = `deadline-display ${dlPendVal ? _dlClass(dlPendVal) : ''}`;
-        itemEl.classList.toggle('has-deadline', !!dlPendVal);
-        dlConfirm.classList.add('show');
-        if (dlOutside) { document.removeEventListener('click', dlOutside, true); dlOutside = null; }
-        setTimeout(() => {
-          const cardEl = itemEl.closest('.card') || itemWrap;
-          dlOutside = ev => {
-            if (!cardEl.contains(ev.target)) {
-              if (confirm('변경사항을 저장할까요?')) dlApply(); else dlCancel();
-            }
-          };
-          document.addEventListener('click', dlOutside, true);
-        }, 300);
-      });
-
-      dlOkBtn?.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); dlApply(); });
-      dlCancelBtn?.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); dlCancel(); });
-    }
     /* 메모 토글 */
     const memoRow   = itemEl.closest('.item-wrap').querySelector('.item-memo-row');
     const memoTA    = memoRow?.querySelector('.item-memo');
@@ -2566,9 +2530,78 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
         itemMain.classList.remove('memo-open');
       });
     }
+
+    /* 마감기한 — 담당자별과 동일한 직접 바인딩 방식 */
+    const itemWrap_   = itemEl.closest('.item-wrap');
+    const dlWrap      = itemWrap_?.querySelector('.dl-badge-wrap');
+    const dlInput     = dlWrap?.querySelector('.deadline-input');
+    const dlDisp      = dlWrap?.querySelector('.deadline-display');
+    const dlConfirm   = itemWrap_?.querySelector('.dl-confirm');
+    const dlOkBtn     = dlConfirm?.querySelector('.dl-ok-btn');
+    const dlCancelBtn = dlConfirm?.querySelector('.dl-cancel-btn');
+    if (dlWrap && dlInput && dlDisp) {
+      let _outsideH = null;
+
+      function _applyDl() {
+        const val = dlInput.value;
+        dlWrap.classList.remove('editing');
+        if (val) localStorage.setItem(`detail-${card.id}-${idx}-deadline`, val);
+        else     localStorage.removeItem(`detail-${card.id}-${idx}-deadline`);
+        dlDisp.textContent = val ? _dlText(val) : '📅 기한입력';
+        dlDisp.className   = `deadline-display ${val ? _dlClass(val) : ''}`;
+        itemEl.classList.toggle('has-deadline', !!val);
+        dlConfirm?.classList.remove('show');
+        dlWrap.dataset.origVal = val;
+        saveItemToSupabase(card.id, idx);
+        const info = getCardObject(card.id);
+        if (info) updateCard(card.id, info.grade.id);
+        document.dispatchEvent(new CustomEvent('deadline-updated'));
+        document.dispatchEvent(new CustomEvent('assignee-updated'));
+        if (_outsideH) { document.removeEventListener('click', _outsideH, true); _outsideH = null; }
+      }
+
+      function _cancelDl() {
+        const orig = dlWrap.dataset.origVal ?? '';
+        dlInput.value = orig;
+        dlWrap.classList.remove('editing');
+        dlDisp.textContent = orig ? _dlText(orig) : '📅 기한입력';
+        dlDisp.className   = `deadline-display ${orig ? _dlClass(orig) : ''}`;
+        dlConfirm?.classList.remove('show');
+        if (_outsideH) { document.removeEventListener('click', _outsideH, true); _outsideH = null; }
+      }
+
+      dlInput.addEventListener('blur', () => {
+        setTimeout(() => {
+          if (dlConfirm?.classList.contains('show')) return;
+          dlWrap.classList.remove('editing');
+        }, 200);
+      });
+
+      dlInput.addEventListener('change', () => {
+        const val = dlInput.value;
+        dlWrap.classList.remove('editing');
+        dlDisp.textContent = val ? _dlText(val) : '📅 기한입력';
+        dlDisp.className   = `deadline-display ${val ? _dlClass(val) : ''}`;
+        itemEl.classList.toggle('has-deadline', !!val);
+        dlConfirm?.classList.add('show');
+        if (_outsideH) { document.removeEventListener('click', _outsideH, true); _outsideH = null; }
+        setTimeout(() => {
+          _outsideH = ev => {
+            if (itemWrap_.contains(ev.target)) return;
+            if (dlConfirm?.classList.contains('show')) {
+              if (confirm('변경사항을 저장할까요?')) _applyDl(); else _cancelDl();
+            }
+          };
+          document.addEventListener('click', _outsideH, true);
+        }, 300);
+      });
+
+      dlOkBtn?.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); _applyDl(); });
+      dlCancelBtn?.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); _cancelDl(); });
+    }
   }
 
-  el.querySelectorAll(`#cl-${card.id} .checklist-item`).forEach((itemEl, i) => bindItem(itemEl, i, true));
+  el.querySelectorAll('.checklist-item').forEach((itemEl, i) => bindItem(itemEl, i, true));
 
   // 리빌드 후 pending 상태 복원
   el.querySelectorAll(`#cl-${card.id} .checklist-item`).forEach((itemEl, idx) => {
@@ -2582,16 +2615,18 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
   });
   el.querySelector('.cpf-cancel')?.addEventListener('click', () => cancelCardChanges(card.id));
   el.querySelector('.cpf-apply')?.addEventListener('click', () => applyCardChanges(card.id));
-  document.addEventListener('pointerdown', function onPendingOutside(e) {
-    const footer = document.getElementById(`cpf-${card.id}`);
-    if (!footer?.classList.contains('visible')) return;
-    if (el.contains(e.target)) return;
-    if (confirm('변경사항을 반영하시겠습니까?')) applyCardChanges(card.id);
-    else cancelCardChanges(card.id);
-  });
   el.querySelector('.detail-toggle-btn')?.addEventListener('click', () => {
-    const open = el.classList.toggle('show-detail');
-    el.querySelector('.detail-toggle-btn').textContent = open ? '세부내용 닫기' : '세부내용 보기';
+    const isOpen = el.classList.contains('show-detail');
+    if (isOpen) {
+      /* pending 변경사항은 닫을 때 자동 반영 (취소는 footer의 '취소' 버튼으로 명시적으로) */
+      const hasPending = [...pendingCardChanges.keys()].some(k => k.startsWith(card.id + '__'));
+      if (hasPending) applyCardChanges(card.id);
+      el.classList.remove('show-detail');
+      el.querySelector('.detail-toggle-btn').textContent = '세부내용 보기';
+    } else {
+      el.classList.add('show-detail');
+      el.querySelector('.detail-toggle-btn').textContent = '세부내용 닫기';
+    }
   });
   updateCardFooter(card.id);
 
@@ -2721,6 +2756,25 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
     if (e.key === 'Escape') el.querySelector('.add-item-cancel').click();
   });
 
+  /* click으로 마감기한 입력 열기 — deadline-display 클릭 시 즉시 캘린더 오픈
+     dblclick은 macOS Safari에서 user activation이 보존되지 않아 showPicker 실패하는 문제가 있음 */
+  el.querySelectorAll('.dl-badge-wrap').forEach(wrap => {
+    if (wrap._dlClickBound) return;
+    wrap._dlClickBound = true;
+    const inp  = wrap.querySelector('.deadline-input');
+    const disp = wrap.querySelector('.deadline-display');
+    if (!inp || !disp) return;
+    disp.addEventListener('click', e => {
+      e.stopPropagation();
+      if (wrap.classList.contains('editing')) return;
+      wrap.dataset.origVal = inp.value;
+      wrap.classList.add('editing');
+      void wrap.offsetWidth;   // 동기 reflow → editing CSS 즉시 반영
+      inp.focus();
+      try { inp.showPicker(); } catch(x) {}
+    });
+  });
+
   return el;
 }
 
@@ -2795,6 +2849,9 @@ function buildUI() {
   etcSec.appendChild(etcGrid);
   main.appendChild(etcSec);
 }
+
+/* ─── 카드 인라인 마감기한 핸들러 ─── */
+/* click 핸들러는 buildCard 끝에서 .deadline-display 에 직접 바인딩 */
 
 /* ─── 카드 업데이트 ─── */
 function updateCard(cardId, gradeId) {
@@ -3510,8 +3567,10 @@ function bindAssigneeTasks(container) {
         e.stopPropagation();
         origVal = dlInput.value; pendVal = null;
         dlWrap.classList.add('editing');
-        dlInput.focus();
-        try { dlInput.showPicker(); } catch(x) {}
+        requestAnimationFrame(() => {
+          dlInput.focus();
+          try { dlInput.showPicker(); } catch(x) {}
+        });
       });
 
       dlInput.addEventListener('blur', () => { dlWrap.classList.remove('editing'); });
