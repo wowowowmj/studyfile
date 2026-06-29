@@ -2047,6 +2047,20 @@ function getCardMeta(cardId, idx) {
       }
     }
   }
+  /* 커스텀 카드 */
+  const customCards = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+  const cc = customCards.find(c => c.id === cardId);
+  if (cc) {
+    const extras = JSON.parse(localStorage.getItem('extra-items-' + cardId) || '[]');
+    return {
+      grade_id:   cc.gradeId || 'etc',
+      grade_name: '기타',
+      semester:   cc.semKey  || 'etc',
+      card_type:  'custom',
+      card_title: cc.title,
+      item_label: extras[idx] || ''
+    };
+  }
   return {};
 }
 
@@ -2138,6 +2152,25 @@ async function loadAllFromSupabase() {
     }
 
     applyToLocalStorage(data);
+
+    /* 커스텀 카드/항목 로드 */
+    const { data: customCardRows } = await _sb.from('cards').select('*').eq('type', 'custom');
+    if (customCardRows?.length) {
+      const existing = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+      let changed = false;
+      for (const cc of customCardRows) {
+        if (!existing.find(c => c.id === cc.id)) {
+          existing.push({ id: cc.id, semKey: cc.semester, gradeId: cc.grade, title: cc.title });
+          changed = true;
+        }
+        const { data: ciRows } = await _sb.from('card_items').select('*').eq('card_id', cc.id).order('item_index');
+        if (ciRows?.length) {
+          localStorage.setItem('extra-items-' + cc.id, JSON.stringify(ciRows.map(r => r.label)));
+        }
+      }
+      if (changed) localStorage.setItem('custom-cards', JSON.stringify(existing));
+    }
+
     return true;
   } catch (e) {
     console.warn('[Supabase] 로드 실패 → localStorage 사용:', e.message);
@@ -2219,6 +2252,29 @@ async function saveItemToSupabase(cardId, idx) {
     _handleSupabaseError(e, async () => {
       await _sb.from('item_states').upsert(mkRow(false), { onConflict: 'card_id,item_index' });
     });
+  }
+}
+
+/* ─── 커스텀 카드/항목 Supabase 저장 ─── */
+async function saveCustomCardMeta(cardId, gradeId, semKey, title) {
+  try {
+    await _sb.from('cards').upsert(
+      { id: cardId, grade: gradeId, semester: semKey, type: 'custom', title: title },
+      { onConflict: 'id' }
+    );
+  } catch(e) {
+    console.warn('[Supabase] 커스텀 카드 저장 실패:', e.message);
+  }
+}
+
+async function saveCustomItemLabel(cardId, itemIndex, label) {
+  try {
+    await _sb.from('card_items').upsert(
+      { card_id: cardId, item_index: itemIndex, label: label },
+      { onConflict: 'card_id,item_index' }
+    );
+  } catch(e) {
+    console.warn('[Supabase] 커스텀 항목 라벨 저장 실패:', e.message);
   }
 }
 
@@ -2777,6 +2833,7 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
     states2[idx] = false;
     localStorage.setItem('card-' + card.id, JSON.stringify(states2));
     saveItemToSupabase(card.id, idx);
+    if (card.id.startsWith('custom-')) saveCustomItemLabel(card.id, idx, label);
     updateCard(card.id, gradeId);
 
     inputEl.value = '';
@@ -3462,6 +3519,22 @@ function collectAssigneeTasks(name) {
       });
     });
   });
+  /* 기타 커스텀 카드 */
+  const customCards = JSON.parse(localStorage.getItem('custom-cards') || '[]');
+  customCards.forEach(cc => {
+    const extraLabels = JSON.parse(localStorage.getItem('extra-items-' + cc.id) || '[]');
+    extraLabels.forEach((label, ei) => {
+      if ((localStorage.getItem(`assignee-${cc.id}-${ei}`) || '미정').trim() !== name) return;
+      const clItem = document.querySelectorAll(`#cl-${cc.id} .checklist-item`)[ei];
+      if (clItem?.querySelector('input').checked) return;
+      tasks.push({ cardId: cc.id, idx: ei,
+        cardName: `기타 ${cc.title}`, label,
+        status:   localStorage.getItem(`detail-${cc.id}-${ei}-status`)   || '',
+        memo:     localStorage.getItem(`detail-${cc.id}-${ei}-memo`)     || '',
+        deadline: localStorage.getItem(`detail-${cc.id}-${ei}-deadline`) || '' });
+    });
+  });
+
   tasks.sort((a, b) => {
     if (a.deadline && b.deadline) return a.deadline.localeCompare(b.deadline);
     if (a.deadline) return -1;
@@ -4299,6 +4372,7 @@ function getOrCreateCustomCard(semKey, customType) {
       customCards.push({ id: cardId, semKey: 'etc', gradeId: 'etc', title: customType });
       localStorage.setItem('custom-cards', JSON.stringify(customCards));
     }
+    saveCustomCardMeta(cardId, 'etc', 'etc', customType);
     const card = { id: cardId, type: 'custom', title: customType, items: [] };
     const el = buildCard(card, '#64748b', '#64748b', '#64748b', 'etc', '기타', '');
     stack.appendChild(el);
@@ -4319,6 +4393,7 @@ function getOrCreateCustomCard(semKey, customType) {
     customCards.push({ id: cardId, semKey, gradeId, title: customType });
     localStorage.setItem('custom-cards', JSON.stringify(customCards));
   }
+  saveCustomCardMeta(cardId, gradeId, semKey, customType);
 
   /* 카드 렌더링 */
   const card  = { id: cardId, type: 'custom', title: customType, items: [] };
