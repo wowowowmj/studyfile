@@ -2115,11 +2115,22 @@ async function seedSupabase() {
 /* ─── Supabase: 전체 로드 ─── */
 async function loadAllFromSupabase() {
   try {
+    /* status 컬럼 존재 여부 먼저 확인 */
+    const colCheck = await _sb.from('item_states').select('status').limit(1);
+    if (colCheck.error?.message?.includes('status')) {
+      _statusColExists = false;
+      if (!_statusColAlertShown) {
+        _statusColAlertShown = true;
+        alert('Supabase에 status 컬럼이 없습니다.\n\nSupabase 대시보드 → SQL Editor에서 아래 SQL을 실행하세요:\n\nALTER TABLE item_states ADD COLUMN IF NOT EXISTS status TEXT;\n\n실행 후 페이지를 새로고침하면 정상 저장됩니다.');
+      }
+    } else {
+      _statusColExists = true;
+    }
+
     const { data, error } = await _sb.from('item_states').select('*');
     if (error) throw error;
 
     if (!data || data.length === 0) {
-      // 테이블이 비어있으면 현재 상태로 시드
       await seedSupabase();
       const { data: seeded } = await _sb.from('item_states').select('*');
       if (seeded?.length) applyToLocalStorage(seeded);
