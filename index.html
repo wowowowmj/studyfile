@@ -3932,7 +3932,8 @@ function buildAssigneeSubMenu() {
   const sub = document.getElementById('assigneeSubMenu');
   if (!sub) return;
   sub.innerHTML = '';
-  AOPTS.filter(n => n !== '미정').forEach(name => {
+  const orderedOpts = AOPTS.filter(n => n !== '미정').concat(AOPTS.includes('미정') ? ['미정'] : []);
+  orderedOpts.forEach(name => {
     const el = document.createElement('a');
     el.className = 'nav-sub-item';
     el.textContent = name;
@@ -4047,7 +4048,8 @@ document.addEventListener('assignee-added',   buildAssigneeSubMenu);
   function buildAssigneeTabs() {
     /* 기존 담당자 탭만 제거 후 재생성 */
     [...tabBar.querySelectorAll('.mobile-tab')].filter(b => b.dataset.tab !== 'priority').forEach(b => b.remove());
-    AOPTS.forEach(name => {
+    const mobOpts = AOPTS.filter(n => n !== '미정').concat(AOPTS.includes('미정') ? ['미정'] : []);
+    mobOpts.forEach(name => {
       const btn = document.createElement('button');
       btn.className = 'mobile-tab';
       btn.dataset.tab = name;
