@@ -2257,25 +2257,19 @@ async function saveItemToSupabase(cardId, idx) {
 
 /* ─── 커스텀 카드/항목 Supabase 저장 ─── */
 async function saveCustomCardMeta(cardId, gradeId, semKey, title) {
-  try {
-    await _sb.from('cards').upsert(
-      { id: cardId, grade: gradeId, semester: semKey, type: 'custom', title: title },
-      { onConflict: 'id' }
-    );
-  } catch(e) {
-    console.warn('[Supabase] 커스텀 카드 저장 실패:', e.message);
-  }
+  const { error } = await _sb.from('cards').upsert(
+    { id: cardId, grade: gradeId, semester: semKey, type: 'custom', title: title },
+    { onConflict: 'id' }
+  );
+  if (error) console.error('[Supabase] cards 저장 실패:', error.message, error);
 }
 
 async function saveCustomItemLabel(cardId, itemIndex, label) {
-  try {
-    await _sb.from('card_items').upsert(
-      { card_id: cardId, item_index: itemIndex, label: label },
-      { onConflict: 'card_id,item_index' }
-    );
-  } catch(e) {
-    console.warn('[Supabase] 커스텀 항목 라벨 저장 실패:', e.message);
-  }
+  const { error } = await _sb.from('card_items').upsert(
+    { card_id: cardId, item_index: itemIndex, label: label },
+    { onConflict: 'card_id,item_index' }
+  );
+  if (error) console.error('[Supabase] card_items 저장 실패:', error.message, error);
 }
 
 /* ─── 진행률 색상 ─── */
@@ -4495,16 +4489,27 @@ function doAtSubmit() {
     var items   = document.querySelectorAll('#cl-' + cardId + ' .checklist-item');
     var newItem = items[items.length - 1];
     if (!newItem) return;
+    var wrap = newItem.closest('.item-wrap');
+
+    /* 마감기한 먼저 저장 (change → ok 버튼 클릭으로 localStorage 저장까지 완료) */
+    var dl = document.getElementById('atDeadline')?.value;
+    if (dl) {
+      var d = wrap?.querySelector('.deadline-input');
+      if (d) {
+        d.value = dl;
+        d.dispatchEvent(new Event('change'));
+        var okBtn = wrap?.querySelector('.dl-ok-btn');
+        if (okBtn) okBtn.click();
+      }
+    }
+
+    /* 담당자 (마감기한 저장 후에 처리해야 Supabase에 deadline 포함) */
     var assignee = document.getElementById('atAssignee')?.value;
     if (assignee) {
       var s = newItem.parentElement?.querySelector('.assignee-select');
       if (s) { s.value = assignee; s.dispatchEvent(new Event('change')); }
     }
-    var dl = document.getElementById('atDeadline')?.value;
-    if (dl) {
-      var d = newItem.closest('.item-wrap')?.querySelector('.deadline-input') || newItem.querySelector('.deadline-input');
-      if (d) { d.value = dl; d.dispatchEvent(new Event('change')); }
-    }
+
     /* 해당 학년 섹션 펼치기 */
     document.getElementById('card-' + cardId)?.closest('.grade-section')?.classList.remove('collapsed');
   });
