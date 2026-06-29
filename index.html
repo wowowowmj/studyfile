@@ -4299,6 +4299,38 @@ function deleteItem(cardId, itemIdx, baseCount) {
   }
   updateCard(cardId, grade.id);
   document.dispatchEvent(new CustomEvent('assignee-updated'));
+  if (cardId.startsWith('custom-')) syncCustomCardToSupabase(cardId);
+}
+
+/* ─── 커스텀 카드 Supabase 전체 동기화 (삭제 후 재정렬) ─── */
+async function syncCustomCardToSupabase(cardId) {
+  await _sb.from('item_states').delete().eq('card_id', cardId);
+  await _sb.from('card_items').delete().eq('card_id', cardId);
+
+  const extras = JSON.parse(localStorage.getItem('extra-items-' + cardId) || '[]');
+  if (extras.length === 0) {
+    await _sb.from('cards').delete().eq('id', cardId);
+    return;
+  }
+
+  const ciRows = extras.map(function(label, i) { return { card_id: cardId, item_index: i, label: label }; });
+  await _sb.from('card_items').insert(ciRows);
+
+  const items = [...document.querySelectorAll('#cl-' + cardId + ' .checklist-item')];
+  if (items.length) {
+    const rows = items.map(function(item, idx) {
+      return Object.assign({ card_id: cardId, item_index: idx }, getCardMeta(cardId, idx), {
+        done:       item.querySelector('input').checked,
+        status:     localStorage.getItem('detail-' + cardId + '-' + idx + '-status')   || null,
+        assignee:   localStorage.getItem('assignee-' + cardId + '-' + idx) || '미정',
+        deadline:   localStorage.getItem('detail-' + cardId + '-' + idx + '-deadline') || null,
+        memo:       localStorage.getItem('detail-' + cardId + '-' + idx + '-memo')     || null,
+        link:       localStorage.getItem('detail-' + cardId + '-' + idx + '-link')     || null,
+        updated_at: new Date().toISOString()
+      });
+    });
+    await _sb.from('item_states').upsert(rows, { onConflict: 'card_id,item_index' });
+  }
 }
 
 /* ─── 항목 순서 이동 ─── */
