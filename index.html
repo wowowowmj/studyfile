@@ -2584,16 +2584,6 @@ function buildCard(card, gradeColor, unitColor, vodColor, gradeId, gradeName, se
         dlDisp.className   = `deadline-display ${val ? _dlClass(val) : ''}`;
         itemEl.classList.toggle('has-deadline', !!val);
         dlConfirm?.classList.add('show');
-        if (_outsideH) { document.removeEventListener('click', _outsideH, true); _outsideH = null; }
-        setTimeout(() => {
-          _outsideH = ev => {
-            if (itemWrap_.contains(ev.target)) return;
-            if (dlConfirm?.classList.contains('show')) {
-              if (confirm('변경사항을 저장할까요?')) _applyDl(); else _cancelDl();
-            }
-          };
-          document.addEventListener('click', _outsideH, true);
-        }, 300);
       });
 
       dlOkBtn?.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); _applyDl(); });
@@ -3035,33 +3025,8 @@ function updateOverall() {
   const pendingChanges     = new Map(); // "cardId__idx" → { newStatus, originalStatus }
   const pendingMetaChanges = new Map(); // "cardId__idx" → { dateNew, dateOld, assigneeNew, assigneeOld }
 
-  let _priOutside = null;
-  function setupPriOutside() {
-    if (_priOutside) return;
-    _priOutside = function(e) {
-      if (pendingChanges.size === 0 && pendingMetaChanges.size === 0) { teardownPriOutside(); return; }
-      const footer = document.getElementById('priFooter');
-      if (footer && footer.contains(e.target)) return;
-      const allKeys = new Set([...pendingChanges.keys(), ...pendingMetaChanges.keys()]);
-      const inside = [...allKeys].some(key => {
-        const [c, i] = key.split('__');
-        const el = document.querySelector(`#priList .pri-item[data-card="${c}"][data-idx="${i}"]`);
-        return el && el.contains(e.target);
-      });
-      if (inside) return;
-      e.stopPropagation();
-      teardownPriOutside();
-      setTimeout(() => {
-        const ok = confirm('변경사항을 반영할까요?');
-        if (ok) document.getElementById('priApplyBtn')?.click();
-        else    document.getElementById('priCancelBtn')?.click();
-      }, 0);
-    };
-    document.addEventListener('mousedown', _priOutside, true);
-  }
-  function teardownPriOutside() {
-    if (_priOutside) { document.removeEventListener('mousedown', _priOutside, true); _priOutside = null; }
-  }
+  function setupPriOutside() {}
+  function teardownPriOutside() {}
 
   function updatePriFooter() {
     const footer = document.getElementById('priFooter');
@@ -3582,15 +3547,6 @@ function bindAssigneeTasks(container) {
         dlText.textContent = info.text;
         dlText.className   = `at-dl-text ${info.cls}`;
         dlWrap.classList.add('pending');
-        if (outsideHandler) { document.removeEventListener('click', outsideHandler, true); outsideHandler = null; }
-        setTimeout(() => {
-          outsideHandler = function(ev) {
-            if (!itemEl.contains(ev.target)) {
-              if (confirm('변경사항을 저장할까요?')) applyDl(); else cancelDl();
-            }
-          };
-          document.addEventListener('click', outsideHandler, true);
-        }, 300);
       });
 
       dlOk.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); applyDl(); });
