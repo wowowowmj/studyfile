@@ -5328,6 +5328,10 @@ document.getElementById('calFormSaveBtn')?.addEventListener('click', async funct
     if (!res.ok) throw new Error('HTTP ' + res.status);
     calAllEvents = null;
     closeCalForm();
+    /* 저장한 날짜의 월로 자동 이동 */
+    var d = new Date(startDate + 'T00:00:00');
+    calYear  = d.getFullYear();
+    calMonth = d.getMonth();
     await loadCalendar();
   } catch(e) { alert('저장 실패: ' + e.message); }
 });
