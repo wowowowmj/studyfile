@@ -4619,7 +4619,7 @@ function parseICS(text, grade) {
     else if (propName === 'LOCATION')    ev.location    = icsText(val);
     else if (propName === 'DTSTART')     ev.start       = icsDate(propRaw, val);
     else if (propName === 'DTEND')       ev.end         = icsDate(propRaw, val);
-    else if (propName === 'UID')         ev.id          = val;
+    else if (propName === 'UID')         ev.id          = val.replace(/@google\.com$/, '');
   });
   return events;
 }
@@ -4937,7 +4937,7 @@ function makeEventEl(ev) {
   var grade = ev._grade;
   var col   = CAL_COLORS[grade];
   var el    = document.createElement('div');
-  el.className = 'cal-event ' + grade + (_calCompleted[ev.id] ? ' cal-event-done' : '');
+  el.className = 'cal-event ' + grade + (_calCompleted[normalizeCalId(ev.id)] ? ' cal-event-done' : '');
   el.style.background = col.bg;
   el.style.color      = col.text;
 
@@ -5105,11 +5105,14 @@ function enableDayCellClick() {}
 /* 일정 완료 상태 (Supabase 공유) */
 var _calCompleted = {};
 
+/* ICS UID는 "id@google.com", API ID는 "id" — 항상 접미사 제거해서 통일 */
+function normalizeCalId(id) { return (id || '').replace(/@google\.com$/, ''); }
+
 async function loadCalCompleted() {
   var { data } = await _sb.from('cal_completed').select('event_id');
   if (data) {
     _calCompleted = {};
-    data.forEach(function(r) { _calCompleted[r.event_id] = true; });
+    data.forEach(function(r) { _calCompleted[normalizeCalId(r.event_id)] = true; });
   }
 }
 
@@ -5125,8 +5128,11 @@ function initCalCompletedRealtime() {
 }
 
 async function toggleEventCompleted(evId) {
+  evId = normalizeCalId(evId);
   if (_calCompleted[evId]) {
     delete _calCompleted[evId];
+    /* 구버전 DB 항목(@google.com 붙은 것)도 함께 삭제 */
+    await _sb.from('cal_completed').delete().eq('event_id', evId + '@google.com');
     var { error } = await _sb.from('cal_completed').delete().eq('event_id', evId);
     if (error) { _calCompleted[evId] = true; console.error('완료 해제 실패:', error); return; }
   } else {
@@ -5162,7 +5168,8 @@ function _renderDayModalContent(dateKey) {
   } else {
     evs.forEach(function(ev) {
       var col      = CAL_COLORS[ev._grade];
-      var done     = !!_calCompleted[ev.id];
+      var nid      = normalizeCalId(ev.id);
+      var done     = !!_calCompleted[nid];
       var item     = document.createElement('button');
       item.className = 'cal-day-list-item' + (done ? ' completed' : '');
       item.style.background = col.bg;
@@ -5173,8 +5180,8 @@ function _renderDayModalContent(dateKey) {
       chk.className = 'cal-day-list-check' + (done ? ' checked' : '');
       chk.addEventListener('click', function(e) {
         e.stopPropagation();
-        toggleEventCompleted(ev.id);
-        var nowDone = !!_calCompleted[ev.id];
+        toggleEventCompleted(nid);
+        var nowDone = !!_calCompleted[nid];
         item.classList.toggle('completed', nowDone);
         chk.classList.toggle('checked', nowDone);
       });
