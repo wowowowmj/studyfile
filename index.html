@@ -5067,7 +5067,8 @@ function initTokenClient() {
       calEditMode = true;
       document.getElementById('calGrid').classList.add('edit-mode-active');
       enableDayCellClick();
-      if (calAllEvents !== null) renderCalendar(filterByMonth(calAllEvents, calYear, calMonth));
+      calAllEvents = null;
+      loadCalendar(true);
     }
   });
 }
