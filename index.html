@@ -4621,7 +4621,6 @@ function parseICS(text, grade) {
     else if (propName === 'DTEND')       ev.end         = icsDate(propRaw, val);
     else if (propName === 'UID')         ev.id          = val.replace(/@google\.com$/, '');  /* normalizeCalId */
   });
-  console.log('[ICS ID 샘플]', grade, ':', events.slice(0,3).map(function(e){return e.id;}));
   return events;
 }
 
@@ -4718,8 +4717,7 @@ async function fetchEventsViaAPI() {
           end:   ev.end
         }));
       });
-      console.log('[API 이벤트 ID 샘플]', src.grade, ':', (data.items||[]).slice(0,3).map(function(e){return e.id;}));
-    } catch(e) { console.warn('API 로드 실패 (' + src.grade + '):', e); }
+      } catch(e) { console.warn('API 로드 실패 (' + src.grade + '):', e); }
   }));
   return results;
 }
@@ -4859,16 +4857,6 @@ function buildWeekdayCells(y, m) {
 function renderCalendar(events) {
   var grid = document.getElementById('calGrid');
   if (!grid) return;
-
-  /* ── 디버그: ID 불일치 확인 ── */
-  var completedKeys = Object.keys(_calCompleted);
-  var sampleEvIds  = events.slice(0, 5).map(function(e) { return normalizeCalId(e.id); });
-  console.log('[렌더] 이벤트 수:', events.length, '/ 완료키:', completedKeys, '/ 이벤트ID 샘플:', sampleEvIds);
-  completedKeys.forEach(function(k) {
-    var hit = events.some(function(e) { return normalizeCalId(e.id) === k; });
-    if (!hit) console.warn('[렌더] 완료키 "' + k + '" 가 이벤트 목록에 없음!');
-  });
-  /* ──────────────────────────── */
 
   var label = document.getElementById('calMonthLabel');
   if (label) label.textContent = calYear + '년 ' + (calMonth + 1) + '월';
@@ -5125,7 +5113,6 @@ async function loadCalCompleted() {
   if (data) {
     _calCompleted = {};
     data.forEach(function(r) { _calCompleted[normalizeCalId(r.event_id)] = true; });
-    console.log('[완료상태 로드] DB 항목 수:', data.length, '/ 정규화 키:', Object.keys(_calCompleted));
   }
 }
 
@@ -5334,18 +5321,11 @@ document.getElementById('calFormSaveBtn')?.addEventListener('click', async funct
 
   var url    = CAL_API_BASE + '/' + encodeURIComponent(calId) + '/events' + (calEditEventId ? '/' + calEditEventId : '');
   var method = calEditEventId ? 'PUT' : 'POST';
-  console.log('[캘린더 저장]', method, url);
-  console.log('[캘린더 저장] grade:', grade, '/ calId:', calId, '/ eventId:', calEditEventId);
   try {
     var res = await fetch(url, { method: method,
       headers: { 'Authorization': 'Bearer ' + calAccessToken, 'Content-Type': 'application/json' },
       body: JSON.stringify(body) });
-    if (!res.ok) {
-      var errBody = '';
-      try { errBody = await res.text(); } catch(_) {}
-      console.error('[캘린더 저장 실패]', res.status, errBody);
-      throw new Error('HTTP ' + res.status);
-    }
+    if (!res.ok) throw new Error('HTTP ' + res.status);
     calAllEvents = null;
     closeCalForm();
     await loadCalendar();
