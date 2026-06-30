@@ -4619,8 +4619,9 @@ function parseICS(text, grade) {
     else if (propName === 'LOCATION')    ev.location    = icsText(val);
     else if (propName === 'DTSTART')     ev.start       = icsDate(propRaw, val);
     else if (propName === 'DTEND')       ev.end         = icsDate(propRaw, val);
-    else if (propName === 'UID')         ev.id          = val.replace(/@google\.com$/, '');
+    else if (propName === 'UID')         ev.id          = val.replace(/@google\.com$/, '');  /* normalizeCalId */
   });
+  console.log('[ICS ID 샘플]', grade, ':', events.slice(0,3).map(function(e){return e.id;}));
   return events;
 }
 
@@ -4717,6 +4718,7 @@ async function fetchEventsViaAPI() {
           end:   ev.end
         }));
       });
+      console.log('[API 이벤트 ID 샘플]', src.grade, ':', (data.items||[]).slice(0,3).map(function(e){return e.id;}));
     } catch(e) { console.warn('API 로드 실패 (' + src.grade + '):', e); }
   }));
   return results;
@@ -5113,6 +5115,7 @@ async function loadCalCompleted() {
   if (data) {
     _calCompleted = {};
     data.forEach(function(r) { _calCompleted[normalizeCalId(r.event_id)] = true; });
+    console.log('[완료상태 로드] DB 항목 수:', data.length, '/ 정규화 키:', Object.keys(_calCompleted));
   }
 }
 
