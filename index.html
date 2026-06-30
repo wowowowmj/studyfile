@@ -2054,6 +2054,7 @@ function removeAssignee(name) {
           const key = `assignee-${card.id}-${i}`;
           if (localStorage.getItem(key) === name) {
             localStorage.setItem(key, '미정');
+            saveItemToSupabase(card.id, i);
             /* DOM 드롭다운도 즉시 반영 */
             const sel = document.querySelector(`.assignee-select[data-card="${card.id}"][data-idx="${i}"]`);
             if (sel) { sel.value = '미정'; sel.closest('.item-main')?.querySelector('.checklist-item')?.classList.remove('has-assignee'); }
@@ -2372,7 +2373,7 @@ function buildItemHTML(cardId, i, label, status, assignee, deadline, canDelete) 
       <span class="check-label">${label}</span>
     </div>
     <div class="dl-badge-wrap">
-      <span class="deadline-display ${deadline ? _dlClass(deadline) : ''}">${deadline ? _dlText(deadline) : '📅 기한입력'}</span>
+      <span class="deadline-display ${deadline ? _dlClass(deadline) : ''}" title="더블클릭으로 수정">${deadline ? _dlText(deadline) : '📅 기한입력'}</span>
       <input type="date" class="deadline-input" data-card="${cardId}" data-idx="${i}" value="${deadline}" title="마감기한 설정"/>
     </div>
     <span class="dl-confirm"><button class="dl-ok-btn" type="button">✓</button><button class="dl-cancel-btn" type="button">✕</button></span>
@@ -3621,7 +3622,7 @@ function renderAssigneeTasksHTML(tasks, color) {
           <div class="assignee-task-label">${t.label}</div>
         </div>
         <div class="at-dl-wrap">
-          <span class="at-dl-text ${dl.cls}">${dl.text}</span>
+          <span class="at-dl-text ${dl.cls}" title="더블클릭으로 수정">${dl.text}</span>
           <input type="date" class="at-dl-input" value="${t.deadline||''}" />
           <div class="at-dl-actions">
             <button class="at-dl-ok" type="button">✓</button>
@@ -5024,7 +5025,7 @@ async function loadCalendar(bustCache) {
     console.log('[캘린더] 렌더 완료 — 전체 이벤트:', all.length, '/ 이번 달:', events.length);
   } catch(e) {
     console.error('[캘린더] 최종 오류:', e);
-    grid.innerHTML = '<div class="cal-error">일정을 불러오지 못했습니다.<br><small>' + e.message + '</small></div>';
+    grid.innerHTML = '<div class="cal-error">일정을 불러오지 못했습니다.<br><small>인터넷 연결을 확인하거나 잠시 후 새로고침해 주세요. (' + e.message + ')</small></div>';
   }
 }
 
@@ -5143,13 +5144,17 @@ document.getElementById('calRefreshBtn')?.addEventListener('click', async functi
 });
 
 /* 편집 버튼 */
+function _calResetSession() {
+  calAccessToken = null; calEditMode = false;
+  var btn = document.getElementById('calEditBtn');
+  if (btn) { btn.textContent = '✏️ 편집 모드'; btn.classList.remove('logged-in'); }
+  document.getElementById('calRefreshBtn').style.display = 'none';
+  document.getElementById('calGrid').classList.remove('edit-mode-active');
+}
+
 document.getElementById('calEditBtn')?.addEventListener('click', function() {
   if (calEditMode) {
-    calAccessToken = null; calEditMode = false;
-    this.textContent = '✏️ 편집 모드';
-    this.classList.remove('logged-in');
-    document.getElementById('calRefreshBtn').style.display = 'none';
-    document.getElementById('calGrid').classList.remove('edit-mode-active');
+    _calResetSession();
     if (calAllEvents !== null) renderCalendar(filterByMonth(calAllEvents, calYear, calMonth));
   } else {
     if (!tokenClient) { alert('잠시 후 다시 시도해주세요.'); return; }
@@ -5383,6 +5388,11 @@ document.getElementById('calFormSaveBtn')?.addEventListener('click', async funct
     var res = await fetch(url, { method: method,
       headers: { 'Authorization': 'Bearer ' + calAccessToken, 'Content-Type': 'application/json' },
       body: JSON.stringify(body) });
+    if (res.status === 401 || res.status === 403) {
+      _calResetSession(); closeCalForm();
+      alert('로그인 세션이 만료됐습니다.\n편집 모드 버튼을 다시 눌러 로그인해 주세요.');
+      return;
+    }
     if (!res.ok) throw new Error('HTTP ' + res.status);
     calAllEvents = null;
     closeCalForm();
@@ -5401,6 +5411,11 @@ document.getElementById('calFormDelete')?.addEventListener('click', async functi
   try {
     var res = await fetch(CAL_API_BASE + '/' + encodeURIComponent(calId) + '/events/' + calEditEventId, {
       method: 'DELETE', headers: { 'Authorization': 'Bearer ' + calAccessToken } });
+    if (res.status === 401 || res.status === 403) {
+      _calResetSession(); closeCalForm();
+      alert('로그인 세션이 만료됐습니다.\n편집 모드 버튼을 다시 눌러 로그인해 주세요.');
+      return;
+    }
     if (!res.ok && res.status !== 204) throw new Error('HTTP ' + res.status);
     calAllEvents = null;
     closeCalForm();
