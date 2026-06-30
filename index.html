@@ -4860,6 +4860,16 @@ function renderCalendar(events) {
   var grid = document.getElementById('calGrid');
   if (!grid) return;
 
+  /* ── 디버그: ID 불일치 확인 ── */
+  var completedKeys = Object.keys(_calCompleted);
+  var sampleEvIds  = events.slice(0, 5).map(function(e) { return normalizeCalId(e.id); });
+  console.log('[렌더] 이벤트 수:', events.length, '/ 완료키:', completedKeys, '/ 이벤트ID 샘플:', sampleEvIds);
+  completedKeys.forEach(function(k) {
+    var hit = events.some(function(e) { return normalizeCalId(e.id) === k; });
+    if (!hit) console.warn('[렌더] 완료키 "' + k + '" 가 이벤트 목록에 없음!');
+  });
+  /* ──────────────────────────── */
+
   var label = document.getElementById('calMonthLabel');
   if (label) label.textContent = calYear + '년 ' + (calMonth + 1) + '월';
 
