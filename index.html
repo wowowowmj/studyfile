@@ -1939,6 +1939,76 @@ let AOPTS = ['민주','찬희','대표님','미정'];
   });
 })();
 
+/* ── 담당자 설정 Supabase 동기화 ── */
+async function loadAssigneeSettings() {
+  try {
+    const { data } = await _sb.from('app_settings')
+      .select('key, value')
+      .in('key', ['extra-assignees', 'hidden-assignees']);
+
+    const extraRow  = data?.find(r => r.key === 'extra-assignees');
+    const hiddenRow = data?.find(r => r.key === 'hidden-assignees');
+    const sbExtra   = extraRow  ? extraRow.value  : null;
+    const sbHidden  = hiddenRow ? hiddenRow.value : null;
+
+    const localExtra  = JSON.parse(localStorage.getItem('extra-assignees')  || '[]');
+    const localHidden = JSON.parse(localStorage.getItem('hidden-assignees') || '[]');
+
+    if (sbExtra === null && sbHidden === null) {
+      /* Supabase 첫 사용 → localStorage 데이터가 있으면 마이그레이션 */
+      if (localExtra.length > 0 || localHidden.length > 0) {
+        await _sb.from('app_settings').upsert([
+          { key: 'extra-assignees',  value: localExtra  },
+          { key: 'hidden-assignees', value: localHidden }
+        ], { onConflict: 'key' });
+        console.log('[담당자 설정] localStorage → Supabase 마이그레이션 완료');
+      }
+      return;
+    }
+
+    /* Supabase 데이터로 AOPTS 재구성 */
+    const base = ['민주', '찬희', '대표님', '미정'];
+    AOPTS = [...base];
+    (sbHidden || []).forEach(n => {
+      const i = AOPTS.indexOf(n);
+      if (i !== -1) { AOPTS.splice(i, 1); delete ASSIGNEE_COLOR_MAP[n]; }
+    });
+    (sbExtra || []).forEach(n => {
+      if (!AOPTS.includes(n)) {
+        const mi = AOPTS.indexOf('미정');
+        if (mi !== -1) AOPTS.splice(mi, 0, n); else AOPTS.push(n);
+        if (!ASSIGNEE_COLOR_MAP[n])
+          ASSIGNEE_COLOR_MAP[n] = _EXTRA_COLORS[_nextColorIdx++ % _EXTRA_COLORS.length];
+      }
+    });
+
+    /* localStorage 캐시 업데이트 */
+    localStorage.setItem('extra-assignees',  JSON.stringify(sbExtra  || []));
+    localStorage.setItem('hidden-assignees', JSON.stringify(sbHidden || []));
+  } catch(e) {
+    console.warn('[담당자 설정 로드 실패]', e);
+  }
+}
+
+async function saveAssigneeSettings() {
+  const base   = ['민주', '찬희', '대표님', '미정'];
+  const extra  = AOPTS.filter(n => !base.includes(n));
+  const hidden = base.filter(n => !AOPTS.includes(n));
+
+  localStorage.setItem('extra-assignees',  JSON.stringify(extra));
+  localStorage.setItem('hidden-assignees', JSON.stringify(hidden));
+
+  try {
+    await _sb.from('app_settings').upsert([
+      { key: 'extra-assignees',  value: extra  },
+      { key: 'hidden-assignees', value: hidden }
+    ], { onConflict: 'key' });
+  } catch(e) {
+    console.warn('[담당자 설정 저장 실패]', e);
+  }
+}
+/* ──────────────────────────────── */
+
 /* 신규업무추가 — 직접입력 칸 토글 (전역, IIFE 외부) */
 function toggleAtCustom(sel) {
   var inp = document.getElementById('atTypeCustom');
@@ -1956,12 +2026,7 @@ function addAssignee(name) {
   if (mijeongIdx !== -1) AOPTS.splice(mijeongIdx, 0, name);
   else AOPTS.push(name);
   ASSIGNEE_COLOR_MAP[name] = color;
-  /* extra-assignees에 저장, hidden-assignees에서 제거 */
-  const extras = JSON.parse(localStorage.getItem('extra-assignees') || '[]');
-  if (!extras.includes(name)) { extras.push(name); localStorage.setItem('extra-assignees', JSON.stringify(extras)); }
-  const hidden = JSON.parse(localStorage.getItem('hidden-assignees') || '[]');
-  const newHidden = hidden.filter(n => n !== name);
-  localStorage.setItem('hidden-assignees', JSON.stringify(newHidden));
+  saveAssigneeSettings();
   /* 모든 선택 드롭다운에 옵션 추가 — '미정' 앞에 삽입 */
   document.querySelectorAll('.assignee-select, #modal-assignee-select, .pri-assignee-select, #atAssignee').forEach(sel => {
     if ([...sel.options].some(o => o.value === name)) return;
@@ -2000,15 +2065,7 @@ function removeAssignee(name) {
 
   AOPTS.splice(idx, 1);
   delete ASSIGNEE_COLOR_MAP[name];
-  /* 기본 담당자는 hidden-assignees, 추가 담당자는 extra-assignees에서 제거 */
-  const base = ['민주','찬희','대표님','미정'];
-  if (base.includes(name)) {
-    const hidden = JSON.parse(localStorage.getItem('hidden-assignees') || '[]');
-    if (!hidden.includes(name)) { hidden.push(name); localStorage.setItem('hidden-assignees', JSON.stringify(hidden)); }
-  } else {
-    const extras = JSON.parse(localStorage.getItem('extra-assignees') || '[]');
-    localStorage.setItem('extra-assignees', JSON.stringify(extras.filter(n => n !== name)));
-  }
+  saveAssigneeSettings();
   /* DOM에서 카드 제거 */
   document.querySelector(`.assignee-card[data-assignee="${name}"]`)?.remove();
   /* 모든 드롭다운에서 옵션 제거 */
@@ -3008,6 +3065,7 @@ function updateOverall() {
 
     // Supabase에서 최신 데이터 로드 (실패해도 계속 진행)
     await loadAllFromSupabase();
+    await loadAssigneeSettings();
   } catch (e) {
     console.warn('[init] 초기화 중 오류, localStorage로 진행:', e.message);
   } finally {
