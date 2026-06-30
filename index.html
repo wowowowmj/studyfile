@@ -25,7 +25,16 @@
       padding: 14px 40px 12px;
       box-shadow: 0 4px 16px rgba(30,58,138,.25);
     }
-    header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; margin-bottom: 2px; }
+    header h1 { font-size: 1.25rem; font-weight: 700; letter-spacing: -.5px; margin-bottom: 2px; display: flex; align-items: center; gap: 10px; }
+    .guide-btn {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: rgba(255,255,255,.18); color: #fff;
+      border: 1px solid rgba(255,255,255,.35); border-radius: 20px;
+      padding: 3px 11px; font-size: .72rem; font-weight: 600;
+      cursor: pointer; text-decoration: none; white-space: nowrap;
+      transition: background .15s;
+    }
+    .guide-btn:hover { background: rgba(255,255,255,.3); }
     header p.subtitle { font-size: .78rem; opacity: .75; margin-bottom: 10px; }
 
     .overall-bar-wrap { display: flex; align-items: center; gap: 14px; }
@@ -935,9 +944,17 @@
       .pri-list { max-height: none; }
       /* 페이지 타이틀 */
       #mob-page-title {
-        display: block; padding: 12px 16px 8px;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 12px 16px 8px;
         font-size: .9rem; font-weight: 700; color: #1e293b;
         border-bottom: 1px solid #EEF2FF; background: #fff;
+      }
+      #mob-guide-btn {
+        display: inline-flex; align-items: center; gap: 4px;
+        background: #EEF2FF; color: #5068B5;
+        border: 1px solid #c7d2fe; border-radius: 20px;
+        padding: 3px 10px; font-size: .68rem; font-weight: 600;
+        text-decoration: none; white-space: nowrap; flex-shrink: 0;
       }
 
       /* 담당자별 패널 모바일 */
@@ -1416,7 +1433,7 @@
 </div>
 
 <header id="header-top">
-  <h1>📚 교육실 개발파트 업무 현황</h1>
+  <h1>📚 교육실 개발파트 업무 현황 <a class="guide-btn" href="사용가이드.html" target="_blank">💡 이용가이드</a></h1>
   <div class="overall-bar-wrap">
     <label>전체 완료율</label>
     <div class="overall-bar-track">
@@ -1438,7 +1455,7 @@
     <a href="#main" class="nav-item" id="nav-grade">학년별</a>
   </div>
 </nav>
-<div id="mob-page-title"></div>
+<div id="mob-page-title"><span id="mob-page-title-text"></span><a id="mob-guide-btn" href="사용가이드.html" target="_blank">💡 이용가이드</a></div>
 
 <section id="schedule-section">
   <div class="schedule-wrapper">
@@ -3912,7 +3929,7 @@ function mobActivate(sectionId, activeEl) {
   document.getElementById(sectionId)?.classList.add('mob-visible');
   document.querySelectorAll('.nav-item, .nav-sub-item').forEach(el => el.classList.remove('mob-active'));
   activeEl?.classList.add('mob-active');
-  const titleEl = document.getElementById('mob-page-title');
+  const titleEl = document.getElementById('mob-page-title-text');
   if (titleEl) titleEl.textContent = activeEl?.textContent || '';
   window.scrollTo({ top: 0, behavior: 'instant' });
 }
@@ -4001,7 +4018,7 @@ function buildAssigneeSubMenu() {
       closeAllSectionCards();
       if (isMobView()) {
         mobActivate('assignee-section', el);
-        const titleEl = document.getElementById('mob-page-title');
+        const titleEl = document.getElementById('mob-page-title-text');
         if (titleEl) titleEl.textContent = '담당자별';
       } else {
         document.getElementById('assignee-section')?.scrollIntoView({ behavior: 'smooth' });

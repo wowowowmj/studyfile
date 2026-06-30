@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>교육실 개발파트 — 사용 가이드</title>
+<style>
+  :root {
+    --bg: #f5f6fa;
+    --white: #ffffff;
+    --border: #e2e5ef;
+    --text: #1e2235;
+    --muted: #8b90a8;
+    --accent: #6c63ff;
+    --accent-light: #ede9ff;
+    --green: #22c55e;
+    --green-light: #dcfce7;
+    --red: #ef4444;
+    --yellow: #f59e0b;
+    --yellow-light: #fef3c7;
+    --blue: #3b82f6;
+    --blue-light: #dbeafe;
+    --callout: #ff5c5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Apple SD Gothic Neo', -apple-system, sans-serif;
+    line-height: 1.6;
+    padding: 40px 20px 80px;
+  }
+  .container { max-width: 820px; margin: 0 auto; }
+
+  /* Header */
+  .guide-header {
+    text-align: center;
+    padding: 40px 0 32px;
+    margin-bottom: 48px;
+  }
+  .guide-header .tag {
+    display: inline-block;
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .1em;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 14px;
+  }
+  .guide-header h1 { font-size: 26px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .guide-header p { color: var(--muted); font-size: 14px; }
+  .guide-header a { color: var(--accent); text-decoration: none; }
+
+  /* Step section */
+  .step { margin-bottom: 56px; }
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 20px;
+  }
+  .step-num {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    color: #fff;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .step-header h2 { font-size: 18px; font-weight: 700; }
+  .step-header p { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+  /* Mock UI */
+  .mock {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,.06);
+    position: relative;
+  }
+  .mock-bar {
+    background: #f0f1f5;
+    border-bottom: 1px solid var(--border);
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mock-dot { width: 10px; height: 10px; border-radius: 50%; }
+  .mock-url {
+    flex: 1;
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+  .mock-body { display: flex; min-height: 220px; }
+
+  /* Sidebar mock */
+  .mock-sidebar {
+    width: 56px;
+    background: #1e2235;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 14px 0;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .mock-nav-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px;
+    color: #8b90a8;
+    cursor: pointer;
+  }
+  .mock-nav-icon.active { background: #6c63ff; color: #fff; }
+  .mock-nav-icon.highlight { background: rgba(108,99,255,.2); color: #a89fff; }
+
+  /* Content mock */
+  .mock-content { flex: 1; padding: 18px 20px; }
+
+  /* Card mock */
+  .mock-card {
+    background: #fafbff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+  }
+  .mock-card-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .mock-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f1f5;
+    font-size: 12.5px;
+  }
+  .mock-item:last-child { border-bottom: none; }
+  .mock-check {
+    width: 16px; height: 16px;
+    border: 2px solid var(--border);
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px;
+  }
+  .mock-check.checked { background: var(--green); border-color: var(--green); color: #fff; }
+  .mock-item-name { flex: 1; }
+  .mock-item-name.done { text-decoration: line-through; color: var(--muted); }
+  .mock-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .mock-badge.dl-soon { background: var(--yellow-light); color: #92400e; }
+  .mock-badge.dl-ok   { background: var(--green-light); color: #166534; }
+  .mock-badge.dl-none { background: #f0f1f5; color: var(--muted); }
+  .mock-badge.person  { background: var(--blue-light); color: #1e40af; }
+  .mock-badge.status-wip { background: #fef9c3; color: #713f12; }
+
+  /* Callout bubble */
+  .callout-wrap { position: relative; }
+  .callout {
+    position: absolute;
+    background: var(--callout);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 11px;
+    border-radius: 20px;
+    white-space: nowrap;
+    z-index: 10;
+    box-shadow: 0 2px 8px rgba(255,92,92,.35);
+  }
+  .callout::before {
+    content: '';
+    position: absolute;
+    border: 6px solid transparent;
+  }
+  .callout.bottom::before { border-top-color: var(--callout); top: 100%; left: 50%; transform: translateX(-50%); }
+  .callout.top::before    { border-bottom-color: var(--callout); bottom: 100%; left: 50%; transform: translateX(-50%); }
+  .callout.right::before  { border-left-color: var(--callout); left: 100%; top: 50%; transform: translateY(-50%); }
+  .callout.left::before   { border-right-color: var(--callout); right: 100%; top: 50%; transform: translateY(-50%); }
+
+  /* Highlight ring */
+  .ring {
+    outline: 3px solid var(--callout);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Desc box */
+  .desc-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-top: 14px;
+    font-size: 13.5px;
+    line-height: 1.9;
+  }
+  .desc-box b { color: var(--accent); }
+  .desc-box .tip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-light);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+    margin-top: 8px;
+  }
+
+  /* Step list */
+  .step-list { list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
+  .step-list li {
+    display: flex; gap: 12px; align-items: flex-start;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; padding: 12px 16px; font-size: 13.5px;
+  }
+  .step-list li .n {
+    width: 22px; height: 22px; background: var(--accent); color: #fff;
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; flex-shrink: 0; margin-top: 1px;
+  }
+
+  /* Calendar mock */
+  .cal-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 4px;
+    margin-top: 8px;
+  }
+  .cal-head {
+    text-align: center;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--muted);
+    padding: 4px 0;
+  }
+  .cal-cell {
+    min-height: 48px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 5px;
+    font-size: 10px;
+  }
+  .cal-cell .date { font-weight: 700; font-size: 11px; color: var(--text); }
+  .cal-event {
+    background: #ede9ff;
+    color: var(--accent);
+    border-radius: 3px;
+    padding: 1px 4px;
+    font-size: 9.5px;
+    margin-top: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .cal-event.done { text-decoration: line-through; opacity: .5; }
+  .cal-cell.today { border-color: var(--accent); background: var(--accent-light); }
+
+  /* Divider */
+  hr { border: none; border-top: 1px solid var(--border); margin: 48px 0; }
+
+  /* Appendix */
+  .appendix-label {
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    color: var(--muted); text-transform: uppercase; margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .appendix-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .info-box {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 18px;
+    font-size: 13.5px;
+    line-height: 1.9;
+    margin-bottom: 14px;
+  }
+  .info-box.warn { border-left-color: var(--yellow); }
+  code {
+    background: #f0f1f5;
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-family: monospace;
+  }
+
+  footer {
+    text-align: center; color: var(--muted); font-size: 12px;
+    margin-top: 60px; padding-top: 20px; border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="guide-header">
+    <div class="tag">📘 사용 가이드</div>
+    <h1>교육실 개발파트 업무 현황</h1>
+    <p>사이트 주소: <a href="https://wowowowmj.github.io/studyfile/" target="_blank">wowowowmj.github.io/studyfile</a></p>
+  </div>
+
+
+  <!-- STEP 1: 내 업무 확인 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <h2>내 업무 확인하기</h2>
+        <p>사이드바에서 내 이름 탭을 클릭하면 담당 업무만 모아볼 수 있어요</p>
+      </div>
+    </div>
+
+    <div class="mock">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <div class="mock-url">wowowowmj.github.io/studyfile</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-sidebar">
+          <div class="mock-nav-icon">📅</div>
+          <div class="mock-nav-icon">⚡</div>
+          <div class="mock-nav-icon">＋</div>
+          <div class="mock-nav-icon active" style="position:relative;">
+            👤
+            <div class="callout left" style="right:calc(100% + 12px);top:50%;transform:translateY(-50%);">② 담당자별 클릭</div>
+          </div>
+          <div class="mock-nav-icon">📁</div>
+          <div class="mock-nav-icon">🎓</div>
+        </div>
+        <div class="mock-content">
+          <!-- tab bar -->
+          <div style="display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;">
+            <div style="background:#f0f1f5;border-radius:20px;padding:4px 12px;font-size:12px;color:var(--muted);">전체</div>
+            <div style="background:var(--accent);border-radius:20px;padding:4px 12px;font-size:12px;color:#fff;position:relative;" class="ring">
+              민주
+              <div class="callout bottom" style="bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);">③ 내 이름 탭</div>
+            </div>
+            <div style="background:#f0f1f5;border-radius:20px;padding:4px 12px;font-size:12px;color:var(--muted);">찬희</div>
+            <div style="background:#f0f1f5;border-radius:20px;padding:4px 12px;font-size:12px;color:var(--muted);">대표님</div>
+            <div style="background:#f0f1f5;border-radius:20px;padding:4px 12px;font-size:12px;color:var(--muted);">미정</div>
+          </div>
+          <div class="mock-card">
+            <div class="mock-card-title">📚 3학년 2학기 — 수학 자료</div>
+            <div class="mock-item">
+              <div class="mock-check checked">✓</div>
+              <div class="mock-item-name done">개념 정리 PPT</div>
+              <div class="mock-badge dl-ok">✓ 완료</div>
+            </div>
+            <div class="mock-item">
+              <div class="mock-check"></div>
+              <div class="mock-item-name">문제 풀이 영상</div>
+              <div class="mock-badge dl-soon">📅 D-3</div>
+              <div class="mock-badge status-wip">진행중</div>
+            </div>
+            <div class="mock-item">
+              <div class="mock-check"></div>
+              <div class="mock-item-name">연습문제 PDF</div>
+              <div class="mock-badge dl-none">📅 기한입력</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="desc-box">
+      <b>① 사이드바</b>에서 👤 아이콘 클릭 → <b>② 탭</b>에서 내 이름 선택하면 내 업무만 표시돼요.<br>
+      다른 탭을 클릭하면 해당 담당자 업무도 확인할 수 있어요.
+    </div>
+  </div>
+
+
+  <!-- STEP 2: 완료 체크 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <h2>완료 체크하기</h2>
+        <p>항목 왼쪽 체크박스를 클릭하면 완료 처리돼요</p>
+      </div>
+    </div>
+
+    <div class="mock">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <div class="mock-url">wowowowmj.github.io/studyfile</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-sidebar">
+          <div class="mock-nav-icon">📅</div>
+          <div class="mock-nav-icon">⚡</div>
+          <div class="mock-nav-icon">＋</div>
+          <div class="mock-nav-icon active">👤</div>
+          <div class="mock-nav-icon">📁</div>
+          <div class="mock-nav-icon">🎓</div>
+        </div>
+        <div class="mock-content">
+          <div class="mock-card">
+            <div class="mock-card-title">📚 3학년 2학기 — 수학 자료</div>
+            <div class="mock-item" style="position:relative;">
+              <div class="mock-check ring" style="position:relative;">
+                <div class="callout top" style="top:calc(100% + 8px);left:50%;transform:translateX(-50%);">클릭!</div>
+              </div>
+              <div class="mock-item-name">문제 풀이 영상</div>
+              <div class="mock-badge dl-soon">📅 D-3</div>
+            </div>
+            <div class="mock-item" style="opacity:.4;">
+              <div class="mock-check"></div>
+              <div class="mock-item-name">연습문제 PDF</div>
+              <div class="mock-badge dl-none">📅 기한입력</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);text-align:center;margin-top:4px;">↓ 클릭 후</div>
+          <div class="mock-card" style="margin-top:6px;">
+            <div class="mock-card-title">📚 3학년 2학기 — 수학 자료</div>
+            <div class="mock-item">
+              <div class="mock-check checked">✓</div>
+              <div class="mock-item-name done">문제 풀이 영상</div>
+              <div class="mock-badge dl-ok">✓ 완료</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="desc-box">
+      체크 상태는 <b>자동 저장</b>되고 모든 기기에서 공유돼요.<br>
+      새로고침해도 유지됩니다.
+    </div>
+  </div>
+
+
+  <!-- STEP 3: 마감기한 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <h2>마감기한 수정하기</h2>
+        <p>마감기한 뱃지를 더블클릭하면 날짜를 바꿀 수 있어요</p>
+      </div>
+    </div>
+
+    <div class="mock">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <div class="mock-url">wowowowmj.github.io/studyfile</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-sidebar">
+          <div class="mock-nav-icon active">👤</div>
+        </div>
+        <div class="mock-content" style="display:flex;flex-direction:column;justify-content:center;">
+          <div class="mock-card">
+            <div class="mock-item" style="position:relative;">
+              <div class="mock-check"></div>
+              <div class="mock-item-name">연습문제 PDF</div>
+              <div class="mock-badge dl-soon ring" style="position:relative;cursor:pointer;">
+                📅 D-3
+                <div class="callout top" style="top:calc(100% + 8px);left:50%;transform:translateX(-50%);">더블클릭</div>
+              </div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--muted);text-align:center;margin:8px 0;">↓ 더블클릭 후</div>
+          <div class="mock-card">
+            <div class="mock-item" style="align-items:center;flex-wrap:wrap;gap:6px;">
+              <div class="mock-check"></div>
+              <div class="mock-item-name">연습문제 PDF</div>
+              <div style="display:flex;align-items:center;gap:4px;">
+                <input type="date" value="2026-07-03" style="font-size:11px;padding:3px 6px;border:1px solid var(--accent);border-radius:6px;outline:none;" readonly>
+                <button style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">확인</button>
+                <button style="background:#f0f1f5;color:var(--muted);border:none;border-radius:6px;padding:3px 8px;font-size:11px;cursor:pointer;">취소</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="desc-box">
+      마감기한 뱃지를 <b>더블클릭</b> → 날짜 선택 → <b>확인</b> 클릭<br>
+      <span class="tip">💡 색상 의미: 🔴 마감 지남 &nbsp;·&nbsp; 🟡 3일 이내 &nbsp;·&nbsp; 🟢 여유 있음</span>
+    </div>
+  </div>
+
+
+  <!-- STEP 4: 우선순위 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <h2>오늘 뭐 해야 하는지 보기</h2>
+        <p>우선순위 섹션에서 마감 임박 업무를 한눈에 확인해요</p>
+      </div>
+    </div>
+
+    <div class="mock">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <div class="mock-url">wowowowmj.github.io/studyfile</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-sidebar">
+          <div class="mock-nav-icon">📅</div>
+          <div class="mock-nav-icon active" style="position:relative;">
+            ⚡
+            <div class="callout right" style="left:calc(100% + 12px);top:50%;transform:translateY(-50%);">① 클릭</div>
+          </div>
+        </div>
+        <div class="mock-content">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px;">⚡ 우선순위 체크리스트</div>
+          <div style="display:flex;flex-direction:column;gap:6px;">
+            <div style="background:#fff1f2;border:1px solid #fecdd3;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+              <span>📌 문제 풀이 영상 <span style="color:var(--muted);font-size:11px;">수학 자료</span></span>
+              <span style="color:#dc2626;font-weight:700;font-size:11px;">D-1 · 민주</span>
+            </div>
+            <div style="background:#fef9c3;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+              <span>📌 연습문제 PDF <span style="color:var(--muted);font-size:11px;">수학 자료</span></span>
+              <span style="color:#a16207;font-weight:700;font-size:11px;">D-3 · 찬희</span>
+            </div>
+            <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:8px 12px;font-size:12px;display:flex;justify-content:space-between;align-items:center;">
+              <span>📌 개념 정리 PPT <span style="color:var(--muted);font-size:11px;">영어 자료</span></span>
+              <span style="color:#16a34a;font-weight:700;font-size:11px;">D-10 · 민주</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="desc-box">
+      <b>⚡ 아이콘</b> 클릭 → 마감일 임박 순으로 정렬된 업무 목록 확인<br>
+      빨간색일수록 급한 업무예요.
+    </div>
+  </div>
+
+
+  <!-- STEP 5: 신규 업무 추가 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <h2>새 업무 추가하기</h2>
+        <p>＋ 버튼으로 업무를 직접 등록할 수 있어요</p>
+      </div>
+    </div>
+
+    <ul class="step-list">
+      <li><div class="n">1</div> 사이드바 <b>＋ 아이콘</b> 클릭</li>
+      <li><div class="n">2</div> 자료명, 항목명 입력</li>
+      <li><div class="n">3</div> 담당자 선택</li>
+      <li><div class="n">4</div> 마감기한 설정 후 <b>저장</b></li>
+    </ul>
+
+    <div class="desc-box" style="margin-top:14px;">
+      추가한 업무는 담당자별·유형별 화면에 바로 반영돼요.
+    </div>
+  </div>
+
+
+  <!-- STEP 6: 캘린더 -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <h2>일정 확인하기</h2>
+        <p>캘린더에서 3·4학년 일정을 확인하고 완료 체크할 수 있어요</p>
+      </div>
+    </div>
+
+    <div class="mock">
+      <div class="mock-bar">
+        <div class="mock-dot" style="background:#ff5f57"></div>
+        <div class="mock-dot" style="background:#febc2e"></div>
+        <div class="mock-dot" style="background:#28c840"></div>
+        <div class="mock-url">wowowowmj.github.io/studyfile</div>
+      </div>
+      <div class="mock-body">
+        <div class="mock-sidebar">
+          <div class="mock-nav-icon active" style="position:relative;">
+            📅
+            <div class="callout right" style="left:calc(100% + 12px);top:50%;transform:translateY(-50%);">① 클릭</div>
+          </div>
+        </div>
+        <div class="mock-content">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <span style="font-size:13px;font-weight:700;">2026년 6월</span>
+            <div style="display:flex;gap:6px;">
+              <div style="background:#ede9ff;color:var(--accent);padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;">3학년</div>
+              <div style="background:#f0f1f5;color:var(--muted);padding:3px 10px;border-radius:20px;font-size:11px;">4학년</div>
+            </div>
+          </div>
+          <div class="cal-grid">
+            <div class="cal-head">월</div><div class="cal-head">화</div><div class="cal-head">수</div><div class="cal-head">목</div><div class="cal-head">금</div>
+            <div class="cal-cell"><div class="date">23</div></div>
+            <div class="cal-cell"><div class="date">24</div><div class="cal-event">수학 시험</div></div>
+            <div class="cal-cell"><div class="date">25</div></div>
+            <div class="cal-cell"><div class="date">26</div><div class="cal-event done">영어 수행</div></div>
+            <div class="cal-cell"><div class="date">27</div></div>
+            <div class="cal-cell today"><div class="date">30</div><div class="cal-event">과학 발표</div></div>
+            <div class="cal-cell"><div class="date">1</div></div>
+            <div class="cal-cell"><div class="date">2</div></div>
+            <div class="cal-cell"><div class="date">3</div></div>
+            <div class="cal-cell"><div class="date">4</div></div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;">💡 날짜 칸 클릭 → 해당 날짜 일정 목록 팝업</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="desc-box">
+      <b>📅 아이콘</b> 클릭 → 달력 확인<br>
+      날짜 칸을 클릭하면 그 날의 일정 목록이 팝업으로 떠요.<br>
+      팝업에서 일정 옆 체크박스로 <b>완료 표시</b> 가능 (전체 공유됨)<br>
+      <span class="tip">취소선 표시 = 완료된 일정</span>
+    </div>
+  </div>
+
+
+  <hr>
+
+
+  <!-- 부록 -->
+  <div class="step">
+    <div class="appendix-label">부록 — 관리자용 추가 기능</div>
+
+    <div style="margin-bottom:24px;">
+      <h3 style="font-size:15px;margin-bottom:12px;">Google Sheets에서 데이터 수정하기</h3>
+      <div class="info-box">
+        <b>구조:</b> 웹페이지 ↔ Supabase (실시간) ↔ Google Sheets (수동 새로고침)
+      </div>
+      <ul class="step-list">
+        <li><div class="n">1</div> 스프레드시트 열기 → 상단 메뉴 <b>데이터 관리 → 최신 데이터 불러오기</b> 클릭</li>
+        <li><div class="n">2</div> <b>상태편집</b> 탭에서 흰색 열만 수정 (저장 버튼 없음, 자동 저장)</li>
+        <li><div class="n">3</div> 웹페이지에서 확인하려면 브라우저 새로고침</li>
+      </ul>
+      <div class="info-box warn" style="margin-top:12px;">
+        ⚠️ <b>회색 열(학년·자료명·항목 등)은 수정하지 마세요.</b> 새로고침 시 덮어써집니다.
+      </div>
+    </div>
+
+    <div>
+      <h3 style="font-size:15px;margin-bottom:12px;">Apps Script 트리거 확인 (자동저장이 안 될 때)</h3>
+      <ul class="step-list">
+        <li><div class="n">1</div> 스프레드시트 → <b>확장 프로그램 → Apps Script</b></li>
+        <li><div class="n">2</div> 왼쪽 <b>시계 아이콘</b> 클릭</li>
+        <li><div class="n">3</div> <code>onEdit</code> 트리거가 있는지 확인. 없으면 <b>+ 트리거 추가</b> → 함수: <code>onEdit</code> / 이벤트: 수정 시 → 저장</li>
+      </ul>
+    </div>
+  </div>
+
+  <footer>
+    교육실 개발파트 업무 현황 사용 가이드 · 2026-06-30
+  </footer>
+
+</div>
+</body>
+</html>
