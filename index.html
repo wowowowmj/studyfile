@@ -5314,11 +5314,18 @@ document.getElementById('calFormSaveBtn')?.addEventListener('click', async funct
 
   var url    = CAL_API_BASE + '/' + encodeURIComponent(calId) + '/events' + (calEditEventId ? '/' + calEditEventId : '');
   var method = calEditEventId ? 'PUT' : 'POST';
+  console.log('[캘린더 저장]', method, url);
+  console.log('[캘린더 저장] grade:', grade, '/ calId:', calId, '/ eventId:', calEditEventId);
   try {
     var res = await fetch(url, { method: method,
       headers: { 'Authorization': 'Bearer ' + calAccessToken, 'Content-Type': 'application/json' },
       body: JSON.stringify(body) });
-    if (!res.ok) throw new Error('HTTP ' + res.status);
+    if (!res.ok) {
+      var errBody = '';
+      try { errBody = await res.text(); } catch(_) {}
+      console.error('[캘린더 저장 실패]', res.status, errBody);
+      throw new Error('HTTP ' + res.status);
+    }
     calAllEvents = null;
     closeCalForm();
     await loadCalendar();
